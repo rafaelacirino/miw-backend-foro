@@ -32,10 +32,10 @@ h2 {
   box-shadow: 0 0 5px rgba(13, 110, 253, 0.25); /* Sombra al enfocar */
 }
 
-/* Botón de inicio de sesión */
+/* Botón de registro */
 .btn-primary {
-  background-color: #0d6efd; /* Azul principal */
-  border-color: #0d6efd; /* Borde azul */
+  background-color: #28a745; /* Verde principal */
+  border-color: #28a745; /* Borde verde */
   font-size: 18px; /* Tamaño de fuente */
   font-weight: bold; /* Negrita */
   letter-spacing: 1px; /* Espaciado entre letras */
@@ -43,11 +43,11 @@ h2 {
 }
 
 .btn-primary:hover {
-  background-color: #0b5ed7; /* Azul más oscuro al pasar el mouse */
-  border-color: #0a58ca;
+  background-color: #218838; /* Verde más oscuro al pasar el mouse */
+  border-color: #1e7e34;
 }
 
-/* Enlace para restablecer contraseña */
+/* Enlace para inicio de sesión */
 .text-muted {
   font-size: 14px; /* Tamaño de fuente */
   transition: color 0.3s ease; /* Transición suave */

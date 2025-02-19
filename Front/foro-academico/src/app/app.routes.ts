@@ -1,11 +1,13 @@
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login.component';
-import { foroComponent } from './pages/foro/foro.component';
 import { NgModule } from '@angular/core';
+import { foroComponent } from './pages/foro/foro.component';
+import { LoginComponent } from './pages/login/login.component';
+import { RegistroComponent } from './pages/registro/registro.component';
 
 export const routes: Routes = [
-    { path: '', component: LoginComponent },
-    { path: 'foro', component: foroComponent }
+    { path: '', component: foroComponent },
+    { path: 'login', component: LoginComponent },
+    { path: 'registro', component: RegistroComponent },
 ]
 
 @NgModule({

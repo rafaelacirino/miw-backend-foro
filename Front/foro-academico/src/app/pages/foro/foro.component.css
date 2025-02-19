@@ -1,12 +1,22 @@
+body {
+  background-color: #f4f4f4;
+}
 .card {
-    border-radius: 10px;
-  }
-  
-  .list-group-item {
-    transition: 0.3s ease-in-out;
-  }
-  
-  .list-group-item:hover {
-    background-color: #f8f9fa;
-  }
-  
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.list-group-item {
+  border: none;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.list-group-item:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
