@@ -1,62 +1,52 @@
-/* Fondo del contenedor */
 .container {
-  background-color: #f8f9fa; /* Color de fondo suave */
+  background-color: #f8f9fa;
 }
 
-/* Estilo del card */
 .card {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-  border: none; /* Quita el borde por defecto */
-  background-color: #ffffff; /* Fondo blanco */
-  border-radius: 12px; /* Bordes redondeados */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: none;
+  background-color: #ffffff;
+  border-radius: 12px;
 }
 
-/* Título del formulario */
 h2 {
   font-size: 24px;
   font-weight: bold;
-  color: #333333; /* Texto oscuro */
+  color: #333333;
 }
 
-/* Campos de entrada */
 .form-control {
-  border: 1px solid #ced4da; /* Borde suave */
-  border-radius: 8px; /* Bordes redondeados */
-  padding: 0.75rem; /* Espaciado interno */
-  font-size: 16px; /* Tamaño de fuente */
-  transition: border-color 0.3s ease; /* Transición suave */
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
 }
 
 .form-control:focus {
-  border-color: #0d6efd; /* Color azul al enfocar */
-  box-shadow: 0 0 5px rgba(13, 110, 253, 0.25); /* Sombra al enfocar */
+  border-color: #0d6efd;
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.25);
 }
 
-/* Botón de registro */
 .btn-primary {
-  background-color: #0d6efd; /* Azul principal */
-  border-color: #0d6efd; /* Borde azul */
-  font-size: 18px; /* Tamaño de fuente */
-  font-weight: bold; /* Negrita */
-  letter-spacing: 1px; /* Espaciado entre letras */
-  transition: all 0.3s ease; /* Transición suave */
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #0d6efd; /* Azul principal */
-  border-color: #0d6efd; /* Borde azul */
+  background-color: #0d6efd;
+  border-color: #0d6efd;
 }
 
-/* Enlace para inicio de sesión */
 .text-muted {
-  font-size: 14px; /* Tamaño de fuente */
-  transition: color 0.3s ease; /* Transición suave */
+  font-size: 14px;
+  transition: color 0.3s ease;
 }
 
 .text-muted:hover {
-  color: #0d6efd; /* Azul al pasar el mouse */
-}
-
-.navbar {
-  background-color: rgb(133, 162, 208);
+  color: #0d6efd;
 }

@@ -56,7 +56,3 @@ h2 {
 .text-muted:hover {
   color: #0d6efd; /* Azul al pasar el mouse */
 }
-
-.navbar {
-  background-color: rgb(133, 162, 208);
-}
