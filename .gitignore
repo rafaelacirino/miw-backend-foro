@@ -6,6 +6,7 @@ dist/
 # IDEs e sistema
 .vscode/
 .DS_Store
+.idea/
 
 # Logs
 logs/
