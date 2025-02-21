@@ -21,7 +21,7 @@ jobs:
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
       - name: Sonar
-        if: success() # always() failure() success()
+        if: success()
         working-directory: Back/foro
         run: >
           mvn -B verify -DskipTests sonar:sonar
