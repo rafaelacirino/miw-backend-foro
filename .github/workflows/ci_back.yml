@@ -1,10 +1,10 @@
-name: CI
+name: Backend CI
 on:
   push:
     branches:
       - develop
 jobs:
-  ci:
+  backend-ci:
     name: Test - Unit & Integration & SonarCloud Scan & Slack WebHook
     runs-on: ubuntu-22.04
     steps:
@@ -17,10 +17,12 @@ jobs:
           java-version: 21
       - name: Unit & Integration Tests
         run: mvn -B verify # -B: --batch-mode
+        working-directory: Back/foro
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
       - name: Sonar
         if: success() # always() failure() success()
+        working-directory: Back/foro
         run: >
           mvn -B verify -DskipTests sonar:sonar
           -Dsonar.projectKey=rafaelacirino_foro-academico
