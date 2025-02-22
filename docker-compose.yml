@@ -10,7 +10,7 @@ services:                               # Define los servicios: son contenedores
     environment:                        # Variables de entorno para configurar PostgreSQL
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: foro
+      POSTGRES_DB: forodb
     ports:                              # Mapea el puerto 5432 del contenedor al puerto 5432 de la máquina host
       - "5432:5432"
     # Monta un volumen (pgdata) en la ruta indicada del contenedor, pero estan conectados con la ruta real del anfitrion
@@ -22,14 +22,14 @@ services:                               # Define los servicios: son contenedores
       - "es.upm.miw.foro=database"
   app:
     build: .                            # Construye el contenedor a partir del Dockerfile en el directorio actual
-    container_name: foro
+    container_name: foro-api
     restart: always
     depends_on:                         # Este servicio depende del servicio database y debe arrancar después
       - database
     ports:
       - "8081:8081"
     environment:                        # Variables de entorno de Spring para configurar la conexión a la base de datos:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/foro
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/forodb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       # none: no hace nada con el esquema
@@ -39,7 +39,7 @@ services:                               # Define los servicios: son contenedores
       # create-drop: parecido al anterior, pero lo elimina al detener
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     labels:
-      - "es.upm.miw.foro"
+      - "es.upm.miw.foro=app"
 volumes:
   pgdata:
     name: "postgres-data"                # Nombre amigable para el volumen
