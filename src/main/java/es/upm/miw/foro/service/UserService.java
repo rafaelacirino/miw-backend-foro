@@ -5,4 +5,6 @@ import es.upm.miw.foro.api.dto.UserDto;
 public interface UserService {
 
     UserDto create(UserDto userDto);
+
+    UserDto getById(String id);
 }

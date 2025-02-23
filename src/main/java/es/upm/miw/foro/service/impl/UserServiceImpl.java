@@ -9,4 +9,9 @@ public class UserServiceImpl implements UserService {
     public UserDto create(UserDto userDto) {
         return null;
     }
+
+    @Override
+    public UserDto getById(String id) {
+        return null;
+    }
 }
