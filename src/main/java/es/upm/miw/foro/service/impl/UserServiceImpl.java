@@ -59,7 +59,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto registerUser(UserDto userDto) {
         try {
-            userDto.setRole(Role.CUSTOMER);
+            if (userDto.getRole() == null) {
+                userDto.setRole(Role.CUSTOMER);
+            }
             User user = UserMapper.toUser(userDto);
             User savedUser = userRepository.save(user);
             return UserMapper.toUserDto(savedUser);
