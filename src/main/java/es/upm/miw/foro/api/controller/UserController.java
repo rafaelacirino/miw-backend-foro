@@ -1,5 +1,7 @@
 package es.upm.miw.foro.api.controller;
 
+import es.upm.miw.foro.api.dto.LoginRequestDto;
+import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,14 +25,26 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.createUser(userDto),HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+        String token = userService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+        return ResponseEntity.ok(new TokenDto(token));
     }
 
     @GetMapping("/getAllUsers")

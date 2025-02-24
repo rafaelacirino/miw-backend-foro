@@ -4,6 +4,7 @@ import es.upm.miw.foro.api.converter.UserMapper;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
+import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.persistance.model.User;
 import es.upm.miw.foro.persistance.repository.UserRepository;
 import es.upm.miw.foro.service.UserService;
@@ -11,6 +12,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,18 +23,45 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
+        // get the user authenticated
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new ServiceException("Authenticated user not found"));
+        if (!Role.ADMIN.equals(currentUser.getRole())) {
+            throw new ServiceException("Unauthorized: Only admins can create users");
+        }
         try {
             User user = UserMapper.toUser(userDto);
             User savedUser = this.userRepository.save(user);
+            return UserMapper.toUserDto(savedUser);
+        } catch (DataAccessException exception) {
+            throw new RepositoryException("Error saving User", exception);
+        } catch (Exception e) {
+            throw new ServiceException("Unexpected error while creating User", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public UserDto registerUser(UserDto userDto) {
+        try {
+            userDto.setRole(Role.CUSTOMER);
+            User user = UserMapper.toUser(userDto);
+            User savedUser = userRepository.save(user);
             return UserMapper.toUserDto(savedUser);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error saving User", exception);
@@ -48,6 +79,14 @@ public class UserServiceImpl implements UserService {
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error getting User with id " + id, exception);
         }
+    }
+
+    @Override
+    public String login(String email, String password) {
+        return userRepository.findByEmail(email)
+                .filter(user -> passwordEncoder.matches(password, user.getPassword()))
+                .map(user -> jwtService.createToken(user.getEmail(), user.getFirstName(), user.getRole().name()))
+                .orElseThrow(() -> new ServiceException("Invalid email " + email + "or password " + password));
     }
 
     @Override
@@ -109,6 +148,18 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(id);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting User with id " + id, exception);
+        }
+    }
+
+    private List<Role> authorizedRoles(Role role) {
+        if (Role.ADMIN.equals(role)) {
+            return List.of(Role.ADMIN, Role.MANAGER, Role.OPERATOR, Role.CUSTOMER);
+        } else if (Role.MANAGER.equals(role)) {
+            return List.of(Role.MANAGER, Role.OPERATOR, Role.CUSTOMER);
+        } else if (Role.OPERATOR.equals(role)) {
+            return List.of(Role.CUSTOMER);
+        } else {
+            return List.of();
         }
     }
 }

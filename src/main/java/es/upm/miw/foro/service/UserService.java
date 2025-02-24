@@ -8,7 +8,11 @@ public interface UserService {
 
     UserDto createUser(UserDto userDto);
 
+    UserDto registerUser(UserDto userDto);
+
     UserDto getUserById(Long id);
+
+    String login(String email, String password);
 
     Page<UserDto> getAllUsers(String firstName, String lastName, String email, Pageable pageable);
 
