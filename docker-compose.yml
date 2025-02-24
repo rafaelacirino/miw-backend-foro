@@ -35,8 +35,8 @@ services:                               # Define los servicios: son contenedores
       # none: no hace nada con el esquema
       # validate: valida si realizar cambios
       # update: añade las nuevas columnas y tablas, pero no quita lo obsoleto
-      # create: elimina el esquema existente antes de crearlo nuevamente
-      # create-drop: parecido al anterior, pero lo elimina al detener
+      # createUser: elimina el esquema existente antes de crearlo nuevamente
+      # createUser-drop: parecido al anterior, pero lo elimina al detener
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     labels:
       - "es.upm.miw.foro=app"

@@ -38,11 +38,11 @@ public class SecurityConfiguration {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return name -> {
-            User user = userRepository.findByFirstName(name)
+        return email -> {
+            User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             return org.springframework.security.core.userdetails.User.builder()
-                    .username(user.getFirstName())
+                    .username(user.getEmail())
                     .password(user.getPassword())
                     .roles(user.getRole().name())
                     .build();
