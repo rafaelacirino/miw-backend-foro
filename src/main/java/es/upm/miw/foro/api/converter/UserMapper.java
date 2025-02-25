@@ -21,7 +21,7 @@ public class UserMapper {
         return userDto;
     }
 
-    public static User toUser(UserDto userDto) {
+    public static User toEntity(UserDto userDto) {
         if (userDto == null) {
             return null;
         }
@@ -40,7 +40,7 @@ public class UserMapper {
     // with 'Stream. toList()' and ensure that the list is unmodified.
     public static List<User> toEntityList(List<UserDto> userDtoList) {
         return userDtoList.stream()
-                .map(UserMapper::toUser)
+                .map(UserMapper::toEntity)
                 .collect(Collectors.toList());
     }
 
@@ -53,7 +53,7 @@ public class UserMapper {
         userDto.setPhone(user.getPhone());
         userDto.setAddress(user.getAddress());
         userDto.setRole(user.getRole());
-        userDto.setRegistredDate(user.getRegistredDate());
+        userDto.setRegisteredDate(user.getRegistredDate());
     }
 
     private static void populateEntity(User entity, UserDto userDto) {
@@ -65,7 +65,7 @@ public class UserMapper {
         entity.setPhone(userDto.getPhone());
         entity.setAddress(userDto.getAddress());
         entity.setRole(userDto.getRole());
-        entity.setRegistredDate(userDto.getRegistredDate());
+        entity.setRegistredDate(userDto.getRegisteredDate());
     }
 
 }

@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
             throw new ServiceException("Unauthorized: Only admins can create users");
         }
         try {
-            User user = UserMapper.toUser(userDto);
+            User user = UserMapper.toEntity(userDto);
             User savedUser = this.userRepository.save(user);
             return UserMapper.toUserDto(savedUser);
         } catch (DataAccessException exception) {
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
             if (userDto.getRole() == null) {
                 userDto.setRole(Role.CUSTOMER);
             }
-            User user = UserMapper.toUser(userDto);
+            User user = UserMapper.toEntity(userDto);
             User savedUser = userRepository.save(user);
             return UserMapper.toUserDto(savedUser);
         } catch (DataAccessException exception) {
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setPhone(userDto.getPhone());
             existingUser.setAddress(userDto.getAddress());
             existingUser.setRole(userDto.getRole());
-            existingUser.setRegistredDate(userDto.getRegistredDate());
+            existingUser.setRegistredDate(userDto.getRegisteredDate());
 
             User updatedUser = this.userRepository.save(existingUser);
             return UserMapper.toUserDto(updatedUser);

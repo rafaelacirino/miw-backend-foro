@@ -37,5 +37,5 @@ public class UserDto {
 
     private Role role;
 
-    private LocalDateTime registredDate;
+    private LocalDateTime registeredDate;
 }
