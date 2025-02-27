@@ -46,6 +46,7 @@ public class UserServiceImpl implements UserService {
         }
         try {
             User user = UserMapper.toEntity(userDto);
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             User savedUser = this.userRepository.save(user);
             return UserMapper.toUserDto(savedUser);
         } catch (DataAccessException exception) {
@@ -63,6 +64,7 @@ public class UserServiceImpl implements UserService {
                 userDto.setRole(Role.CUSTOMER);
             }
             User user = UserMapper.toEntity(userDto);
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             User savedUser = userRepository.save(user);
             return UserMapper.toUserDto(savedUser);
         } catch (DataAccessException exception) {
@@ -85,10 +87,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(String email, String password) {
-        return userRepository.findByEmail(email)
-                .filter(user -> passwordEncoder.matches(password, user.getPassword()))
-                .map(user -> jwtService.createToken(user.getEmail(), user.getFirstName(), user.getRole().name()))
-                .orElseThrow(() -> new ServiceException("Invalid email " + email + "or password " + password));
+        User user = userRepository.findByEmail(email.trim())
+                .orElseThrow(() -> new ServiceException("User with email " + email + " not found"));
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            if (user.getPassword().equals(password)) {
+                String encodedPassword = passwordEncoder.encode(password);
+                user.setPassword(encodedPassword);
+                userRepository.save(user);
+            } else {
+                throw new ServiceException("Wrong password");
+            }
+        }
+        return jwtService.createToken(user.getEmail(), user.getFirstName(), user.getRole().name());
     }
 
     @Override
@@ -150,18 +160,6 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(id);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting User with id " + id, exception);
-        }
-    }
-
-    private List<Role> authorizedRoles(Role role) {
-        if (Role.ADMIN.equals(role)) {
-            return List.of(Role.ADMIN, Role.MANAGER, Role.OPERATOR, Role.CUSTOMER);
-        } else if (Role.MANAGER.equals(role)) {
-            return List.of(Role.MANAGER, Role.OPERATOR, Role.CUSTOMER);
-        } else if (Role.OPERATOR.equals(role)) {
-            return List.of(Role.CUSTOMER);
-        } else {
-            return List.of();
         }
     }
 }

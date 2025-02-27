@@ -1,8 +1,9 @@
 package es.upm.miw.foro.api.controller;
 
-import es.upm.miw.foro.api.dto.LoginRequestDto;
+import es.upm.miw.foro.api.dto.LoginDto;
 import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
+import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
@@ -50,9 +51,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody LoginRequestDto loginRequestDto) {
-        String token = userService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
-        return ResponseEntity.ok(new TokenDto(token));
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        try {
+            String token = userService.login(loginDto.getEmail(), loginDto.getPassword());
+            return ResponseEntity.ok(new TokenDto(token));
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
 
     @GetMapping("/getAllUsers")
@@ -80,7 +85,14 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.noContent().build(); // 204 No Content
+        } catch (ServiceException e) {
+            if (e.getMessage().equals("User with id " + id + " not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

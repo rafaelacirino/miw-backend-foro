@@ -5,7 +5,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.SpringApplication;
 
-class ApplicationMainTests {
+class ApplicationMainTest {
 
 	@Test
 	void applicationContextLoads() {

@@ -3,6 +3,7 @@ package es.upm.miw.foro.service.impl;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class JwtService {
     private static final String BEARER = "Bearer ";
@@ -23,7 +25,8 @@ public class JwtService {
     private final int expire;
 
     @Autowired
-    public JwtService(@Value("${miw.jwt.secret}") String secret, @Value("${miw.jwt.issuer}") String issuer,
+    public JwtService(@Value("${miw.jwt.secret}") String secret,
+                      @Value("${miw.jwt.issuer}") String issuer,
                       @Value("${miw.jwt.expire}") int expire) {
         this.secret = secret;
         this.issuer = issuer;
@@ -58,15 +61,22 @@ public class JwtService {
     }
 
     public String name(String authorization) {
-        return this.verify(authorization)
-                .map(jwt -> jwt.getClaim(NAME_CLAIM).asString())
-                .orElse("");
+        return extractClaim(authorization);
     }
 
     public String role(String authorization) {
         return this.verify(authorization)
                 .map(jwt -> jwt.getClaim(ROLE_CLAIM).asString())
                 .orElse("");
+    }
+
+    private String extractClaim(String token) {
+        return verify(token)
+                .map(jwt -> jwt.getClaim(JwtService.NAME_CLAIM).asString())
+                .orElseGet(() -> {
+                    log.info("Fail extract claim: {}", JwtService.NAME_CLAIM);
+                    return "";
+                });
     }
 
     private Optional<DecodedJWT> verify(String token) {
