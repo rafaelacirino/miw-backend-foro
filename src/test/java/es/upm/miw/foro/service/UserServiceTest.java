@@ -1,5 +1,6 @@
 package es.upm.miw.foro.service;
 
+import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.converter.UserMapper;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.RepositoryException;
@@ -10,19 +11,17 @@ import es.upm.miw.foro.persistance.repository.UserRepository;
 import es.upm.miw.foro.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
+@TestConfig
 class UserServiceTest {
 
     @Mock
