@@ -45,7 +45,7 @@ class UserMapperTest {
         assertEquals(user.getPhone(), userDto.getPhone());
         assertEquals(user.getAddress(), userDto.getAddress());
         assertEquals(user.getRole(), userDto.getRole());
-        assertEquals(user.getRegistredDate(), userDto.getRegisteredDate());
+        assertEquals(user.getRegisteredDate(), userDto.getRegisteredDate());
     }
 
     @Test
@@ -66,7 +66,7 @@ class UserMapperTest {
         assertEquals(userDto.getPhone(), user.getPhone());
         assertEquals(userDto.getAddress(), user.getAddress());
         assertEquals(userDto.getRole(), user.getRole());
-        assertEquals(userDto.getRegisteredDate(), user.getRegistredDate());
+        assertEquals(userDto.getRegisteredDate(), user.getRegisteredDate());
     }
 
     @Test
@@ -123,7 +123,7 @@ class UserMapperTest {
         user.setPhone(PHONE);
         user.setAddress(ADDRESS);
         user.setRole(Role.ADMIN);
-        user.setRegistredDate(REGISTRED_DATE);
+        user.setRegisteredDate(REGISTRED_DATE);
 
         return user;
     }

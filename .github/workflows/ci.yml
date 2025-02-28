@@ -5,7 +5,7 @@ on:
       - develop
 jobs:
   ci:
-    name: Test - Unit & Integration & SonarCloud Scan & Slack WebHook
+    name: Test - Unit & Integration & SonarCloud Scan
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +19,8 @@ jobs:
         run: mvn -B verify # -B: --batch-mode
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      - name: Generate & Coverage Report
+        run: mvn jacoco:report
       - name: Sonar
         if: success() # always() failure() success()
         run: >

@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
             existingUser.setPhone(userDto.getPhone());
             existingUser.setAddress(userDto.getAddress());
             existingUser.setRole(userDto.getRole());
-            existingUser.setRegistredDate(userDto.getRegisteredDate());
+            existingUser.setRegisteredDate(userDto.getRegisteredDate());
 
             User updatedUser = this.userRepository.save(existingUser);
             return UserMapper.toUserDto(updatedUser);

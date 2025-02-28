@@ -39,6 +39,6 @@ public class User {
     @Column(name = "role")
     private Role role;
 
-    @Column(name = "registre_date")
-    private LocalDateTime registredDate;
+    @Column(name = "registered_date")
+    private LocalDateTime registeredDate;
 }

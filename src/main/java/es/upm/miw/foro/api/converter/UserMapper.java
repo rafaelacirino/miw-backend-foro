@@ -53,7 +53,7 @@ public class UserMapper {
         userDto.setPhone(user.getPhone());
         userDto.setAddress(user.getAddress());
         userDto.setRole(user.getRole());
-        userDto.setRegisteredDate(user.getRegistredDate());
+        userDto.setRegisteredDate(user.getRegisteredDate());
     }
 
     private static void populateEntity(User entity, UserDto userDto) {
@@ -65,7 +65,7 @@ public class UserMapper {
         entity.setPhone(userDto.getPhone());
         entity.setAddress(userDto.getAddress());
         entity.setRole(userDto.getRole());
-        entity.setRegistredDate(userDto.getRegisteredDate());
+        entity.setRegisteredDate(userDto.getRegisteredDate());
     }
 
 }

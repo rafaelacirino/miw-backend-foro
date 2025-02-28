@@ -67,7 +67,7 @@ class UserServiceTest {
         user.setPhone(PHONE);
         user.setAddress(ADDRESS);
         user.setRole(Role.ADMIN);
-        user.setRegistredDate(REGISTRED_DATE);
+        user.setRegisteredDate(REGISTRED_DATE);
     }
 
     @Test
