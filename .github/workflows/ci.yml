@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-      - develop
+      - ['develop', 'main']
 jobs:
   ci:
     name: Test - Unit & Integration & SonarCloud Scan & Slack WebHook
