@@ -25,10 +25,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain)
             throws IOException, ServletException {
         String token = jwtService.extractToken(request.getHeader(AUTHORIZATION));
-        if (!token.isEmpty()) {
+        if (token != null && !token.isEmpty()) {
             GrantedAuthority authority = new SimpleGrantedAuthority(Role.PREFIX + jwtService.role(token));
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(jwtService.user(token), token, List.of(authority));

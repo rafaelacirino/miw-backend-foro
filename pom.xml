@@ -107,6 +107,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<version>42.7.2</version>
 		</dependency>
 		<!-- Asynchronous programming -->
 		<dependency>
@@ -175,13 +176,13 @@
 				<version>${jacoco.version}</version>
 				<executions>
 					<execution>
-						<id>default-prepare-agent</id>
+						<id>prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>default-report</id>
+						<id>report</id>
 						<phase>post-integration-test</phase>
 						<goals>
 							<goal>report</goal>
@@ -195,8 +196,7 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<argLine>
-						-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
-						-Xshare:off
+						${surefire.argLine}
 					</argLine>
 				</configuration>
 			</plugin>
@@ -212,9 +212,12 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<argLine>${failsafe.argLine}</argLine>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-
+a
 </project>
 
