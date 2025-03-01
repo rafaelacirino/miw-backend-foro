@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class PasswordValidator implements ConstraintValidator<ValidPassword, String> {
 
+    @SuppressWarnings("squid:S2068")
     private static final String PASSWORD_PATTERN =
             "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$";
 
