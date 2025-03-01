@@ -55,8 +55,6 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
 		<maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
-		<!-- coverage report -->
-		<jacoco.version>0.8.12</jacoco.version>
 		<!-- JWT -->
 		<jwt.version>4.4.0</jwt.version>
 		<!-- OpenAPI -->
@@ -173,7 +171,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${jacoco.version}</version>
+				<version>0.8.12</version>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
@@ -183,7 +181,7 @@
 					</execution>
 					<execution>
 						<id>report</id>
-						<phase>post-integration-test</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
@@ -193,12 +191,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${maven-surefire-plugin.version}</version>
-				<configuration>
-					<argLine>
-						${surefire.argLine}
-					</argLine>
-				</configuration>
+				<version>3.2.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -212,9 +205,6 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<argLine>${failsafe.argLine}</argLine>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
