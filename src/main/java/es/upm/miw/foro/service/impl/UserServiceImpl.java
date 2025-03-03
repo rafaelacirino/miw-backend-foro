@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         try {
             User user = UserMapper.toEntity(userDto);
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            User savedUser = this.userRepository.save(user);
+            User savedUser = userRepository.save(user);
             return UserMapper.toUserDto(savedUser);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error saving User", exception);
