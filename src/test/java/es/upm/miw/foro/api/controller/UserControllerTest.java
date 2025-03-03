@@ -32,8 +32,6 @@ class UserControllerTest {
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
-    private static final String PHONE = "phone";
-    private static final String ADDRESS = "address";
     private static final LocalDateTime REGISTRED_DATE = LocalDateTime.now();
 
     @Test
@@ -81,8 +79,6 @@ class UserControllerTest {
         userDto.setLastName(LAST_NAME);
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
-        userDto.setPhone(PHONE);
-        userDto.setAddress(ADDRESS);
         userDto.setRole(Role.ADMIN);
         userDto.setRegisteredDate(REGISTRED_DATE);
         Page<UserDto> userPage = new PageImpl<>(List.of(userDto));
@@ -109,8 +105,6 @@ class UserControllerTest {
         userDto.setLastName(LAST_NAME);
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
-        userDto.setPhone(PHONE);
-        userDto.setAddress(ADDRESS);
         userDto.setRole(Role.ADMIN);
         userDto.setRegisteredDate(REGISTRED_DATE);
         Page<UserDto> userPage = new PageImpl<>(List.of(userDto));

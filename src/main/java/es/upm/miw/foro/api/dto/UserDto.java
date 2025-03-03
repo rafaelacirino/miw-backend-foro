@@ -41,13 +41,8 @@ public class UserDto {
     //@ValidPassword
     private String password;
 
-    @Size(max = 9, message = "Phone must be at most 9 characters")
-    private String phone;
-
-    @Size(max = 25, message = "Address must be at most 25 characters")
-    private String address;
-
     private Role role;
 
+    @Schema(hidden = true)
     private LocalDateTime registeredDate;
 }

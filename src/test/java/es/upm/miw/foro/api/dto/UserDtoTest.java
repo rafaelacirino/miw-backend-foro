@@ -15,8 +15,6 @@ class UserDtoTest {
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
-    private static final String PHONE = "phone";
-    private static final String ADDRESS = "address";
     private static final LocalDateTime REGISTERED_DATE = LocalDateTime.now();
 
     @Test
@@ -28,8 +26,6 @@ class UserDtoTest {
                 .lastName(LAST_NAME)
                 .email(EMAIL)
                 .password(PASSWORD)
-                .phone(PHONE)
-                .address(ADDRESS)
                 .role(Role.ADMIN)
                 .registeredDate(REGISTERED_DATE)
                 .build();
@@ -40,8 +36,6 @@ class UserDtoTest {
         assertEquals(LAST_NAME, dto.getLastName());
         assertEquals(EMAIL, dto.getEmail());
         assertEquals(PASSWORD, dto.getPassword());
-        assertEquals(PHONE, dto.getPhone());
-        assertEquals(ADDRESS, dto.getAddress());
         assertEquals(Role.ADMIN, dto.getRole());
         assertEquals(REGISTERED_DATE, dto.getRegisteredDate());
     }
@@ -57,8 +51,6 @@ class UserDtoTest {
         dto.setLastName(LAST_NAME);
         dto.setEmail(EMAIL);
         dto.setPassword(PASSWORD);
-        dto.setPhone(PHONE);
-        dto.setAddress(ADDRESS);
         dto.setRole(Role.ADMIN);
         dto.setRegisteredDate(REGISTERED_DATE);
 
@@ -68,8 +60,6 @@ class UserDtoTest {
         assertEquals(LAST_NAME, dto.getLastName());
         assertEquals(EMAIL, dto.getEmail());
         assertEquals(PASSWORD, dto.getPassword());
-        assertEquals(PHONE, dto.getPhone());
-        assertEquals(ADDRESS, dto.getAddress());
         assertEquals(Role.ADMIN, dto.getRole());
         assertEquals(REGISTERED_DATE, dto.getRegisteredDate());
     }

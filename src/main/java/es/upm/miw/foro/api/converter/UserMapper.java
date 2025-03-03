@@ -50,8 +50,6 @@ public class UserMapper {
         userDto.setLastName(user.getLastName());
         userDto.setEmail(user.getEmail());
         userDto.setPassword(user.getPassword());
-        userDto.setPhone(user.getPhone());
-        userDto.setAddress(user.getAddress());
         userDto.setRole(user.getRole());
         userDto.setRegisteredDate(user.getRegisteredDate());
     }
@@ -62,8 +60,6 @@ public class UserMapper {
         entity.setLastName(userDto.getLastName());
         entity.setEmail(userDto.getEmail());
         entity.setPassword(userDto.getPassword());
-        entity.setPhone(userDto.getPhone());
-        entity.setAddress(userDto.getAddress());
         entity.setRole(userDto.getRole());
         entity.setRegisteredDate(userDto.getRegisteredDate());
     }
