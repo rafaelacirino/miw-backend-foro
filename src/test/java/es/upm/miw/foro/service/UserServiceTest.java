@@ -41,8 +41,6 @@ class UserServiceTest {
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
-    private static final String PHONE = "phone";
-    private static final String ADDRESS = "address";
     private static final LocalDateTime REGISTRED_DATE = LocalDateTime.now();
 
     @BeforeEach
@@ -53,8 +51,6 @@ class UserServiceTest {
         userDto.setLastName(LAST_NAME);
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
-        userDto.setPhone(PHONE);
-        userDto.setAddress(ADDRESS);
         userDto.setRole(Role.ADMIN);
         userDto.setRegisteredDate(REGISTRED_DATE);
 
@@ -64,8 +60,6 @@ class UserServiceTest {
         user.setLastName(LAST_NAME);
         user.setEmail(EMAIL);
         user.setPassword(PASSWORD);
-        user.setPhone(PHONE);
-        user.setAddress(ADDRESS);
         user.setRole(Role.ADMIN);
         user.setRegisteredDate(REGISTRED_DATE);
     }

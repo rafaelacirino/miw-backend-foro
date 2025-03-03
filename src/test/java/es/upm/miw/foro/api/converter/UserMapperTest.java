@@ -18,8 +18,6 @@ class UserMapperTest {
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
-    private static final String PHONE = "phone";
-    private static final String ADDRESS = "address";
     private static final LocalDateTime REGISTRED_DATE = LocalDateTime.now();
 
     @Test
@@ -42,8 +40,6 @@ class UserMapperTest {
         assertEquals(user.getLastName(), userDto.getLastName());
         assertEquals(user.getEmail(), userDto.getEmail());
         assertEquals(user.getPassword(), userDto.getPassword());
-        assertEquals(user.getPhone(), userDto.getPhone());
-        assertEquals(user.getAddress(), userDto.getAddress());
         assertEquals(user.getRole(), userDto.getRole());
         assertEquals(user.getRegisteredDate(), userDto.getRegisteredDate());
     }
@@ -63,8 +59,6 @@ class UserMapperTest {
         assertEquals(userDto.getLastName(), user.getLastName());
         assertEquals(userDto.getEmail(), user.getEmail());
         assertEquals(userDto.getPassword(), user.getPassword());
-        assertEquals(userDto.getPhone(), user.getPhone());
-        assertEquals(userDto.getAddress(), user.getAddress());
         assertEquals(userDto.getRole(), user.getRole());
         assertEquals(userDto.getRegisteredDate(), user.getRegisteredDate());
     }
@@ -120,8 +114,6 @@ class UserMapperTest {
         user.setLastName(LAST_NAME);
         user.setEmail(EMAIL);
         user.setPassword(PASSWORD);
-        user.setPhone(PHONE);
-        user.setAddress(ADDRESS);
         user.setRole(Role.ADMIN);
         user.setRegisteredDate(REGISTRED_DATE);
 
@@ -135,8 +127,6 @@ class UserMapperTest {
         userDto.setLastName(LAST_NAME);
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
-        userDto.setPhone(PHONE);
-        userDto.setAddress(ADDRESS);
         userDto.setRole(Role.ADMIN);
         userDto.setRegisteredDate(REGISTRED_DATE);
 
