@@ -41,6 +41,7 @@ public class UserDto {
     //@ValidPassword
     private String password;
 
+    @Schema(hidden = true)
     private Role role;
 
     @Schema(hidden = true)
