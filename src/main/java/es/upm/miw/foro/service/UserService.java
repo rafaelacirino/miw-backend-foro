@@ -12,6 +12,8 @@ public interface UserService {
 
     UserDto getUserById(Long id);
 
+    UserDto getUserByEmail(String email);
+
     String login(String email, String password);
 
     Page<UserDto> getAllUsers(String firstName, String lastName, String email, Pageable pageable);
