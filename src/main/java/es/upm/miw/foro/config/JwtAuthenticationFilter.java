@@ -24,19 +24,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
 
-    @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain chain)
-            throws IOException, ServletException {
-        String token = jwtService.extractToken(request.getHeader(AUTHORIZATION));
+//    @Override
+//    protected void doFilterInternal(@NonNull HttpServletRequest request,
+//                                    @NonNull HttpServletResponse response,
+//                                    @NonNull FilterChain chain)
+//            throws IOException, ServletException {
+//        String token = jwtService.extractToken(request.getHeader(AUTHORIZATION));
+//        if (token != null && !token.isEmpty()) {
+//            GrantedAuthority authority = new SimpleGrantedAuthority(Role.PREFIX + jwtService.role(token));
+//            UsernamePasswordAuthenticationToken authentication =
+//                    new UsernamePasswordAuthenticationToken(jwtService.user(token), token, List.of(authority));
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//        }
+//        chain.doFilter(request, response);
+//    }
+@Override
+protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                @NonNull HttpServletResponse response,
+                                @NonNull FilterChain chain)
+        throws IOException, ServletException {
+
+    try {
+        String bearer = request.getHeader(AUTHORIZATION);
+        String token = jwtService.extractToken(bearer);
+
         if (token != null && !token.isEmpty()) {
-            GrantedAuthority authority = new SimpleGrantedAuthority(Role.PREFIX + jwtService.role(token));
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(jwtService.user(token), token, List.of(authority));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String email = jwtService.user(token);
+            String role = jwtService.role(token);
+
+            if (!email.isEmpty()) {
+                GrantedAuthority authority = new SimpleGrantedAuthority(Role.PREFIX + role);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(email, null, List.of(authority));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
-        chain.doFilter(request, response);
+    } catch (Exception e) {
     }
+
+    chain.doFilter(request, response);
+}
 
 }

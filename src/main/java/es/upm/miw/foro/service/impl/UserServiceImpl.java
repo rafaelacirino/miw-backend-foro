@@ -86,6 +86,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto getUserByEmail(String email) throws ServiceException {
+        return  userRepository.findByEmail(email)
+                .map(UserMapper::toUserDto)
+                .orElseThrow(() -> new ServiceException("User with email " + email + " not found"));
+    }
+
+    @Override
     public String login(String email, String password) {
         User user = userRepository.findByEmail(email.trim())
                 .orElseThrow(() -> new ServiceException("User with email " + email + " not found"));

@@ -6,6 +6,7 @@ import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -53,6 +56,28 @@ public class UserController {
     @Operation(summary = "getUserById", description = "Get User by ID")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/me")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "getAuthenticatedUser", description = "Get details of the authenticated user")
+    public ResponseEntity<UserDto> getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        String email = authentication.getName();
+
+        try {
+            UserDto userDto = userService.getUserByEmail(email);
+            return ResponseEntity.ok(userDto);
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/login")

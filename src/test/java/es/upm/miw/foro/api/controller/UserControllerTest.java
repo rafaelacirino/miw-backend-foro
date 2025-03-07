@@ -2,6 +2,7 @@ package es.upm.miw.foro.api.controller;
 
 import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.UserDto;
+import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -69,6 +71,85 @@ class UserControllerTest {
         assertNotNull(response.getBody());
         assertEquals(dto, response.getBody());
     }
+
+//    @Test
+//    void testGetUserByEmailSuccess() throws ServiceException {
+//        UserDto dto =  new UserDto();
+//        when(userService.getUserByEmail(EMAIL)).thenReturn(dto);
+//
+//        ResponseEntity<UserDto> response = this.userController.getAuthenticatedUser();
+//
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertNotNull(response.getBody());
+//        assertEquals(dto, response.getBody());
+//    }
+//
+//    @Test
+//    void testGetUserByEmail_UserNotFound() {
+//    }
+
+//    @Test
+//    void testGetAuthenticatedUser_Success() throws ServiceException {
+//        // Preparar datos de prueba
+//        String email = "test@example.com";
+//        UserDto userDto = new UserDto();
+//        userDto.setId(1L);
+//        userDto.setEmail(email);
+//        userDto.setFirstName("Test");
+//        userDto.setLastName("User");
+//
+//        // Configurar el contexto de autenticación
+//        Authentication authentication = mock(Authentication.class);
+//        when(authentication.getName()).thenReturn(email);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        // Simular el comportamiento del servicio
+//        when(userService.getUserByEmail(email)).thenReturn(userDto);
+//
+//        // Ejecutar el método
+//        ResponseEntity<UserDto> response = userController.getAuthenticatedUser();
+//
+//        // Verificar resultados
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertNotNull(response.getBody());
+//        assertEquals(1L, response.getBody().getId());
+//        assertEquals("Test", response.getBody().getFirstName());
+//        assertEquals("User", response.getBody().getLastName());
+//
+//        // Verificar interacciones
+//        verify(userService, times(1)).getUserByEmail(email);
+//    }
+//
+//    @Test
+//    void testGetAuthenticatedUser_Unauthorized() {
+//        // Configurar un contexto de autenticación vacío
+//        SecurityContextHolder.clearContext();
+//
+//        // Ejecutar el método
+//        ResponseEntity<UserDto> response = userController.getAuthenticatedUser();
+//
+//        // Verificar resultados
+//        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+//        assertNull(response.getBody());
+//    }
+//
+//    @Test
+//    void testGetAuthenticatedUser_UserNotFound() throws ServiceException {
+//        // Configurar el contexto de autenticación
+//        Authentication authentication = mock(Authentication.class);
+//        when(authentication.getName()).thenReturn("nonexistent@example.com");
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        // Simular que el usuario no existe
+//        when(userService.getUserByEmail("nonexistent@example.com")).thenThrow(new ServiceException("User not found"));
+//
+//        // Ejecutar el método
+//        ResponseEntity<UserDto> response = userController.getAuthenticatedUser();
+//
+//        // Verificar resultados
+//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+//        assertNull(response.getBody());
+//    }
 
     @Test
     void testGetAllUsers() {
