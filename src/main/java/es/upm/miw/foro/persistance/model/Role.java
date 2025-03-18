@@ -2,7 +2,7 @@ package es.upm.miw.foro.persistance.model;
 
 public enum Role {
 
-    ADMIN, MANAGER, OPERATOR, CUSTOMER, AUTHENTICATED;
+    ADMIN, MEMBER;
 
     public static final String PREFIX = "ROLE_";
 
