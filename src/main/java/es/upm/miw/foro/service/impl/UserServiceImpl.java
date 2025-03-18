@@ -8,9 +8,9 @@ import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.persistance.model.User;
 import es.upm.miw.foro.persistance.repository.UserRepository;
 import es.upm.miw.foro.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,9 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
@@ -36,15 +35,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        // get the user authenticated
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-        User currentUser = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ServiceException("Authenticated user not found"));
-        if (!Role.ADMIN.equals(currentUser.getRole())) {
-            throw new ServiceException("Unauthorized: Only admins can create users");
-        }
+        User currentUser = getAuthenticatedUserWithRole(Role.ADMIN);
+        log.info("Current user: {} with role: {}", currentUser.getFirstName(), currentUser.getRole());
         try {
+            if (userDto.getRole() == null) {
+                userDto.setRole(Role.MEMBER);
+            }
             User user = UserMapper.toEntity(userDto);
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             User savedUser = userRepository.save(user);
@@ -61,7 +57,7 @@ public class UserServiceImpl implements UserService {
     public UserDto registerUser(UserDto userDto) {
         try {
             if (userDto.getRole() == null) {
-                userDto.setRole(Role.CUSTOMER);
+                userDto.setRole(Role.MEMBER);
             }
             User user = UserMapper.toEntity(userDto);
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -77,11 +73,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(Long id) {
         try {
+            User currentUser = getAuthenticatedUser();
+            if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
+                throw new ServiceException("Unauthorized: Only admins or the user themselves can get this user");
+            }
             return userRepository.findById(id)
                     .map(UserMapper::toUserDto)
-                    .orElseThrow(() -> new ServiceException("User with id " + id + " not found"));
+                    .orElseThrow(() -> new ServiceException("User with ID " + id + " not found"));
         } catch (DataAccessException exception) {
-            throw new RepositoryException("Error getting User with id " + id, exception);
+            throw new RepositoryException("Error getting User with ID: " + id, exception);
         }
     }
 
@@ -104,31 +104,36 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDto> getAllUsers(String firstName, String lastName, String email, Pageable pageable) {
         try {
-            if (firstName != null && !firstName.isBlank() && lastName != null && !lastName.isBlank() && email != null && !email.isBlank()) {
+            User currentUser = getAuthenticatedUserWithRole(Role.ADMIN);
+            log.info("Authenticated user: {} with role: {}", currentUser.getFirstName(), currentUser.getRole());
+            if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty() && email != null && !email.isEmpty()) {
                 return userRepository.findByFirstNameAndLastNameAndEmail(firstName, lastName, email, pageable)
                         .map(UserMapper::toUserDto);
-            } else if (firstName != null) {
+            } else if(firstName != null){
                 return userRepository.findByFirstName(firstName, pageable)
                         .map(UserMapper::toUserDto);
-            } else if (lastName != null) {
+            } else if(lastName != null){
                 return userRepository.findByLastName(lastName, pageable)
                         .map(UserMapper::toUserDto);
-            } else if (email != null) {
-                return userRepository.findByEmail(email)
-                        .map(user -> (Page<UserDto>) new PageImpl<>(List.of(UserMapper.toUserDto(user)), pageable, 1))
-                        .orElseGet(() -> Page.empty(pageable));
+            } else if(email != null){
+                return userRepository.findByEmail(email, pageable)
+                        .map(UserMapper::toUserDto);
             } else {
                 return userRepository.findAll(pageable)
                         .map(UserMapper::toUserDto);
             }
         } catch (DataAccessException exception) {
-            throw new RepositoryException("Error getting Users", exception);
+            throw new RepositoryException("Error retrieving Users from repository", exception);
         }
     }
 
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
         try {
+            User currentUser = getAuthenticatedUser();
+            if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
+                throw new ServiceException("Unauthorized: Only admins or the user themselves can update this user");
+            }
             User existingUser = userRepository.findById(id)
                     .orElseThrow(() -> new ServiceException("User with id " + id + " not found"));
 
@@ -152,6 +157,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) {
         try {
+            User currentUser = getAuthenticatedUser();
+            if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
+                throw new ServiceException("Unauthorized: Only admins or the user themselves can delete this user");
+            }
             if (!userRepository.existsById(id)) {
                 throw new ServiceException("User with id " + id + " not found");
             }
@@ -159,5 +168,25 @@ public class UserServiceImpl implements UserService {
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting User with id " + id, exception);
         }
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            log.warn("Authentication is null");
+            throw new ServiceException("Unauthorized: No user is logged in");
+        }
+        String currentUserEmail = authentication.getName();
+        return userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new ServiceException("Authenticated user not found"));
+    }
+
+    private User getAuthenticatedUserWithRole(Role requiredRole) {
+        User currentUser = getAuthenticatedUser();
+        if (!requiredRole.equals(currentUser.getRole())) {
+            log.warn("User {} does not have required role {}", currentUser.getEmail(), requiredRole);
+            throw new ServiceException("Unauthorized: User does not have the required role: " + requiredRole);
+        }
+        return currentUser;
     }
 }

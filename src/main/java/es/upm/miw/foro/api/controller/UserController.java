@@ -6,6 +6,7 @@ import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,27 +37,41 @@ public class UserController {
         response.sendRedirect("/swagger-ui/index.html");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/create")
-    @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DDBB")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DB")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
+        try {
+            return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/register")
-    @Operation(summary = "registerUser", description = "Register a new user and insert into DDBB")
+    @Operation(summary = "registerUser", description = "Register a new user and insert into DB")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
         return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "getUserById", description = "Get User by ID")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+        try {
+            return ResponseEntity.ok(userService.getUserById(id));
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/login")
-    @Operation(summary = "login", description = "User login when user is registered and exists in DDBB")
+    @Operation(summary = "login", description = "User login when user is registered and exists in DB")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
         try {
             String token = userService.login(loginDto.getEmail(), loginDto.getPassword());
@@ -67,6 +82,8 @@ public class UserController {
     }
 
     @GetMapping("/getAllUsers")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "getAllUsers", description = "Returns all Users based on filters")
     public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(required = false) String firstName,
                                                      @RequestParam(required = false) String lastName,
@@ -78,25 +95,31 @@ public class UserController {
 
         Pageable pageable = PageRequest.of(page, size,
                 "desc".equalsIgnoreCase(sortDirection) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending());
-
-        Page<UserDto> userPage = userService.getAllUsers(firstName, lastName, email, pageable);
-
-        return ResponseEntity.ok(userPage);
+        try {
+            Page<UserDto> userPage = userService.getAllUsers(firstName, lastName, email, pageable);
+            return ResponseEntity.ok(userPage);
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "updateUser", description = "Update User into DDBB")
+    @PutMapping("/update/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "updateUser", description = "Update User into DB")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
                                               @RequestBody UserDto userDto) {
         return ResponseEntity.ok(userService.updateUser(id, userDto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "deleteUser", description = "Delete User by Id")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
-            return ResponseEntity.noContent().build(); // 204 No Content
+            return ResponseEntity.noContent().build();
         } catch (ServiceException e) {
             if (e.getMessage().equals("User with id " + id + " not found")) {
                 return ResponseEntity.notFound().build();
