@@ -43,7 +43,7 @@ public class UserController {
         response.sendRedirect("/swagger-ui/index.html");
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DB")
@@ -89,7 +89,7 @@ public class UserController {
 
     @GetMapping("/getAllUsers")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "getAllUsers", description = "Returns all Users based on filters")
     public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(required = false) String firstName,
                                                      @RequestParam(required = false) String lastName,

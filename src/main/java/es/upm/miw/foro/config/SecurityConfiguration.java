@@ -1,8 +1,10 @@
 package es.upm.miw.foro.config;
 
 
+import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.persistance.model.User;
 import es.upm.miw.foro.persistance.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Slf4j
 public class SecurityConfiguration {
 
     private final UserRepository userRepository;
@@ -40,10 +43,11 @@ public class SecurityConfiguration {
         return email -> {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            log.info("Loaded user: {} with role: {}", user.getEmail(), user.getRole());
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
-                    .roles(user.getRole().name())
+                    .roles(Role.PREFIX + user.getRole().name())
                     .build();
         };
     }

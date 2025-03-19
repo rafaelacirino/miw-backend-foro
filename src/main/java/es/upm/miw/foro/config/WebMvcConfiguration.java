@@ -18,5 +18,4 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .maxAge(3600);
     }
-
 }
