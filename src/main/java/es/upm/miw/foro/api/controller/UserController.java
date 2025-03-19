@@ -3,6 +3,8 @@ package es.upm.miw.foro.api.controller;
 import es.upm.miw.foro.api.dto.LoginDto;
 import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
+import es.upm.miw.foro.api.dto.validation.CreateValidation;
+import es.upm.miw.foro.api.dto.validation.UpdateValidation;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,9 +20,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -42,7 +46,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DDBB")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(@Validated(CreateValidation.class) @RequestBody UserDto userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
@@ -112,7 +116,7 @@ public class UserController {
     @PutMapping("/{id}")
     @Operation(summary = "updateUser", description = "Update User into DDBB")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
-                                              @RequestBody UserDto userDto) {
+                                              @Validated(UpdateValidation.class) @RequestBody UserDto userDto) {
         return ResponseEntity.ok(userService.updateUser(id, userDto));
     }
 
@@ -128,5 +132,15 @@ public class UserController {
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PostMapping("/verifyPassword")
+    @Operation(summary = "verifyPassword", description = "Verify the password")
+    public ResponseEntity<Map<String, Boolean>> verifyPassword(@RequestBody Map<String, String> request) {
+        Long userId = Long.valueOf(request.get("userId"));
+        String currentPassword = request.get("currentPassword");
+        boolean isValid = userService.verifyPassword(userId, currentPassword);
+
+        return ResponseEntity.ok(Map.of("isValid", isValid));
     }
 }

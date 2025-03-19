@@ -4,7 +4,6 @@ import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.persistance.model.User;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserMapper {
 
@@ -33,7 +32,7 @@ public class UserMapper {
     public static List<UserDto> toDtoList(List<User> userList) {
         return userList.stream()
                 .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // Replace this usage of 'Stream. collect(Collectors. toList())'
@@ -41,7 +40,7 @@ public class UserMapper {
     public static List<User> toEntityList(List<UserDto> userDtoList) {
         return userDtoList.stream()
                 .map(UserMapper::toEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static void populateDto(User user, UserDto userDto) {

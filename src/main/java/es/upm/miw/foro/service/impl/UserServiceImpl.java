@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(String email, String password) {
-        User user = userRepository.findByEmail(email.trim())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ServiceException("User with email " + email + " not found"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
             if (user.getPassword().equals(password)) {
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Wrong password");
             }
         }
-        return jwtService.createToken(user.getEmail(), user.getFirstName(), user.getRole().name());
+        return jwtService.createToken(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole().name());
     }
 
     @Override
@@ -142,10 +142,9 @@ public class UserServiceImpl implements UserService {
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
             existingUser.setEmail(userDto.getEmail());
-            existingUser.setPassword(userDto.getPassword());
-            existingUser.setRole(userDto.getRole());
-            existingUser.setRegisteredDate(userDto.getRegisteredDate());
-
+            if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+                existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            }
             User updatedUser = this.userRepository.save(existingUser);
             return UserMapper.toUserDto(updatedUser);
         } catch (DataAccessException exception) {
@@ -166,5 +165,11 @@ public class UserServiceImpl implements UserService {
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting User with id " + id, exception);
         }
+    }
+
+    public boolean verifyPassword(Long userId, String currentPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ServiceException("User not found"));
+        return passwordEncoder.matches(currentPassword, user.getPassword());
     }
 }
