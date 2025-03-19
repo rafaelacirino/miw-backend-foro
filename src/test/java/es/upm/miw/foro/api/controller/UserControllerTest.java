@@ -5,6 +5,7 @@ import es.upm.miw.foro.api.dto.LoginDto;
 import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
+import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,8 +14,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -162,7 +162,7 @@ class UserControllerTest {
         // Assert
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody() instanceof String);
+        assertInstanceOf(String.class, response.getBody());
         assertEquals(errorMessage, response.getBody());
         verify(userService, times(1)).login(EMAIL, PASSWORD);
     }
@@ -322,5 +322,47 @@ class UserControllerTest {
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         verify(userService, times(1)).deleteUser(USER_ID);
+    }
+
+    @Test
+    void testVerifyPassword_success() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", USER_ID.toString());
+        request.put("currentPassword", PASSWORD);
+
+        when(userService.verifyPassword(USER_ID, PASSWORD)).thenReturn(true);
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> response = userController.verifyPassword(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(Objects.requireNonNull(response.getBody()).get("isValid"));
+
+        // Verify
+        verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);
+    }
+
+    @Test
+    void testVerifyPassword_failure() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", USER_ID.toString());
+        request.put("currentPassword", PASSWORD);
+
+        when(userService.verifyPassword(USER_ID, PASSWORD)).thenReturn(false);
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> response = userController.verifyPassword(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode()); // Verificar el código de estado HTTP
+        assertFalse(response.getBody().get("isValid")); // Verificar que el resultado sea false
+
+        // Verify
+        verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);
     }
 }

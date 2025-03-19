@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(String email, String password) {
-        User user = userRepository.findByEmail(email.trim())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ServiceException("User with email " + email + " not found"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
             if (user.getPassword().equals(password)) {
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Wrong password");
             }
         }
-        return jwtService.createToken(user.getEmail(), user.getFirstName(), user.getRole().name());
+        return jwtService.createToken(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole().name());
     }
 
     @Override
@@ -109,13 +109,13 @@ public class UserServiceImpl implements UserService {
             if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty() && email != null && !email.isEmpty()) {
                 return userRepository.findByFirstNameAndLastNameAndEmail(firstName, lastName, email, pageable)
                         .map(UserMapper::toUserDto);
-            } else if(firstName != null){
+            } else if (firstName != null) {
                 return userRepository.findByFirstName(firstName, pageable)
                         .map(UserMapper::toUserDto);
-            } else if(lastName != null){
+            } else if (lastName != null) {
                 return userRepository.findByLastName(lastName, pageable)
                         .map(UserMapper::toUserDto);
-            } else if(email != null){
+            } else if(email != null) {
                 return userRepository.findByEmail(email, pageable)
                         .map(UserMapper::toUserDto);
             } else {
@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
                         .map(UserMapper::toUserDto);
             }
         } catch (DataAccessException exception) {
-            throw new RepositoryException("Error retrieving Users from repository", exception);
+            throw new RepositoryException("Error getting Users from repository", exception);
         }
     }
 
@@ -140,10 +140,9 @@ public class UserServiceImpl implements UserService {
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
             existingUser.setEmail(userDto.getEmail());
-            existingUser.setPassword(userDto.getPassword());
-            existingUser.setRole(userDto.getRole());
-            existingUser.setRegisteredDate(userDto.getRegisteredDate());
-
+            if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+                existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            }
             User updatedUser = this.userRepository.save(existingUser);
             return UserMapper.toUserDto(updatedUser);
         } catch (DataAccessException exception) {
@@ -168,6 +167,12 @@ public class UserServiceImpl implements UserService {
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting User with id " + id, exception);
         }
+    }
+
+    public boolean verifyPassword(Long userId, String currentPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ServiceException("User not found"));
+        return passwordEncoder.matches(currentPassword, user.getPassword());
     }
 
     private User getAuthenticatedUser() {

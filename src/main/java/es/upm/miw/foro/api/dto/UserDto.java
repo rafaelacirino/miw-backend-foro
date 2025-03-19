@@ -1,9 +1,12 @@
 package es.upm.miw.foro.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import es.upm.miw.foro.api.dto.validation.CreateValidation;
+import es.upm.miw.foro.api.dto.validation.UpdateValidation;
 import es.upm.miw.foro.persistance.model.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -23,21 +26,20 @@ public class UserDto {
     @Schema(hidden = true)
     private Long id;
 
-    @NotNull(message = "First name cannot be null")
+    @NotBlank(groups = {CreateValidation.class}, message = "First name is required")
     @Size(max = 15, message = "First name must be at most 15 characters")
     private String firstName;
 
-    @NotNull(message = "Last name cannot be null")
+    @NotBlank(groups = {CreateValidation.class}, message = "Last name is required")
     @Size(max = 25, message = "Last name must be at most 25 characters")
     private String lastName;
 
-    @NotNull(message = "Email cannot be null")
-    @Size(max = 20, message = "Email must be at most 20 characters")
-    @Email(message = "Invalid email format")
+    @NotBlank(groups = {CreateValidation.class}, message = "Email is required")
+    @Email(groups = {CreateValidation.class, UpdateValidation.class}, message = "Invalid email format")
     private String email;
 
-    @NotNull(message = "Password cannot be null")
-    @Size(min =6, max = 12, message = "Password must be between 6 and 12 characters")
+    // @NotNull(message = "Password cannot be null")
+    @Size(min = 8, groups = {CreateValidation.class}, message = "Password must be at least 8 characters long")
     //@ValidPassword
     private String password;
 

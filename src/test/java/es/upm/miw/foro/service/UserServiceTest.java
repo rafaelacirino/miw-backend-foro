@@ -52,7 +52,7 @@ class UserServiceTest {
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
     private static final String ENCODED_PASSWORD = "encodedPassword";
-    private static final LocalDateTime REGISTRED_DATE = LocalDateTime.now();
+    private static final LocalDateTime REGISTERED_DATE = LocalDateTime.now();
 
     @BeforeEach
     void setUp() {
@@ -63,7 +63,7 @@ class UserServiceTest {
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
         userDto.setRole(Role.ADMIN);
-        userDto.setRegisteredDate(REGISTRED_DATE);
+        userDto.setRegisteredDate(REGISTERED_DATE);
 
         User user = new User();
         user.setId(USER_ID);
@@ -72,7 +72,7 @@ class UserServiceTest {
         user.setEmail(EMAIL);
         user.setPassword(PASSWORD);
         user.setRole(Role.ADMIN);
-        user.setRegisteredDate(REGISTRED_DATE);
+        user.setRegisteredDate(REGISTERED_DATE);
     }
 
     @Test
@@ -195,17 +195,37 @@ class UserServiceTest {
     @Test
     void testLogin_success() {
         User user = new User();
+        user.setId(USER_ID);
         user.setEmail(EMAIL);
-        user.setPassword(PASSWORD);
+        user.setPassword(ENCODED_PASSWORD);
+        user.setFirstName(FIRST_NAME);
+        user.setLastName(LAST_NAME);
         user.setRole(Role.ADMIN);
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(PASSWORD, user.getPassword())).thenReturn(true);
-        when(jwtService.createToken(any(), any(), any())).thenReturn("jwtToken");
+        when(jwtService.createToken(
+                eq(USER_ID),
+                eq(FIRST_NAME),
+                eq(LAST_NAME),
+                eq(EMAIL),
+                eq(Role.ADMIN.name())
+        )).thenReturn("jwtToken");
 
         String token = userService.login(EMAIL, PASSWORD);
 
+        assertNotNull(token);
         assertEquals("jwtToken", token);
+
+        verify(userRepository, times(1)).findByEmail(EMAIL);
+        verify(passwordEncoder, times(1)).matches(PASSWORD, ENCODED_PASSWORD);
+        verify(jwtService, times(1)).createToken(
+                USER_ID,
+                FIRST_NAME,
+                LAST_NAME,
+                EMAIL,
+                Role.ADMIN.name()
+        );
     }
 
     @Test

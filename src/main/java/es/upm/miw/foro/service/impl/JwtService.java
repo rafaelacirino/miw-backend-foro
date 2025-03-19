@@ -16,8 +16,9 @@ import java.util.Optional;
 public class JwtService {
     private static final String BEARER = "Bearer ";
     private static final int PARTIES = 3;
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
+    private static final String FIRSTNAME_CLAIM = "firstName";
+    private static final String LASTNAME_CLAIM = "lastName";
+    private static final String EMAIL_CLAIM = "email";
     private static final String ROLE_CLAIM = "role";
 
     private final String secret;
@@ -41,22 +42,23 @@ public class JwtService {
         }
     }
 
-    public String createToken(String user, String name, String role) {
+    public String createToken(Long id, String firstName, String lastName, String email, String role) {
         return JWT.create()
                 .withIssuer(this.issuer)
                 .withIssuedAt(new Date())
                 .withNotBefore(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + this.expire * 1000L))
-                .withClaim(USER_CLAIM, user)
-                .withClaim(NAME_CLAIM, name)
+                .withClaim("id", id)
+                .withClaim(FIRSTNAME_CLAIM, firstName)
+                .withClaim(LASTNAME_CLAIM, lastName)
+                .withClaim(EMAIL_CLAIM, email)
                 .withClaim(ROLE_CLAIM, role)
                 .sign(Algorithm.HMAC256(this.secret));
-
     }
 
     public String user(String authorization) {
         return this.verify(authorization)
-                .map(jwt -> jwt.getClaim(USER_CLAIM).asString())
+                .map(jwt -> jwt.getClaim(EMAIL_CLAIM).asString())
                 .orElse("");
     }
 
@@ -72,9 +74,9 @@ public class JwtService {
 
     private String extractClaim(String token) {
         return verify(token)
-                .map(jwt -> jwt.getClaim(JwtService.NAME_CLAIM).asString())
+                .map(jwt -> jwt.getClaim(JwtService.EMAIL_CLAIM).asString())
                 .orElseGet(() -> {
-                    log.info("Fail extract claim: {}", JwtService.NAME_CLAIM);
+                    log.info("Fail extract claim: {}", JwtService.EMAIL_CLAIM);
                     return "";
                 });
     }
