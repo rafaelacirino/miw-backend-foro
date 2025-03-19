@@ -1,0 +1,19 @@
+@startuml
+
+state " " as s1
+state " " as s2
+state "Sign Up" as SignUp
+state "Decision" as Decision <<choice>>
+
+[*] --> Login : The system shows Login
+
+Login -down-> s1 : The user insert email and password
+Login -right-> SignUp: The user requests sign up
+s1 -down-> Decision : The system validates email and password
+
+Decision --> s2 : [Ok]
+Decision --> Login : [Invalidate]
+
+s2 --> Opened_Questions : The system Open Questions
+
+@enduml

@@ -1,0 +1,13 @@
+@startuml
+
+state " " as Logout
+
+Opened_Questions --> Logout
+Opened_Question --> Logout
+Filtered_Question --> Logout : The user requests Logout
+Opened_Profile -down-> Logout
+Opened_MyQuestions -down-> Logout
+Opened_Tags -down-> Logout
+Logout -down-> Login : The user shows Login
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+
+actor Admin
+
+left to right direction
+
+(Delete Category) as UC1
+(Delete Question) as UC2
+(Create User) as UC3
+(Open Users) as UC4
+(Delete Answer) as UC5
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+
+@enduml

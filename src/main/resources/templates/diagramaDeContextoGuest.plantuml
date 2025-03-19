@@ -1,0 +1,25 @@
+@startuml
+
+[*] --> Initial
+
+Initial --> Opened_Questions
+Opened_Questions --> Opened_Question : Open Question
+Opened_Questions --> Searched_Content : Search Content
+Searched_Content --> Opened_Question : Open Question
+Opened_Questions --> Filtered_Questions : Filter Questions
+Filtered_Questions --> Opened_Question : Open Question
+
+Opened_Questions --> Opened_Tags : Open Tags
+Opened_Tags --> Searched_Tags : Search Tags
+Searched_Tags --> Opened_Question : Open Question
+
+Opened_Question --> Final : Login
+Opened_Question --> Final : Sign Up
+Opened_Questions --> Final : Login
+Opened_Questions --> Final : Sign Up
+Searched_Tags --> Final : Login
+Searched_Tags --> Final : Sign Up
+
+Final --> [*]
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+
+[*] --> Initial
+
+Initial --> Opened_Questions : Login
+Opened_Questions -> Opened_Question : Open Question
+Opened_Questions -> Opened_MyQuestions : Open MyQuestions
+Opened_Questions --> Opened_Question : Create Question
+Opened_Questions --> Opened_Profile : Open Profile
+' Opened_Questions --> Opened_Question : Search Content
+Opened_Questions --> Filtered_Questions : Filter Questions
+Filtered_Questions --> Opened_Question : Open Question
+Opened_Questions --> Final : Logout
+Filtered_Questions --> Final : Logout
+
+Opened_Questions --> Searched_Content : Search Content
+Searched_Content --> Opened_Question : Open Question
+
+Opened_Questions --> Opened_Tags : Open Tags
+Opened_Tags --> Searched_Tags : Search Tags
+Searched_Tags --> Opened_Question : Open Question
+
+Opened_Question --> Opened_Question : Create Answer \n Update Answer \n Delete Answer \n Mark Answer as Correct \n Create Comment \n Update Comment \n Delete Comment
+Opened_Question --> Final : Logout
+
+Opened_MyQuestions --> Opened_MyQuestions : Update Question \n Delete Question
+Opened_MyQuestions --> Final : Logout
+
+Opened_Profile --> Opened_MyQuestions : Open MyQuestions
+Opened_Profile --> Opened_Profile : Update Profile
+Opened_Profile --> Final : Delete Profile
+Opened_Profile --> Final : Logout
+
+Final --> [*]
+
+@enduml

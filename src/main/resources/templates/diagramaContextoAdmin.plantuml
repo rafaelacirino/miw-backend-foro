@@ -1,0 +1,18 @@
+@startuml
+
+[*] --> Initial
+
+Initial --> Opened_Questions
+
+Opened_Questions --> Managed_Roles : Manage Roles
+Opened_Questions --> Opened_Questions : Delete Content
+'Opened_Questions --> Restored_Content : Restore Content
+Opened_Questions --> Final : Logout
+
+Managed_Roles --> Managed_Roles : Update Role
+Managed_Roles --> Managed_Roles : Delete Role
+Managed_Roles --> Final : Logout
+
+Final --> [*]
+
+@enduml

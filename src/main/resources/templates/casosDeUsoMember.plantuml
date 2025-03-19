@@ -1,0 +1,55 @@
+@startuml
+
+actor Member
+
+left to right direction
+
+(Logout) as UC2
+
+(Open Profile) as UC4
+(Update Profile) as UC5
+(Delete Profile) as UC6
+
+(Create Question) as UC8
+(Delete Question) as UC9
+(Update Question) as UC10
+(Open MyQuestion) as UC12
+(Open MyQuestions) as UC13
+
+(Create Answer) as UC14
+(Update Answer) as UC15
+(Delete Answer) as UC16
+(Mark Answer as Correct) as UC17
+
+(Create Comment) as UC18
+(Update Comment) as UC19
+(Delete Comment) as UC20
+
+'añadir una nueva categoria
+(Update Tags) as UC21
+
+UC8 .-up-> UC13 : <<extend>>
+UC12 .-up-> UC13 : <<extend>>
+UC9 .-up-> UC12 : <<extend>>
+UC10 .-up-> UC12 : <<extend>>
+
+UC21 .-up-> UC8 : <<extend>>
+UC21 .-up-> UC10 : <<extend>>
+
+UC5 .-up-> UC4 : <<extend>>
+UC6 .-up-> UC4 : <<extend>>
+
+UC15 .-up-> UC14 : <<extend>>
+UC16 .-up-> UC14 : <<extend>>
+
+UC19 .-up-> UC18 : <<extend>>
+UC20 .-up-> UC18 : <<extend>>
+
+Member --> UC2
+Member --> UC4
+Member --> UC13
+Member --> UC14
+Member --> UC17
+Member --> UC18
+
+@enduml

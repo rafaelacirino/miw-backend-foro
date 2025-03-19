@@ -1,0 +1,30 @@
+@startuml
+
+actor Guest
+
+left to right direction
+
+(Login) as UC1
+(Sign Up) as UC3
+
+(Open Question) as UC7
+(Open Questions) as UC11
+(Filter Questions) as UC12
+
+(Search Content) as UC25
+(Open Tags) as UC26
+(Search Tags) as UC27
+
+
+UC3 .-down-> UC1 : <<extend>>
+UC11 .-down-> UC7 : <<extend>>
+UC11 .-down-> UC12 : <<extend>
+UC11 .-down-> UC25 : <<extend>>
+UC26 .-down-> UC27 : <<extend>>
+
+Guest --> UC11
+Guest --> UC3
+Guest --> UC26
+
+
+@enduml

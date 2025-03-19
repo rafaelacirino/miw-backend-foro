@@ -1,0 +1,76 @@
+@startuml
+actor Guest
+actor Member
+actor Admin
+Guest <|-down- Member
+Member <|-down- Admin
+
+left to right direction
+(Login) as UC1
+(Logout) as UC2
+(Sign Up) as UC3
+(Open MyProfile) as UC4
+(Update MyProfile) as UC5
+(Delete MyProfile) as UC6
+(Open Question) as UC7
+(Create Question) as UC8
+(Delete MyQuestion) as UC9
+(Update Question) as UC10
+(Open Questions) as UC11
+(Filter Questions) as UC12
+(Open MyQuestions) as UC13
+(Open MyQuestion) as UC32
+(Create Answer) as UC14
+(Update Answer) as UC15
+(Delete MyAnswer) as UC16
+(Mark Answer as Correct) as UC17
+(Create Comment) as UC18
+(Update Comment) as UC19
+(Delete Comment) as UC20
+(Create Tag) as UC21
+'añadir una nueva categoria
+(Add Tags) as UC22
+(Delete Tag) as UC23
+'para los users        delete category para el admin
+(Delete Category) as UC24
+(Search Content) as UC25
+(Open Tags) as UC26
+(Search Tags) as UC27
+' (Manage Roles) as UC26
+(Delete Question) as UC28
+(Create User) as UC29
+(Open Users) as UC30
+(Delete Answer) as UC31
+Guest --> UC7
+Guest --> UC11
+Guest --> UC25
+Guest --> UC26
+Guest --> UC27
+Guest --> UC1
+Guest --> UC3
+Member --> UC2
+Member --> UC4
+Member --> UC5
+Member --> UC6
+Member --> UC8
+Member --> UC9
+Member --> UC10
+Member --> UC12
+Member --> UC13
+Member --> UC14
+Member --> UC15
+Member --> UC16
+Member --> UC17
+Member --> UC18
+Member --> UC19
+Member --> UC20
+Member --> UC21
+Member --> UC22
+Member --> UC23
+Member --> UC32
+Admin --> UC24
+Admin --> UC28
+Admin --> UC29
+Admin --> UC30
+Admin --> UC31
+@enduml

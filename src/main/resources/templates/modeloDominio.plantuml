@@ -1,0 +1,78 @@
+@startuml
+
+Forum *-down-> "*" User
+Forum *-down-> "*" Notification
+Forum *-down-> "*" Question
+User *-down-> Profile
+User .-left-> Role
+Question *-down-> "*" Answer
+Question "*" o-down-> "0..*" Tag
+Tag .-right-> Category
+Answer *-down-> "*" Comment
+
+
+class User {
+- id*: Long
+- firstName: String
+- lastName: String
+- email: String
+- password: String
+- role: Role
+}
+
+class Profile {
+- id*: Long
+- user: User
+}
+
+class Question {
+- id*: Long
+- title: String
+- description: String
+- date: LocalDateTime
+- user: String
+- views: Integer
+}
+
+class Answer {
+- id*: Long
+- content: String
+- date: LocalDateTime
+- user: String
+- isCorrect: Boolean
+}
+
+class Comment {
+- id*: Long
+- reason: String
+- date: LocalDateTime
+- user: String
+}
+
+class Tag {
+- id*: Long
+- message: String
+}
+
+enum Role {
+ADMIN
+MEMBER
+GUEST
+}
+
+enum Category {
+TECHNOLOGY
+STUDY
+HARDWARE
+IMAGES
+}
+
+class Notification {
+- id*: Long
+- message: String
+- date: LocalDateTime
+- isRead: Boolean
+- user: String
+}
+
+@enduml
