@@ -43,40 +43,13 @@ public class UserController {
         response.sendRedirect("/swagger-ui/index.html");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/create")
-    @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DDBB")
-    public ResponseEntity<UserDto> createUser(@Validated(CreateValidation.class) @RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/register")
-    @Operation(summary = "registerUser", description = "Register a new user and insert into DDBB")
-    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "getUserById", description = "Get User by ID")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
-    }
-
-    @GetMapping("/me")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "getAuthenticatedUser", description = "Get details of the authenticated user")
-    public ResponseEntity<UserDto> getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-
-        String email = authentication.getName();
-
+    @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DB")
+    public ResponseEntity<UserDto> createUser(@Validated(CreateValidation.class) @RequestBody UserDto userDto) {
         try {
-            UserDto userDto = userService.getUserByEmail(email);
-            return ResponseEntity.ok(userDto);
+            return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
         } catch (ServiceException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
@@ -84,8 +57,27 @@ public class UserController {
         }
     }
 
+    @PostMapping("/register")
+    @Operation(summary = "registerUser", description = "Register a new user and insert into DB")
+    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "getUserById", description = "Get User by ID")
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(userService.getUserById(id));
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping("/login")
-    @Operation(summary = "login", description = "User login when user is registered and exists in DDBB")
+    @Operation(summary = "login", description = "User login when user is registered and exists in DB")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
         try {
             String token = userService.login(loginDto.getEmail(), loginDto.getPassword());
@@ -96,6 +88,8 @@ public class UserController {
     }
 
     @GetMapping("/getAllUsers")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "getAllUsers", description = "Returns all Users based on filters")
     public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(required = false) String firstName,
                                                      @RequestParam(required = false) String lastName,
@@ -107,25 +101,31 @@ public class UserController {
 
         Pageable pageable = PageRequest.of(page, size,
                 "desc".equalsIgnoreCase(sortDirection) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending());
-
-        Page<UserDto> userPage = userService.getAllUsers(firstName, lastName, email, pageable);
-
-        return ResponseEntity.ok(userPage);
+        try {
+            Page<UserDto> userPage = userService.getAllUsers(firstName, lastName, email, pageable);
+            return ResponseEntity.ok(userPage);
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "updateUser", description = "Update User into DDBB")
+    @PutMapping("/update/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "updateUser", description = "Update User into DB")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
                                               @Validated(UpdateValidation.class) @RequestBody UserDto userDto) {
         return ResponseEntity.ok(userService.updateUser(id, userDto));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "deleteUser", description = "Delete User by Id")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
-            return ResponseEntity.noContent().build(); // 204 No Content
+            return ResponseEntity.noContent().build();
         } catch (ServiceException e) {
             if (e.getMessage().equals("User with id " + id + " not found")) {
                 return ResponseEntity.notFound().build();

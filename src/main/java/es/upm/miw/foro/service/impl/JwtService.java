@@ -81,7 +81,7 @@ public class JwtService {
                 });
     }
 
-    private Optional<DecodedJWT> verify(String token) {
+    public Optional<DecodedJWT> verify(String token) {
         try {
             return Optional.of(JWT.require(Algorithm.HMAC256(this.secret))
                     .withIssuer(this.issuer).build()
@@ -90,5 +90,4 @@ public class JwtService {
             return Optional.empty();
         }
     }
-
 }

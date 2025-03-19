@@ -1,5 +1,6 @@
 package es.upm.miw.foro.config;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.service.impl.JwtService;
 import jakarta.servlet.FilterChain;
@@ -7,16 +8,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION = "Authorization";
@@ -24,45 +29,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
 
-//    @Override
-//    protected void doFilterInternal(@NonNull HttpServletRequest request,
-//                                    @NonNull HttpServletResponse response,
-//                                    @NonNull FilterChain chain)
-//            throws IOException, ServletException {
-//        String token = jwtService.extractToken(request.getHeader(AUTHORIZATION));
-//        if (token != null && !token.isEmpty()) {
-//            GrantedAuthority authority = new SimpleGrantedAuthority(Role.PREFIX + jwtService.role(token));
-//            UsernamePasswordAuthenticationToken authentication =
-//                    new UsernamePasswordAuthenticationToken(jwtService.user(token), token, List.of(authority));
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//        }
-//        chain.doFilter(request, response);
-//    }
-@Override
-protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                @NonNull HttpServletResponse response,
-                                @NonNull FilterChain chain)
-        throws IOException, ServletException {
-
-    try {
-        String bearer = request.getHeader(AUTHORIZATION);
-        String token = jwtService.extractToken(bearer);
-
-        if (token != null && !token.isEmpty()) {
-            String email = jwtService.user(token);
-            String role = jwtService.role(token);
-
-            if (!email.isEmpty()) {
-                GrantedAuthority authority = new SimpleGrantedAuthority(Role.PREFIX + role);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, List.of(authority));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain)
+            throws IOException, ServletException {
+        String authHeader = request.getHeader(AUTHORIZATION);
+        log.info("JWT: {}", authHeader);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
         }
-    } catch (Exception e) {
+        String token = jwtService.extractToken(authHeader);
+        log.info("JWT: {}", token);
+        Optional<DecodedJWT> decodedJWT = jwtService.verify(token);
+        log.info("DecodedJWT: {}", decodedJWT.isPresent());
+        if (decodedJWT.isEmpty()) {
+            chain.doFilter(request, response);
+            return;
+        }
+        String userEmail = jwtService.user(token);
+        log.info("User: {}", userEmail);
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = loadUserByUsername(userEmail);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        chain.doFilter(request, response);
     }
 
-    chain.doFilter(request, response);
-}
-
+    private UserDetails loadUserByUsername(String email) {
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(email)
+                .password("")
+                .roles(jwtService.role(email))
+                .build();
+    }
 }

@@ -1,6 +1,8 @@
 package es.upm.miw.foro.api.controller;
 
 import es.upm.miw.foro.TestConfig;
+import es.upm.miw.foro.api.dto.LoginDto;
+import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistance.model.Role;
@@ -12,12 +14,9 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @TestConfig
@@ -34,7 +33,6 @@ class UserControllerTest {
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
-    private static final LocalDateTime REGISTRED_DATE = LocalDateTime.now();
 
     @Test
     void testCreateUser() {
@@ -46,6 +44,37 @@ class UserControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(dto, response.getBody());
+        verify(userService, times(1)).createUser(dto);
+    }
+
+    @Test
+    void testCreateUserServiceException() {
+        // Arrange
+        UserDto dto = new UserDto();
+        when(userService.createUser(any(UserDto.class))).thenThrow(new ServiceException("User creation failed"));
+
+        // Act
+        ResponseEntity<UserDto> response = this.userController.createUser(dto);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(userService, times(1)).createUser(dto);
+    }
+
+    @Test
+    void testCreateUserGenericException() {
+        // Arrange
+        UserDto dto = new UserDto();
+        when(userService.createUser(any(UserDto.class))).thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act
+        ResponseEntity<UserDto> response = this.userController.createUser(dto);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(userService, times(1)).createUser(dto);
     }
 
     @Test
@@ -70,88 +99,75 @@ class UserControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(dto, response.getBody());
+        verify(userService, times(1)).getUserById(USER_ID);
     }
 
-//    @Test
-//    void testGetUserByEmailSuccess() throws ServiceException {
-//        UserDto dto =  new UserDto();
-//        when(userService.getUserByEmail(EMAIL)).thenReturn(dto);
-//
-//        ResponseEntity<UserDto> response = this.userController.getAuthenticatedUser();
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertNotNull(response.getBody());
-//        assertEquals(dto, response.getBody());
-//    }
-//
-//    @Test
-//    void testGetUserByEmail_UserNotFound() {
-//    }
+    @Test
+    void testGetUserByIdServiceException() {
+        // Arrange
+        when(userService.getUserById(USER_ID)).thenThrow(new ServiceException("User not authorized"));
 
-//    @Test
-//    void testGetAuthenticatedUser_Success() throws ServiceException {
-//        // Preparar datos de prueba
-//        String email = "test@example.com";
-//        UserDto userDto = new UserDto();
-//        userDto.setId(1L);
-//        userDto.setEmail(email);
-//        userDto.setFirstName("Test");
-//        userDto.setLastName("User");
-//
-//        // Configurar el contexto de autenticación
-//        Authentication authentication = mock(Authentication.class);
-//        when(authentication.getName()).thenReturn(email);
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        // Simular el comportamiento del servicio
-//        when(userService.getUserByEmail(email)).thenReturn(userDto);
-//
-//        // Ejecutar el método
-//        ResponseEntity<UserDto> response = userController.getAuthenticatedUser();
-//
-//        // Verificar resultados
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertNotNull(response.getBody());
-//        assertEquals(1L, response.getBody().getId());
-//        assertEquals("Test", response.getBody().getFirstName());
-//        assertEquals("User", response.getBody().getLastName());
-//
-//        // Verificar interacciones
-//        verify(userService, times(1)).getUserByEmail(email);
-//    }
-//
-//    @Test
-//    void testGetAuthenticatedUser_Unauthorized() {
-//        // Configurar un contexto de autenticación vacío
-//        SecurityContextHolder.clearContext();
-//
-//        // Ejecutar el método
-//        ResponseEntity<UserDto> response = userController.getAuthenticatedUser();
-//
-//        // Verificar resultados
-//        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-//        assertNull(response.getBody());
-//    }
-//
-//    @Test
-//    void testGetAuthenticatedUser_UserNotFound() throws ServiceException {
-//        // Configurar el contexto de autenticación
-//        Authentication authentication = mock(Authentication.class);
-//        when(authentication.getName()).thenReturn("nonexistent@example.com");
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        // Simular que el usuario no existe
-//        when(userService.getUserByEmail("nonexistent@example.com")).thenThrow(new ServiceException("User not found"));
-//
-//        // Ejecutar el método
-//        ResponseEntity<UserDto> response = userController.getAuthenticatedUser();
-//
-//        // Verificar resultados
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//        assertNull(response.getBody());
-//    }
+        // Act
+        ResponseEntity<UserDto> response = this.userController.getUserById(USER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(userService, times(1)).getUserById(USER_ID);
+    }
 
     @Test
+    void testGetUserByIdGenericException() {
+        // Arrange
+        when(userService.getUserById(USER_ID)).thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act
+        ResponseEntity<UserDto> response = this.userController.getUserById(USER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(userService, times(1)).getUserById(USER_ID);
+    }
+
+    @Test
+    void testLoginSuccess() {
+        // Arrange
+        String token = UUID.randomUUID().toString();
+        LoginDto loginDto = new LoginDto(EMAIL, PASSWORD);
+        when(userService.login(EMAIL, PASSWORD)).thenReturn(token);
+
+        // Act
+        ResponseEntity<?> response = userController.login(loginDto);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertInstanceOf(TokenDto.class, response.getBody());
+        TokenDto tokenDto = (TokenDto) response.getBody();
+        assertEquals(token, tokenDto.getToken());
+        verify(userService, times(1)).login(EMAIL, PASSWORD);
+    }
+
+    @Test
+    void testLoginServiceException() {
+        // Arrange
+        String errorMessage = "Wrong password";
+        LoginDto loginDto = new LoginDto(EMAIL, PASSWORD);
+        when(userService.login(EMAIL, PASSWORD)).thenThrow(new ServiceException(errorMessage));
+
+        // Act
+        ResponseEntity<?> response = userController.login(loginDto);
+
+        // Assert
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertInstanceOf(String.class, response.getBody());
+        assertEquals(errorMessage, response.getBody());
+        verify(userService, times(1)).login(EMAIL, PASSWORD);
+    }
+
+   @Test
     void testGetAllUsers() {
         // Arrange
         UserDto userDto = new UserDto();
@@ -159,16 +175,64 @@ class UserControllerTest {
         userDto.setFirstName(FIRST_NAME);
         userDto.setLastName(LAST_NAME);
         userDto.setEmail(EMAIL);
-        userDto.setPassword(PASSWORD);
-        userDto.setRole(Role.ADMIN);
-        userDto.setRegisteredDate(REGISTRED_DATE);
+        Page<UserDto> userPage = new PageImpl<>(List.of(userDto));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+
+        when(userService.getAllUsers(null, null, null, pageable)).thenReturn(userPage);
+
+        // Act
+        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+                                                                    0, 10, "id", "asc");
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getTotalElements());
+        verify(userService, times(1))
+                                                        .getAllUsers(null, null, null, pageable);
+    }
+
+    @Test
+    void testGetAllUsersWithDescending() {
+        // Arrange
+        UserDto userDto = new UserDto();
+        userDto.setId(USER_ID);
+        userDto.setFirstName(FIRST_NAME);
+        userDto.setLastName(LAST_NAME);
+        userDto.setEmail(EMAIL);
+        Page<UserDto> userPage = new PageImpl<>(List.of(userDto));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
+
+        when(userService.getAllUsers(null, null, null, pageable)).thenReturn(userPage);
+
+        // Act
+        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+                                                                    0, 10, "id", "desc");
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getTotalElements());
+        verify(userService, times(1))
+                .getAllUsers(null, null, null, pageable);
+    }
+
+   @Test
+    void testGetAllUsers_withFilters() {
+        // Arrange
+        UserDto userDto = new UserDto();
+        userDto.setId(USER_ID);
+        userDto.setFirstName(FIRST_NAME);
+        userDto.setLastName(LAST_NAME);
+        userDto.setEmail(EMAIL);
         Page<UserDto> userPage = new PageImpl<>(List.of(userDto));
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
 
         when(userService.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL, pageable)).thenReturn(userPage);
 
         // Act
-        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL, 0, 10, "id", "asc");
+        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL,
+                                                                        0, 10, "id", "asc");
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -178,29 +242,37 @@ class UserControllerTest {
     }
 
     @Test
-    void testGetAllUsersWithFiltersDescendingFilter() {
+    void testGetAllUsersServiceException() {
         // Arrange
-        UserDto userDto = new UserDto();
-        userDto.setId(USER_ID);
-        userDto.setFirstName(FIRST_NAME);
-        userDto.setLastName(LAST_NAME);
-        userDto.setEmail(EMAIL);
-        userDto.setPassword(PASSWORD);
-        userDto.setRole(Role.ADMIN);
-        userDto.setRegisteredDate(REGISTRED_DATE);
-        Page<UserDto> userPage = new PageImpl<>(List.of(userDto));
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-
-        when(userService.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL, pageable)).thenReturn(userPage);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        when(userService.getAllUsers(null, null, null, pageable))
+                .thenThrow(new ServiceException("Unauthorized: Only admins can list users"));
 
         // Act
-        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL, 0, 10, "id", "desc");
+        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+                0, 10, "id", "asc");
 
         // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().getTotalElements());
-        verify(userService, times(1)).getAllUsers(FIRST_NAME, LAST_NAME, EMAIL, pageable);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(userService, times(1)).getAllUsers(null, null, null, pageable);
+    }
+
+    @Test
+    void testGetAllUsersGenericException() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        when(userService.getAllUsers(null, null, null, pageable))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act
+        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+                0, 10, "id", "asc");
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(userService, times(1)).getAllUsers(null, null, null, pageable);
     }
 
     @Test
@@ -222,5 +294,75 @@ class UserControllerTest {
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(userService).deleteUser(USER_ID);
+    }
+
+    @Test
+    void testDeleteUserNotFound() {
+        // Arrange
+        String errorMessage = "User with id " + USER_ID + " not found";
+        doThrow(new ServiceException(errorMessage)).when(userService).deleteUser(USER_ID);
+
+        // Act
+        ResponseEntity<Void> response = userController.deleteUser(USER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(userService, times(1)).deleteUser(USER_ID);
+    }
+
+    @Test
+    void testDeleteUserOtherServiceException() {
+        // Arrange
+        String errorMessage = "Unauthorized: Only admins or the user themselves can delete this user";
+        doThrow(new ServiceException(errorMessage)).when(userService).deleteUser(USER_ID);
+
+        // Act
+        ResponseEntity<Void> response = userController.deleteUser(USER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        verify(userService, times(1)).deleteUser(USER_ID);
+    }
+
+    @Test
+    void testVerifyPassword_success() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", USER_ID.toString());
+        request.put("currentPassword", PASSWORD);
+
+        when(userService.verifyPassword(USER_ID, PASSWORD)).thenReturn(true);
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> response = userController.verifyPassword(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(Objects.requireNonNull(response.getBody()).get("isValid"));
+
+        // Verify
+        verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);
+    }
+
+    @Test
+    void testVerifyPassword_failure() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", USER_ID.toString());
+        request.put("currentPassword", PASSWORD);
+
+        when(userService.verifyPassword(USER_ID, PASSWORD)).thenReturn(false);
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> response = userController.verifyPassword(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode()); // Verificar el código de estado HTTP
+        assertFalse(response.getBody().get("isValid")); // Verificar que el resultado sea false
+
+        // Verify
+        verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);
     }
 }
