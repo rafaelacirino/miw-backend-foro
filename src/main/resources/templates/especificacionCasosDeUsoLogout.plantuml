@@ -8,6 +8,6 @@ Filtered_Question --> Logout : The user requests Logout
 Opened_Profile -down-> Logout
 Opened_MyQuestions -down-> Logout
 Opened_Tags -down-> Logout
-Logout -down-> Login : The user shows Login
+Logout -down-> Login : The system shows Login
 
 @enduml

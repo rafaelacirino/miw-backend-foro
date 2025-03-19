@@ -6,8 +6,8 @@ Forum *-down-> "*" Question
 User *-down-> Profile
 User .-left-> Role
 Question *-down-> "*" Answer
-Question "*" o-down-> "0..*" Tag
-Tag .-right-> Category
+Question "*" o-down-> "0..*" Category
+Category *-down-> "*" SubCategory
 Answer *-down-> "*" Comment
 
 
@@ -20,9 +20,16 @@ class User {
 - role: Role
 }
 
+enum Role {
+- ADMIN
+- CUSTOMER
+- GUEST
+}
+
 class Profile {
 - id*: Long
-- user: User
+- name: String
+- bio: String
 }
 
 class Question {
@@ -49,29 +56,22 @@ class Comment {
 - user: String
 }
 
-class Tag {
+class Category {
 - id*: Long
 - message: String
+- subCategory: List<SubCategory>
 }
 
-enum Role {
-ADMIN
-MEMBER
-GUEST
-}
-
-enum Category {
-TECHNOLOGY
-STUDY
-HARDWARE
-IMAGES
+class SubCategory {
+- id*: Long
+- message: String
 }
 
 class Notification {
 - id*: Long
 - message: String
 - date: LocalDateTime
-- isRead: Boolean
+- wasRead: Boolean
 - user: String
 }
 
