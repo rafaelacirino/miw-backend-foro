@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = loadUserByUsername(token);
+                UserDetails userDetails = loadUserByUsername(token, userEmail);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -70,8 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    private UserDetails loadUserByUsername(String token) {
-        String userEmail = jwtService.user(token);
+    private UserDetails loadUserByUsername(String token, String userEmail) {
         String role = jwtService.role(token);
         log.info("Role for user {}: {}", userEmail, role);
         return org.springframework.security.core.userdetails.User.builder()

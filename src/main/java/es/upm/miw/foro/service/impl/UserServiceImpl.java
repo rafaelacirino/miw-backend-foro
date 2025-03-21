@@ -106,7 +106,8 @@ public class UserServiceImpl implements UserService {
         try {
             User currentUser = getAuthenticatedUserWithRole(Role.ADMIN);
             log.info("Authenticated user: {} with role: {}", currentUser.getFirstName(), currentUser.getRole());
-            if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty() && email != null && !email.isEmpty()) {
+            if (firstName != null && !firstName.isBlank() && lastName != null && !lastName.isBlank()
+                                                                            && email != null && !email.isBlank()) {
                 return userRepository.findByFirstNameAndLastNameAndEmail(firstName, lastName, email, pageable)
                         .map(UserMapper::toUserDto);
             } else if (firstName != null) {

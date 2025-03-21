@@ -31,6 +31,6 @@ class TokenDtoTest {
     void testToString() {
         TokenDto tokenDto = new TokenDto("sampleToken123");
         String expectedToString = "TokenDto(token=sampleToken123)";
-        assertThat(tokenDto.toString()).isEqualTo(expectedToString);
+        assertThat(tokenDto.toString()).hasToString(expectedToString);
     }
 }

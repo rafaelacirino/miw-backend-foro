@@ -1,8 +1,8 @@
 package es.upm.miw.foro.service;
 
 import es.upm.miw.foro.TestConfig;
-import es.upm.miw.foro.api.converter.UserMapper;
 import es.upm.miw.foro.api.dto.UserDto;
+import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.persistance.model.User;
@@ -13,8 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -35,9 +37,6 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private UserMapper userMapper;
-
-    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
@@ -45,6 +44,8 @@ class UserServiceTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    private User user;
 
     private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
@@ -65,7 +66,7 @@ class UserServiceTest {
         userDto.setRole(Role.ADMIN);
         userDto.setRegisteredDate(REGISTERED_DATE);
 
-        User user = new User();
+        user = new User();
         user.setId(USER_ID);
         user.setFirstName(FIRST_NAME);
         user.setLastName(LAST_NAME);
@@ -92,7 +93,7 @@ class UserServiceTest {
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
 
-        User user = new User();
+        user = new User();
         user.setId(USER_ID);
         user.setEmail(EMAIL);
         user.setPassword("encodedPassword");
@@ -120,10 +121,10 @@ class UserServiceTest {
     @Test
     void testRegisterUser_success() {
         // Arrange
-        User user = new User();
-        user.setId(USER_ID);
-        user.setEmail(EMAIL);
-        user.setPassword(ENCODED_PASSWORD);
+        User userRegistered = new User();
+        userRegistered.setId(USER_ID);
+        userRegistered.setEmail(EMAIL);
+        userRegistered.setPassword(ENCODED_PASSWORD);
 
         UserDto userDtoInput = new UserDto();
         userDtoInput.setEmail(EMAIL);
@@ -194,7 +195,7 @@ class UserServiceTest {
 
     @Test
     void testLogin_success() {
-        User user = new User();
+        user = new User();
         user.setId(USER_ID);
         user.setEmail(EMAIL);
         user.setPassword(ENCODED_PASSWORD);
@@ -205,11 +206,11 @@ class UserServiceTest {
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(PASSWORD, user.getPassword())).thenReturn(true);
         when(jwtService.createToken(
-                eq(USER_ID),
-                eq(FIRST_NAME),
-                eq(LAST_NAME),
-                eq(EMAIL),
-                eq(Role.ADMIN.name())
+                USER_ID,
+                FIRST_NAME,
+                LAST_NAME,
+                EMAIL,
+                Role.ADMIN.name()
         )).thenReturn("jwtToken");
 
         String token = userService.login(EMAIL, PASSWORD);
@@ -230,21 +231,9 @@ class UserServiceTest {
 
     @Test
     void testGetAllUsers_success() {
-        User authenticatedUser = new User();
-        authenticatedUser.setId(USER_ID);
-        authenticatedUser.setEmail(EMAIL);
-        authenticatedUser.setRole(Role.ADMIN);
+        setupAuthentication();
 
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(EMAIL);
-        SecurityContextHolder.setContext(securityContext);
-
-        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
-
-        User user = new User();
+        user = new User();
         Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
 
         when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
@@ -255,25 +244,249 @@ class UserServiceTest {
     }
 
     @Test
+    void testGetAllUsers_noFilters() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mockito
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(null, null, null, pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findAll(pageable);
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByFirstName(any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+        verify(userRepository, never()).findByEmail(any(), any());
+    }
+
+    @Test
+    void testGetAllUsers_withFirstNameLasNameAndEmail() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mockito
+        when(userRepository.findByFirstNameAndLastNameAndEmail(FIRST_NAME, LAST_NAME, EMAIL, pageable)).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL, pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findByFirstNameAndLastNameAndEmail(FIRST_NAME,
+                                                                                            LAST_NAME, EMAIL, pageable);
+        verify(userRepository, never()).findByFirstName(any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+        verify(userRepository, never()).findByEmail(any(), any());
+    }
+
+    @Test
+    void testGetAllUsers_withOnlyFirstName() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mock
+        when(userRepository.findByFirstName(FIRST_NAME, pageable)).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(FIRST_NAME, null, null, pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findByFirstName(FIRST_NAME, pageable);
+        verify(userRepository, never()).findAll(pageable);
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+        verify(userRepository, never()).findByEmail(any(), any());
+    }
+
+    @Test
+    void testGetAllUsers_withOnlyLastName() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mock
+        when(userRepository.findByLastName(LAST_NAME, pageable)).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(null, LAST_NAME, null, pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findByLastName(LAST_NAME, pageable);
+        verify(userRepository, never()).findAll(pageable);
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByFirstName(any(), any());
+        verify(userRepository, never()).findByEmail(any(), any());
+    }
+
+    @Test
+    void testGetAllUsers_withOnlyEmail() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mock
+        when(userRepository.findByEmail(EMAIL, pageable)).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(null, null, EMAIL, pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findByEmail(EMAIL, pageable);
+        verify(userRepository, never()).findAll(pageable);
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByFirstName(any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+    }
+
+    @Test
+    void testGetAllUsers_withOnlyFirstNameBlankLastNameAndEmail() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mock
+        when(userRepository.findByFirstName(FIRST_NAME, pageable)).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(FIRST_NAME, "", "", pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findByFirstName(FIRST_NAME, pageable);
+        verify(userRepository, never()).findAll(pageable);
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+        verify(userRepository, never()).findByEmail(any(), any());
+    }
+
+    @Test
+    void testGetAllUsers_withOnlyFirstNameLastNameBlankEmail() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mock
+        when(userRepository.findByFirstName(FIRST_NAME, pageable)).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(FIRST_NAME, LAST_NAME, "", pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findByFirstName(FIRST_NAME, pageable);
+        verify(userRepository, never()).findAll(pageable);
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+        verify(userRepository, never()).findByEmail(any(), any());
+    }
+
+    @Test
+    void testGetAllUsers_withOnlyFirstNameLastNameNullEmail() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+
+        // Mock
+        when(userRepository.findByFirstName(FIRST_NAME, pageable)).thenReturn(userPage);
+
+        // Act
+        Page<UserDto> result = userService.getAllUsers(FIRST_NAME, LAST_NAME, null, pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        //noinspection SequencedCollectionMethodCanBeUsed
+        assertEquals(user.getId(), result.getContent().get(0).getId());
+
+        // Verify
+        verify(userRepository, times(1)).findByFirstName(FIRST_NAME, pageable);
+        verify(userRepository, never()).findAll(pageable);
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+        verify(userRepository, never()).findByEmail(any(), any());
+    }
+
+    @Test
+    void getAllUsers_repositoryException() {
+        // Arrange
+        setupAuthentication();
+        Pageable pageable = PageRequest.of(0, 10);
+        when(userRepository.findByEmail(EMAIL, pageable)).thenThrow(new DataAccessException("Error") {});
+
+        // Act & Assert
+        RepositoryException exception = assertThrows(RepositoryException.class, () ->
+                userService.getAllUsers(null, null, EMAIL, pageable));
+        assertEquals("Error getting Users from repository", exception.getMessage());
+
+        // Verify
+        verify(userRepository, times(1)).findByEmail(EMAIL, pageable);
+        verify(userRepository, never()).findAll(any(Pageable.class));
+        verify(userRepository, never()).findByFirstNameAndLastNameAndEmail(any(), any(), any(), any());
+        verify(userRepository, never()).findByFirstName(any(), any());
+        verify(userRepository, never()).findByLastName(any(), any());
+    }
+
+    @Test
     void testUpdateUser_success() {
         // Arrange
-        User authenticatedUser = new User();
-        authenticatedUser.setId(USER_ID);
-        authenticatedUser.setEmail(EMAIL);
-        authenticatedUser.setRole(Role.ADMIN);
-
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(EMAIL);
-        SecurityContextHolder.setContext(securityContext);
-
-        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
+        setupAuthentication();
 
         User existingUser = new User();
         existingUser.setId(USER_ID);
-        existingUser.setEmail("old@email.com");
+        existingUser.setEmail(EMAIL);
         existingUser.setRole(Role.MEMBER);
 
         UserDto userDtoInput = new UserDto();
@@ -336,6 +549,15 @@ class UserServiceTest {
 
     @Test
     void testDeleteUser_notFound() {
+        setupAuthentication();
+
+        when(userRepository.existsById(USER_ID)).thenReturn(false);
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.deleteUser(USER_ID));
+        assertEquals("User with id " + USER_ID + " not found", exception.getMessage());
+    }
+
+    private void setupAuthentication() {
         User authenticatedUser = new User();
         authenticatedUser.setId(USER_ID);
         authenticatedUser.setEmail(EMAIL);
@@ -343,16 +565,10 @@ class UserServiceTest {
 
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
-
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(EMAIL);
         SecurityContextHolder.setContext(securityContext);
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
-
-        when(userRepository.existsById(USER_ID)).thenReturn(false);
-
-        ServiceException exception = assertThrows(ServiceException.class, () -> userService.deleteUser(USER_ID));
-        assertEquals("User with id " + USER_ID + " not found", exception.getMessage());
     }
 }

@@ -5,7 +5,6 @@ import es.upm.miw.foro.api.dto.LoginDto;
 import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
-import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -359,8 +358,8 @@ class UserControllerTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode()); // Verificar el código de estado HTTP
-        assertFalse(response.getBody().get("isValid")); // Verificar que el resultado sea false
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertFalse(response.getBody().get("isValid"));
 
         // Verify
         verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);

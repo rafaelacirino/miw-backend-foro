@@ -31,7 +31,7 @@ class JwtAuthenticationFilterTest {
     private static final String AUTHORIZATION = "Authorization";
     private static final String TOKEN = "mockedToken";
     private static final String BEARER_TOKEN = "Bearer " + TOKEN;
-    private static final String ROLE = "USER";
+    private static final String ROLE = "GUEST";
     private static final String USERNAME = "mockUser";
     private static final String PASSWORD = "mockPassword";
 
@@ -91,7 +91,7 @@ class JwtAuthenticationFilterTest {
         when(jwtService.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
         when(jwtService.verify(TOKEN)).thenReturn(Optional.of(mock(DecodedJWT.class)));
         when(jwtService.user(TOKEN)).thenReturn(USERNAME);
-        when(jwtService.role(USERNAME)).thenReturn(ROLE);
+        when(jwtService.role(TOKEN)).thenReturn(ROLE);
 
         // Act
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -104,14 +104,14 @@ class JwtAuthenticationFilterTest {
         assertThat(userDetails.getUsername()).isEqualTo(USERNAME);
         assertThat(authentication.getCredentials()).isNull();
         assertThat(authentication.getAuthorities()).extracting("authority")
-                                                                        .containsExactly("ROLE_" + ROLE);
+                .containsExactly("ROLE_" + ROLE);
         assertThat(authentication.getDetails()).isNotNull();
 
         verify(filterChain, times(1)).doFilter(request, response);
         verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
         verify(jwtService, times(1)).verify(TOKEN);
         verify(jwtService, times(1)).user(TOKEN);
-        verify(jwtService, times(1)).role(USERNAME);
+        verify(jwtService, times(1)).role(TOKEN);
     }
 
     @Test
