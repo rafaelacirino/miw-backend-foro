@@ -29,7 +29,7 @@ enum Role {
 class Profile {
 - id*: Long
 - name: String
-- bio: String
+- description: String
 }
 
 class Question {
@@ -59,7 +59,6 @@ class Comment {
 class Category {
 - id*: Long
 - message: String
-- subCategory: List<SubCategory>
 }
 
 class SubCategory {
