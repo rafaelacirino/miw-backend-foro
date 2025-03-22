@@ -41,6 +41,17 @@ class JwtServiceTest {
     }
 
     @Test
+    void testExtractTokenWithValidToken() {
+        String validToken = "Bearer header.payload.signature";
+        assertEquals("header.payload.signature", jwtService.extractToken(validToken));
+    }
+
+    @Test
+    void testExtractTokenWithNullHeader() {
+        assertNull(jwtService.extractToken(null));
+    }
+
+    @Test
     void testExtractTokenWithNoBearer() {
         assertNull(jwtService.extractToken("t.t.t")); // Sem "Bearer "
     }
@@ -53,6 +64,21 @@ class JwtServiceTest {
     @Test
     void testUserWithInvalidTokenThrowsException() {
         assertThrows(JWTDecodeException.class, () -> jwtService.user("Bearer invalid"));
+    }
+
+    @Test
+    void testExtractWithEmptyToken() {
+        assertNull(jwtService.extractToken("Bearer "));
+    }
+
+    @Test
+    void testExtractWithTwoParts() {
+        assertNull(jwtService.extractToken("Bearer part1.part2"));
+    }
+
+    @Test
+    void testExtractWithFourParts() {
+        assertNull(jwtService.extractToken("Bearer part1.part2.part3.part4"));
     }
 
     @Test
@@ -87,5 +113,37 @@ class JwtServiceTest {
                 .withClaim("role", ROLE)
                 .sign(Algorithm.HMAC256("test-secret"));
         assertThrows(JWTDecodeException.class, () -> jwtService.user(token));
+    }
+
+    @Test
+    void testUserWithEmptyEmailClaimThrowsException() {
+        String token = JWT.create()
+                .withIssuer("test-issuer")
+                .withClaim("email", "")
+                .withClaim("role", ROLE)
+                .sign(Algorithm.HMAC256("test-secret"));
+
+        JWTDecodeException exception = assertThrows(JWTDecodeException.class, () -> jwtService.user("Bearer " + token));
+        assertEquals("Invalid token", exception.getMessage());
+    }
+
+    @Test
+    void testRoleWithNullTokenThrowsException() {
+        JWTDecodeException exception = assertThrows(JWTDecodeException.class, () -> jwtService.role(null));
+        assertEquals("Invalid token format", exception.getMessage());
+    }
+
+    @Test
+    void testRoleWithInvalidTokenFormatThrowsException() {
+        JWTDecodeException exception = assertThrows(JWTDecodeException.class, () -> jwtService.role("invalid.token"));
+        assertEquals("Invalid token format", exception.getMessage());
+    }
+
+    @Test
+    void testRoleWithDecodingFailureThrowsException() {
+        String malformedToken = "invalid.token.format";
+
+        JWTDecodeException exception = assertThrows(JWTDecodeException.class, () -> jwtService.role(malformedToken));
+        assertNotNull(exception.getMessage());
     }
 }

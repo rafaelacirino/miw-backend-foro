@@ -146,6 +146,77 @@ class UserServiceTest {
     }
 
     @Test
+    void testRegisterUser_withRole() {
+        // Arrange
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+        userDtoInput.setRole(Role.ADMIN);
+
+        User userToSave = new User();
+        userToSave.setEmail(EMAIL);
+        userToSave.setPassword(ENCODED_PASSWORD);
+        userToSave.setRole(Role.ADMIN);
+
+        User savedUser = new User();
+        savedUser.setId(USER_ID);
+        savedUser.setEmail(EMAIL);
+        savedUser.setPassword(ENCODED_PASSWORD);
+        savedUser.setRole(Role.ADMIN);
+
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        // Act
+        UserDto registeredUser = userService.registerUser(userDtoInput);
+
+        // Assert
+        assertNotNull(registeredUser);
+        assertEquals(EMAIL, registeredUser.getEmail());
+        assertEquals(Role.ADMIN, registeredUser.getRole());
+
+        // Verify
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(passwordEncoder, times(1)).encode(PASSWORD);
+    }
+
+    @Test
+    void testRegisterUser_repositoryException() {
+        // Arrange
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
+        when(userRepository.save(any(User.class))).thenThrow(new DataAccessException("Error") {});
+
+        // Act & Assert
+        RepositoryException exception = assertThrows(RepositoryException.class, () -> userService.registerUser(userDtoInput));
+        assertEquals("Error saving User", exception.getMessage());
+
+        // Verify
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(passwordEncoder, times(1)).encode(PASSWORD);
+    }
+
+    @Test
+    void testRegisterUser_unexpectedException() {
+        // Arrange
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+
+        when(passwordEncoder.encode(PASSWORD)).thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.registerUser(userDtoInput));
+        assertEquals("Unexpected error while creating User", exception.getMessage());
+
+        // Verify
+        verify(passwordEncoder, times(1)).encode(PASSWORD);
+    }
+
+    @Test
     void testGetUserById_success() {
         SecurityContextHolder.clearContext();
 
