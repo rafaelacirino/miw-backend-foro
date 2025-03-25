@@ -149,6 +149,44 @@ class UserServiceTest {
     }
 
     @Test
+    void testCreateUser_withNullRole() {
+        // Arrange
+        setupAuthentication();
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setFirstName(FIRST_NAME);
+        userDtoInput.setLastName(LAST_NAME);
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+        userDtoInput.setRole(null);
+
+        User savedUser = new User();
+        savedUser.setId(USER_ID);
+        savedUser.setFirstName(FIRST_NAME);
+        savedUser.setLastName(LAST_NAME);
+        savedUser.setEmail(EMAIL);
+        savedUser.setPassword(ENCODED_PASSWORD);
+        savedUser.setRole(Role.MEMBER);
+
+        when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
+        when(validator.validate(any(UserDto.class), eq(UserValidation.class))).thenReturn(Collections.emptySet());
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        // Act
+        UserDto createdUser = userService.createUser(userDtoInput);
+
+        // Assert
+        assertNotNull(createdUser);
+        assertEquals(Role.MEMBER, createdUser.getRole());
+
+        // Verify
+        verify(userRepository, times(1)).existsByEmail(EMAIL);
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(passwordEncoder, times(1)).encode(PASSWORD);
+        verify(validator, times(1)).validate(any(UserDto.class), eq(UserValidation.class));
+    }
+
+    @Test
     void testCreateUser_failure() {
         // Arrange
         User authenticatedUser = new User();
@@ -193,6 +231,65 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
         verify(passwordEncoder, never()).encode(anyString());
         verify(validator, never()).validate(any(UserDto.class), eq(UserValidation.class));
+    }
+
+    @Test
+    void testCreateUser_dataAccessException() {
+        // Arrange
+        setupAuthentication();
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+
+        when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
+        when(validator.validate(any(UserDto.class), eq(UserValidation.class))).thenReturn(Collections.emptySet());
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
+        when(userRepository.save(any(User.class))).thenThrow(new DataAccessException("DB error") {});
+
+        // Act & Assert
+        RepositoryException exception = assertThrows(RepositoryException.class, () -> userService.createUser(userDtoInput));
+        assertEquals("Error saving User", exception.getMessage());
+
+        // Verify
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    void testCreateUser_serviceExceptionFromValidateEmail() {
+        // Arrange
+        setupAuthentication();
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+
+        when(userRepository.existsByEmail(EMAIL)).thenReturn(true);
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.createUser(userDtoInput));
+        assertEquals("Email " + EMAIL + " already exists", exception.getMessage());
+
+        // Verify
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void testCreateUser_unexpectedException() {
+        // Arrange
+        setupAuthentication();
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+
+        when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
+        when(validator.validate(any(UserDto.class), eq(UserValidation.class))).thenReturn(Collections.emptySet());
+        when(passwordEncoder.encode(PASSWORD)).thenThrow(new RuntimeException("Encoding error"));
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.createUser(userDtoInput));
+        assertEquals("Unexpected error while creating User", exception.getMessage());
+
+        // Verify
+        verify(userRepository, never()).save(any(User.class));
     }
 
 
@@ -343,6 +440,44 @@ class UserServiceTest {
     }
 
     @Test
+    void testGetUserById_unauthorized() {
+        // Arrange
+        User authenticatedUser = new User();
+        authenticatedUser.setId(2L);
+        authenticatedUser.setEmail(EMAIL);
+        authenticatedUser.setRole(Role.MEMBER);
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(EMAIL);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.getUserById(USER_ID));
+        assertEquals("Unauthorized: Only admins or the user themselves can get this user", exception.getMessage());
+
+        // Verify
+        verify(userRepository, never()).findById(anyLong());
+    }
+
+    @Test
+    void testGetUserById_dataAccessException() {
+        // Arrange
+        setupAuthentication();
+        when(userRepository.findById(USER_ID)).thenThrow(new DataAccessException("DB error") {});
+
+        // Act & Assert
+        RepositoryException exception = assertThrows(RepositoryException.class, () -> userService.getUserById(USER_ID));
+        assertEquals("Error getting User with ID: " + USER_ID, exception.getMessage());
+
+        // Verify
+        verify(userRepository, times(1)).findById(USER_ID);
+    }
+
+    @Test
     void testLogin_success() {
         user = new User();
         user.setId(USER_ID);
@@ -376,6 +511,51 @@ class UserServiceTest {
                 EMAIL,
                 Role.ADMIN.name()
         );
+    }
+
+    @Test
+    void testLogin_reencodePassword() {
+        // Arrange
+        user.setId(USER_ID);
+        user.setEmail(EMAIL);
+        user.setPassword(PASSWORD);
+        user.setFirstName(FIRST_NAME);
+        user.setLastName(LAST_NAME);
+        user.setRole(Role.MEMBER);
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(PASSWORD, PASSWORD)).thenReturn(false);
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(jwtService.createToken(USER_ID, FIRST_NAME, LAST_NAME, EMAIL, Role.MEMBER.name())).thenReturn("jwtToken");
+
+        // Act
+        String token = userService.login(EMAIL, PASSWORD);
+
+        // Assert
+        assertEquals("jwtToken", token);
+
+        // Verify
+        verify(userRepository, times(1)).save(any(User.class));
+        verify(passwordEncoder, times(1)).encode(PASSWORD);
+    }
+
+    @Test
+    void testLogin_wrongPassword() {
+        // Arrange
+        user.setId(USER_ID);
+        user.setEmail(EMAIL);
+        user.setPassword(ENCODED_PASSWORD);
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrongPassword", ENCODED_PASSWORD)).thenReturn(false);
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.login(EMAIL, "wrongPassword"));
+        assertEquals("Wrong password", exception.getMessage());
+
+        // Verify
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test

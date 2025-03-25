@@ -121,7 +121,20 @@ class UserTest {
 
         // Act & Assert
         assertEquals(expectedString, user.toString());
+    }
 
+    @Test
+    void testOnCreate_setsRegisteredDate() {
+        // Arrange
+        User user = new User();
+        assertNull(user.getRegisteredDate());
 
+        // Act
+        user.onCreate();
+
+        // Assert
+        assertNotNull(user.getRegisteredDate());
+        assertTrue(user.getRegisteredDate().isBefore(LocalDateTime.now().plusSeconds(1)));
+        assertTrue(user.getRegisteredDate().isAfter(LocalDateTime.now().minusSeconds(1)));
     }
 }

@@ -64,6 +64,24 @@ class UserControllerTest {
     }
 
     @Test
+    void testCreateUserServiceExceptionWithCustomStatus() {
+        // Arrange
+        UserDto dto = new UserDto();
+        String errorMessage = "Invalid user data";
+        HttpStatus customStatus = HttpStatus.BAD_REQUEST;
+        when(userService.createUser(any(UserDto.class)))
+                .thenThrow(new ServiceException(errorMessage, customStatus));
+
+        // Act
+        ResponseEntity<Object> response = this.userController.createUser(dto);
+
+        // Assert
+        assertEquals(customStatus, response.getStatusCode());
+        assertEquals(errorMessage, response.getBody());
+        verify(userService, times(1)).createUser(dto);
+    }
+
+    @Test
     void testCreateUserGenericException() {
         // Arrange
         UserDto dto = new UserDto();
@@ -102,6 +120,24 @@ class UserControllerTest {
 
         // Assert
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(errorMessage, response.getBody());
+        verify(userService, times(1)).registerUser(dto);
+    }
+
+    @Test
+    void testRegisterUserServiceExceptionWithCustomStatus() {
+        // Arrange
+        UserDto dto = new UserDto();
+        String errorMessage = "Email already registered";
+        HttpStatus customStatus = HttpStatus.BAD_REQUEST;
+        when(userService.registerUser(any(UserDto.class)))
+                .thenThrow(new ServiceException(errorMessage, customStatus));
+
+        // Act
+        ResponseEntity<Object> response = this.userController.registerUser(dto);
+
+        // Assert
+        assertEquals(customStatus, response.getStatusCode());
         assertEquals(errorMessage, response.getBody());
         verify(userService, times(1)).registerUser(dto);
     }
@@ -331,6 +367,24 @@ class UserControllerTest {
 
         // Assert
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(errorMessage, response.getBody());
+        verify(userService, times(1)).updateUser(USER_ID, dto);
+    }
+
+    @Test
+    void testUpdateUserServiceExceptionWithCustomStatus() {
+        // Arrange
+        UserDto dto = new UserDto();
+        String errorMessage = "User not found";
+        HttpStatus customStatus = HttpStatus.NOT_FOUND;
+        when(userService.updateUser(eq(USER_ID), any(UserDto.class)))
+                .thenThrow(new ServiceException(errorMessage, customStatus));
+
+        // Act
+        ResponseEntity<Object> response = this.userController.updateUser(USER_ID, dto);
+
+        // Assert
+        assertEquals(customStatus, response.getStatusCode());
         assertEquals(errorMessage, response.getBody());
         verify(userService, times(1)).updateUser(USER_ID, dto);
     }

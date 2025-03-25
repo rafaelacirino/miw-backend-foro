@@ -19,6 +19,18 @@ class PasswordValidatorTest {
     }
 
     @Test
+    void testInitialize() {
+        // Arrange
+        ValidPassword constraintAnnotation = mock(ValidPassword.class);
+
+        // Act
+        passwordValidator.initialize(constraintAnnotation);
+
+        // Assert
+        assertThat(passwordValidator).isNotNull();
+    }
+
+    @Test
     void testValidPasswords() {
         assertThat(passwordValidator.isValid("Valid1@pass", context)).isTrue();
         assertThat(passwordValidator.isValid("Str0ng!Pass", context)).isTrue();
@@ -27,13 +39,13 @@ class PasswordValidatorTest {
 
     @Test
     void testInvalidPasswords() {
-        assertThat(passwordValidator.isValid(null, context)).isFalse(); // Null password
-        assertThat(passwordValidator.isValid("", context)).isFalse(); // Empty password
-        assertThat(passwordValidator.isValid("short1@", context)).isFalse(); // Too short
-        assertThat(passwordValidator.isValid("NOLOWERCASE1@", context)).isFalse(); // No lowercase
-        assertThat(passwordValidator.isValid("nouppercase1@", context)).isFalse(); // No uppercase
-        assertThat(passwordValidator.isValid("NoNumber@!", context)).isFalse(); // No number
-        assertThat(passwordValidator.isValid("NoSpecialChar1", context)).isFalse(); // No special character
-        assertThat(passwordValidator.isValid("WayTooLongPassword123@", context)).isFalse(); // Too long
+        assertThat(passwordValidator.isValid(null, context)).isFalse();
+        assertThat(passwordValidator.isValid("", context)).isFalse();
+        assertThat(passwordValidator.isValid("short1@", context)).isFalse();
+        assertThat(passwordValidator.isValid("NOLOWERCASE1@", context)).isFalse();
+        assertThat(passwordValidator.isValid("nouppercase1@", context)).isFalse();
+        assertThat(passwordValidator.isValid("NoNumber@!", context)).isFalse();
+        assertThat(passwordValidator.isValid("NoSpecialChar1", context)).isFalse();
+        assertThat(passwordValidator.isValid("WayTooLongPassword123@", context)).isFalse();
     }
 }
