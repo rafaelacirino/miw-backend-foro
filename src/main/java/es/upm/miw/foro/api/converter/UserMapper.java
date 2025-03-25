@@ -4,7 +4,6 @@ import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.persistance.model.User;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserMapper {
 
@@ -33,7 +32,7 @@ public class UserMapper {
     public static List<UserDto> toDtoList(List<User> userList) {
         return userList.stream()
                 .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // Replace this usage of 'Stream. collect(Collectors. toList())'
@@ -41,13 +40,15 @@ public class UserMapper {
     public static List<User> toEntityList(List<UserDto> userDtoList) {
         return userDtoList.stream()
                 .map(UserMapper::toEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static void populateDto(User user, UserDto userDto) {
         userDto.setId(user.getId());
         userDto.setFirstName(user.getFirstName());
         userDto.setLastName(user.getLastName());
+        userDto.setAddress(user.getAddress());
+        userDto.setPhone(user.getPhone());
         userDto.setEmail(user.getEmail());
         userDto.setPassword(user.getPassword());
         userDto.setRole(user.getRole());
@@ -58,10 +59,11 @@ public class UserMapper {
         entity.setId(userDto.getId());
         entity.setFirstName(userDto.getFirstName());
         entity.setLastName(userDto.getLastName());
+        entity.setAddress(userDto.getAddress());
+        entity.setPhone(userDto.getPhone());
         entity.setEmail(userDto.getEmail());
         entity.setPassword(userDto.getPassword());
         entity.setRole(userDto.getRole());
         entity.setRegisteredDate(userDto.getRegisteredDate());
     }
-
 }

@@ -24,6 +24,12 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -36,4 +42,9 @@ public class User {
 
     @Column(name = "registered_date")
     private LocalDateTime registeredDate;
+
+    @PrePersist
+    public void onCreate() {
+        this.registeredDate = LocalDateTime.now();
+    }
 }

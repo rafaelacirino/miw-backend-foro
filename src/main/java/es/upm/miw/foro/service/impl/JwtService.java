@@ -2,6 +2,7 @@ package es.upm.miw.foro.service.impl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,10 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class JwtService {
-    private static final String BEARER = "Bearer ";
-    private static final int PARTIES = 3;
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
+
+    private static final String FIRSTNAME_CLAIM = "firstName";
+    private static final String LASTNAME_CLAIM = "lastName";
+    private static final String EMAIL_CLAIM = "email";
     private static final String ROLE_CLAIM = "role";
 
     private final String secret;
@@ -33,50 +34,58 @@ public class JwtService {
         this.expire = expire;
     }
 
-    public String extractToken(String bearer) {
-        if (bearer != null && bearer.startsWith(BEARER) && PARTIES == bearer.split("\\.").length) {
-            return bearer.substring(BEARER.length());
-        } else {
-            return "";
+    public String extractToken(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            if (token.split("\\.").length == 3) {
+                return token;
+            }
         }
+        return null;
     }
 
-    public String createToken(String user, String name, String role) {
+    public String createToken(Long id, String firstName, String lastName, String email, String role) {
         return JWT.create()
                 .withIssuer(this.issuer)
                 .withIssuedAt(new Date())
                 .withNotBefore(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + this.expire * 1000L))
-                .withClaim(USER_CLAIM, user)
-                .withClaim(NAME_CLAIM, name)
+                .withClaim("id", id)
+                .withClaim(FIRSTNAME_CLAIM, firstName)
+                .withClaim(LASTNAME_CLAIM, lastName)
+                .withClaim(EMAIL_CLAIM, email)
                 .withClaim(ROLE_CLAIM, role)
                 .sign(Algorithm.HMAC256(this.secret));
-
     }
 
     public String user(String authorization) {
         return this.verify(authorization)
-                .map(jwt -> jwt.getClaim(USER_CLAIM).asString())
-                .orElse("");
+                .map(jwt -> {
+                    String email = jwt.getClaim(EMAIL_CLAIM).asString();
+                    if (email == null || email.isEmpty()) {
+                        log.error("Email claim not found in token");
+                        throw new JWTDecodeException("Email claim not found in token");
+                    }
+                    return email;
+                })
+                .orElseThrow(() -> new JWTDecodeException("Invalid token"));
     }
 
-    public String name(String authorization) {
-        return extractClaim(authorization);
-    }
-
-    public String role(String authorization) {
-        return this.verify(authorization)
-                .map(jwt -> jwt.getClaim(ROLE_CLAIM).asString())
-                .orElse("");
-    }
-
-    private String extractClaim(String token) {
-        return verify(token)
-                .map(jwt -> jwt.getClaim(JwtService.NAME_CLAIM).asString())
-                .orElseGet(() -> {
-                    log.info("Fail extract claim: {}", JwtService.NAME_CLAIM);
-                    return "";
-                });
+    public String role(String token) {
+        log.info("Token to decode: {}", token);
+        if (token == null || token.split("\\.").length != 3) {
+            log.error("Invalid token format");
+            throw new JWTDecodeException("Invalid token format");
+        }
+        try {
+            DecodedJWT decodedJWT = JWT.decode(token);
+            String role = decodedJWT.getClaim("role").asString();
+            log.info("Extracted role from token: {}", role);
+            return role;
+        } catch (JWTDecodeException e) {
+            log.error("Failed to decode token: {}", e.getMessage());
+            throw e;
+        }
     }
 
     public Optional<DecodedJWT> verify(String token) {
