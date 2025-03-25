@@ -3,13 +3,13 @@ package es.upm.miw.foro.api.controller;
 import es.upm.miw.foro.api.dto.LoginDto;
 import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
-import es.upm.miw.foro.api.dto.validation.CreateValidation;
-import es.upm.miw.foro.api.dto.validation.UpdateValidation;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,12 +18,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Map;
 
+@ToString
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -45,20 +44,28 @@ public class UserController {
     @PostMapping("/create")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DB")
-    public ResponseEntity<UserDto> createUser(@Validated(CreateValidation.class) @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto userDto) {
         try {
             return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
         } catch (ServiceException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.CONFLICT;
+            return ResponseEntity.status(status).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
         }
     }
 
     @PostMapping("/register")
     @Operation(summary = "registerUser", description = "Register a new user and insert into DB")
-    public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody UserDto userDto) {
+        try{
+            return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
+        } catch (ServiceException e) {
+            HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.CONFLICT;
+            return ResponseEntity.status(status).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error while creating User");
+        }
     }
 
     @GetMapping("/{id}")
@@ -112,9 +119,16 @@ public class UserController {
     @PutMapping("/update/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "updateUser", description = "Update User into DB")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
-                                              @Validated(UpdateValidation.class) @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.updateUser(id, userDto));
+    public ResponseEntity<Object> updateUser( @Valid @PathVariable Long id,
+                                              @RequestBody UserDto userDto) {
+        try {
+            return ResponseEntity.ok(userService.updateUser(id, userDto));
+        } catch (ServiceException e) {
+            HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.CONFLICT;
+            return ResponseEntity.status(status).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
+        }
     }
 
     @DeleteMapping("/delete/{id}")
@@ -130,15 +144,5 @@ public class UserController {
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    @PostMapping("/verifyPassword")
-    @Operation(summary = "verifyPassword", description = "Verify the password")
-    public ResponseEntity<Map<String, Boolean>> verifyPassword(@RequestBody Map<String, String> request) {
-        Long userId = Long.valueOf(request.get("userId"));
-        String currentPassword = request.get("currentPassword");
-        boolean isValid = userService.verifyPassword(userId, currentPassword);
-
-        return ResponseEntity.ok(Map.of("isValid", isValid));
     }
 }

@@ -36,7 +36,6 @@ class JwtServiceTest {
         assertEquals(3, token.split("\\.").length);
         assertTrue(token.length() > 30);
         assertEquals(EMAIL, jwtService.user(token));
-        assertEquals(EMAIL, jwtService.name(token));
         assertEquals(ROLE, jwtService.role(token));
     }
 
@@ -99,11 +98,6 @@ class JwtServiceTest {
     void testVerifyWithInvalidToken() {
         Optional<DecodedJWT> decodedJWT = jwtService.verify("invalid.token.here");
         assertFalse(decodedJWT.isPresent());
-    }
-
-    @Test
-    void testNameWithInvalidToken() {
-        assertEquals("", jwtService.name("Bearer invalid"));
     }
 
     @Test

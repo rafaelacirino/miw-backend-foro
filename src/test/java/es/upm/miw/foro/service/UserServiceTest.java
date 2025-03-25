@@ -2,6 +2,7 @@ package es.upm.miw.foro.service;
 
 import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.UserDto;
+import es.upm.miw.foro.api.dto.validation.UserValidation;
 import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistance.model.Role;
@@ -9,6 +10,7 @@ import es.upm.miw.foro.persistance.model.User;
 import es.upm.miw.foro.persistance.repository.UserRepository;
 import es.upm.miw.foro.service.impl.JwtService;
 import es.upm.miw.foro.service.impl.UserServiceImpl;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -47,10 +49,16 @@ class UserServiceTest {
 
     private User user;
 
+    @Mock
+    private Validator validator;
+
     private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
+    private static final String ADDRESS = "UserAddress";
+    private static final String PHONE_NUMBER = "UserPhoneNumber";
     private static final String EMAIL = "email@email.com";
+    private static final String EMAIL_ADMIN = "admin@email.com";
     private static final String PASSWORD = "password";
     private static final String ENCODED_PASSWORD = "encodedPassword";
     private static final LocalDateTime REGISTERED_DATE = LocalDateTime.now();
@@ -61,6 +69,8 @@ class UserServiceTest {
         userDto.setId(USER_ID);
         userDto.setFirstName(FIRST_NAME);
         userDto.setLastName(LAST_NAME);
+        userDto.setAddress(ADDRESS);
+        userDto.setPhone(PHONE_NUMBER);
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
         userDto.setRole(Role.ADMIN);
@@ -70,6 +80,8 @@ class UserServiceTest {
         user.setId(USER_ID);
         user.setFirstName(FIRST_NAME);
         user.setLastName(LAST_NAME);
+        user.setAddress(ADDRESS);
+        user.setPhone(PHONE_NUMBER);
         user.setEmail(EMAIL);
         user.setPassword(PASSWORD);
         user.setRole(Role.ADMIN);
@@ -80,41 +92,107 @@ class UserServiceTest {
     void testCreateUser_success() {
         // Arrange
         User authenticatedUser = new User();
-        authenticatedUser.setId(USER_ID);
-        authenticatedUser.setEmail(EMAIL);
+        authenticatedUser.setId(2L);
+        authenticatedUser.setEmail(EMAIL_ADMIN);
         authenticatedUser.setRole(Role.ADMIN);
 
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(EMAIL);
+        when(authentication.getName()).thenReturn(EMAIL_ADMIN);
         SecurityContextHolder.setContext(securityContext);
 
-        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
+        when(userRepository.findByEmail(EMAIL_ADMIN)).thenReturn(Optional.of(authenticatedUser));
+        when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
+        when(validator.validate(any(UserDto.class), eq(UserValidation.class))).thenReturn(Collections.emptySet()); // Mock do Validator
 
-        user = new User();
-        user.setId(USER_ID);
-        user.setEmail(EMAIL);
-        user.setPassword("encodedPassword");
+        User savedUser = new User();
+        savedUser.setId(USER_ID);
+        savedUser.setFirstName(FIRST_NAME);
+        savedUser.setLastName(LAST_NAME);
+        savedUser.setAddress(ADDRESS);
+        savedUser.setPhone(PHONE_NUMBER);
+        savedUser.setEmail(EMAIL);
+        savedUser.setPassword(ENCODED_PASSWORD);
+        savedUser.setRole(Role.MEMBER);
+
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         UserDto userDtoInput = new UserDto();
+        userDtoInput.setFirstName(FIRST_NAME);
+        userDtoInput.setLastName(LAST_NAME);
+        userDtoInput.setAddress(ADDRESS);
+        userDtoInput.setPhone(PHONE_NUMBER);
         userDtoInput.setEmail(EMAIL);
         userDtoInput.setPassword(PASSWORD);
-
-        when(passwordEncoder.encode(PASSWORD)).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // Act
         UserDto createdUser = userService.createUser(userDtoInput);
 
         // Assert
         assertNotNull(createdUser);
+        assertEquals(USER_ID, createdUser.getId());
+        assertEquals(FIRST_NAME, createdUser.getFirstName());
+        assertEquals(LAST_NAME, createdUser.getLastName());
+        assertEquals(ADDRESS, createdUser.getAddress());
+        assertEquals(PHONE_NUMBER, createdUser.getPhone());
         assertEquals(EMAIL, createdUser.getEmail());
+        assertEquals(Role.MEMBER, createdUser.getRole());
 
         // Verify
+        verify(userRepository, times(1)).existsByEmail(EMAIL);
         verify(userRepository, times(1)).save(any(User.class));
         verify(passwordEncoder, times(1)).encode(PASSWORD);
+        verify(validator, times(1)).validate(any(UserDto.class), eq(UserValidation.class));
+    }
+
+    @Test
+    void testCreateUser_failure() {
+        // Arrange
+        User authenticatedUser = new User();
+        authenticatedUser.setId(2L);
+        authenticatedUser.setEmail(EMAIL_ADMIN);
+        authenticatedUser.setFirstName(FIRST_NAME);
+        authenticatedUser.setLastName(LAST_NAME);
+        authenticatedUser.setAddress(ADDRESS);
+        authenticatedUser.setPhone(PHONE_NUMBER);
+        authenticatedUser.setRole(Role.ADMIN);
+        authenticatedUser.setRegisteredDate(REGISTERED_DATE);
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(EMAIL_ADMIN);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail(EMAIL_ADMIN)).thenReturn(Optional.of(authenticatedUser));
+        when(userRepository.existsByEmail(EMAIL)).thenReturn(true);
+        when(validator.validate(any(UserDto.class), eq(UserValidation.class))).thenReturn(Collections.emptySet());
+
+        UserDto userDtoInput = new UserDto();
+        userDtoInput.setFirstName(FIRST_NAME);
+        userDtoInput.setLastName(LAST_NAME);
+        userDtoInput.setAddress(ADDRESS);
+        userDtoInput.setPhone(PHONE_NUMBER);
+        userDtoInput.setEmail(EMAIL);
+        userDtoInput.setPassword(PASSWORD);
+        userDtoInput.setRegisteredDate(REGISTERED_DATE);
+
+        // Act & Assert
+        ServiceException thrown = assertThrows(ServiceException.class, () -> {
+            userService.createUser(userDtoInput);
+        });
+
+        assertEquals("Email " + EMAIL + " already exists", thrown.getMessage());
+
+        // Verify
+        verify(userRepository, times(1)).findByEmail(EMAIL_ADMIN);
+        verify(userRepository, times(1)).existsByEmail(EMAIL);
+        verify(userRepository, never()).save(any(User.class));
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(validator, never()).validate(any(UserDto.class), eq(UserValidation.class));
     }
 
 
