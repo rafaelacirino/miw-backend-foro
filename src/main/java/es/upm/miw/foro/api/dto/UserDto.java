@@ -34,8 +34,9 @@ public class UserDto {
     @Size(max = 25, message = "Last name must be at most 25 characters")
     private String lastName;
 
-    @Size(max = 55, message = "Address must be at most 55 characters")
-    private String address;
+    @NotBlank(groups = {UserValidation.class}, message = "User name is required")
+    @Size(max = 15, message = "User name must be at most 15 characters")
+    private String userName;
 
     @Size(max = 15, message = "Phone must be at most 15 characters")
     private String phone;

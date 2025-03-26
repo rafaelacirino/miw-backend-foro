@@ -16,7 +16,7 @@ class UserMapperTest {
     private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
-    private static final String ADDRESS = "UserAddress";
+    private static final String USER_NAME = "UserName";
     private static final String PHONE_NUMBER = "UserPhoneNumber";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
@@ -40,7 +40,7 @@ class UserMapperTest {
         assertEquals(user.getId(), userDto.getId());
         assertEquals(user.getFirstName(), userDto.getFirstName());
         assertEquals(user.getLastName(), userDto.getLastName());
-        assertEquals(user.getAddress(), userDto.getAddress());
+        assertEquals(user.getUserName(), userDto.getUserName());
         assertEquals(user.getPhone(), userDto.getPhone());
         assertEquals(user.getEmail(), userDto.getEmail());
         assertEquals(user.getPassword(), userDto.getPassword());
@@ -61,7 +61,7 @@ class UserMapperTest {
         assertEquals(userDto.getId(), user.getId());
         assertEquals(userDto.getFirstName(), user.getFirstName());
         assertEquals(userDto.getLastName(), user.getLastName());
-        assertEquals(userDto.getAddress(), user.getAddress());
+        assertEquals(userDto.getUserName(), user.getUserName());
         assertEquals(userDto.getPhone(), user.getPhone());
         assertEquals(userDto.getEmail(), user.getEmail());
         assertEquals(userDto.getPassword(), user.getPassword());
@@ -118,7 +118,7 @@ class UserMapperTest {
         user.setId(USER_ID);
         user.setFirstName(FIRST_NAME);
         user.setLastName(LAST_NAME);
-        user.setAddress(ADDRESS);
+        user.setUserName(USER_NAME);
         user.setPhone(PHONE_NUMBER);
         user.setEmail(EMAIL);
         user.setPassword(PASSWORD);
@@ -133,7 +133,7 @@ class UserMapperTest {
         userDto.setId(USER_ID);
         userDto.setFirstName(FIRST_NAME);
         userDto.setLastName(LAST_NAME);
-        userDto.setAddress(ADDRESS);
+        userDto.setUserName(USER_NAME);
         userDto.setPhone(PHONE_NUMBER);
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);

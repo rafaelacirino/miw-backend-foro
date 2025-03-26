@@ -27,7 +27,6 @@ class UserTest {
         assertNull(user.getId());
         assertNull(user.getFirstName());
         assertNull(user.getLastName());
-        assertNull(user.getAddress());
         assertNull(user.getPhone());
         assertNull(user.getPassword());
         assertNull(user.getEmail());
@@ -40,14 +39,14 @@ class UserTest {
         // Arrange
         LocalDateTime registeredDate = LocalDateTime.now();
         User user = new User(
-                1L, "firstName", "lastName", "address", "phone",
+                1L, "firstName", "lastName", "userName", "phone",
                 "email@email.com", "password", Role.ADMIN, registeredDate);
 
         // Assert
         assertEquals(1L, user.getId());
         assertEquals("firstName", user.getFirstName());
         assertEquals("lastName", user.getLastName());
-        assertEquals("address", user.getAddress());
+        assertEquals("userName", user.getUserName());
         assertEquals("phone", user.getPhone());
         assertEquals("email@email.com", user.getEmail());
         assertEquals("password", user.getPassword());
@@ -63,7 +62,7 @@ class UserTest {
         user.setId(1L);
         user.setFirstName("firstName");
         user.setLastName("lastName");
-        user.setAddress("address");
+        user.setUserName("userName");
         user.setPhone("phone");
         user.setEmail("email@email.com");
         user.setPassword("password");
@@ -73,7 +72,7 @@ class UserTest {
         assertEquals(1L, user.getId());
         assertEquals("firstName", user.getFirstName());
         assertEquals("lastName", user.getLastName());
-        assertEquals("address", user.getAddress());
+        assertEquals("userName", user.getUserName());
         assertEquals("phone", user.getPhone());
         assertEquals("email@email.com", user.getEmail());
         assertEquals("password", user.getPassword());
@@ -86,7 +85,7 @@ class UserTest {
         // Arrange
         LocalDateTime registeredDate = LocalDateTime.now();
         User user = new User(
-                1L, "firstName", "lastName", "address", "phone",
+                1L, "firstName", "lastName", "userName", "phone",
                 "email@email.com", "password", Role.ADMIN, registeredDate);
 
         when(userRepository.save(user)).thenReturn(user);
@@ -99,7 +98,7 @@ class UserTest {
         assertEquals(user.getId(), savedUser.getId());
         assertEquals(user.getFirstName(), savedUser.getFirstName());
         assertEquals(user.getLastName(), savedUser.getLastName());
-        assertEquals(user.getAddress(), savedUser.getAddress());
+        assertEquals(user.getUserName(), savedUser.getUserName());
         assertEquals(user.getPhone(), savedUser.getPhone());
         assertEquals(user.getEmail(), savedUser.getEmail());
         assertEquals(user.getPassword(), savedUser.getPassword());
@@ -113,10 +112,10 @@ class UserTest {
         // Arrange
         LocalDateTime registeredDate = LocalDateTime.of(2023, 1, 1, 10, 0);
         User user = new User(
-                1L, "firstName", "lastName", "address", "phone",
+                1L, "firstName", "lastName", "userName", "phone",
                 "email@email.com", "password", Role.ADMIN, registeredDate);
 
-        String expectedString = "User(id=1, firstName=firstName, lastName=lastName, address=address, phone=phone, " +
+        String expectedString = "User(id=1, firstName=firstName, lastName=lastName, userName=userName, address=address, phone=phone, " +
                 "email=email@email.com, password=password, role=ADMIN, registeredDate=2023-01-01T10:00)";
 
         // Act & Assert

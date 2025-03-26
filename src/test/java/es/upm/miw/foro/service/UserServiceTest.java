@@ -55,7 +55,6 @@ class UserServiceTest {
     private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
-    private static final String ADDRESS = "UserAddress";
     private static final String PHONE_NUMBER = "UserPhoneNumber";
     private static final String EMAIL = "email@email.com";
     private static final String EMAIL_ADMIN = "admin@email.com";
@@ -69,7 +68,6 @@ class UserServiceTest {
         userDto.setId(USER_ID);
         userDto.setFirstName(FIRST_NAME);
         userDto.setLastName(LAST_NAME);
-        userDto.setAddress(ADDRESS);
         userDto.setPhone(PHONE_NUMBER);
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
@@ -80,7 +78,6 @@ class UserServiceTest {
         user.setId(USER_ID);
         user.setFirstName(FIRST_NAME);
         user.setLastName(LAST_NAME);
-        user.setAddress(ADDRESS);
         user.setPhone(PHONE_NUMBER);
         user.setEmail(EMAIL);
         user.setPassword(PASSWORD);
@@ -112,7 +109,6 @@ class UserServiceTest {
         savedUser.setId(USER_ID);
         savedUser.setFirstName(FIRST_NAME);
         savedUser.setLastName(LAST_NAME);
-        savedUser.setAddress(ADDRESS);
         savedUser.setPhone(PHONE_NUMBER);
         savedUser.setEmail(EMAIL);
         savedUser.setPassword(ENCODED_PASSWORD);
@@ -123,7 +119,6 @@ class UserServiceTest {
         UserDto userDtoInput = new UserDto();
         userDtoInput.setFirstName(FIRST_NAME);
         userDtoInput.setLastName(LAST_NAME);
-        userDtoInput.setAddress(ADDRESS);
         userDtoInput.setPhone(PHONE_NUMBER);
         userDtoInput.setEmail(EMAIL);
         userDtoInput.setPassword(PASSWORD);
@@ -136,7 +131,6 @@ class UserServiceTest {
         assertEquals(USER_ID, createdUser.getId());
         assertEquals(FIRST_NAME, createdUser.getFirstName());
         assertEquals(LAST_NAME, createdUser.getLastName());
-        assertEquals(ADDRESS, createdUser.getAddress());
         assertEquals(PHONE_NUMBER, createdUser.getPhone());
         assertEquals(EMAIL, createdUser.getEmail());
         assertEquals(Role.MEMBER, createdUser.getRole());
@@ -194,7 +188,6 @@ class UserServiceTest {
         authenticatedUser.setEmail(EMAIL_ADMIN);
         authenticatedUser.setFirstName(FIRST_NAME);
         authenticatedUser.setLastName(LAST_NAME);
-        authenticatedUser.setAddress(ADDRESS);
         authenticatedUser.setPhone(PHONE_NUMBER);
         authenticatedUser.setRole(Role.ADMIN);
         authenticatedUser.setRegisteredDate(REGISTERED_DATE);
@@ -212,7 +205,6 @@ class UserServiceTest {
         UserDto userDtoInput = new UserDto();
         userDtoInput.setFirstName(FIRST_NAME);
         userDtoInput.setLastName(LAST_NAME);
-        userDtoInput.setAddress(ADDRESS);
         userDtoInput.setPhone(PHONE_NUMBER);
         userDtoInput.setEmail(EMAIL);
         userDtoInput.setPassword(PASSWORD);

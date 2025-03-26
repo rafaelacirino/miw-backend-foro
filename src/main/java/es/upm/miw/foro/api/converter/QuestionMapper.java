@@ -2,6 +2,7 @@ package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.persistance.model.Question;
+import es.upm.miw.foro.persistance.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,12 +22,12 @@ public class QuestionMapper {
         return questionDto;
     }
 
-    public static Question toEntity(QuestionDto questionDto) {
+    public static Question toEntity(QuestionDto questionDto, User questionAuthor) {
         if (questionDto == null) {
             return null;
         }
         Question question = new Question();
-        populateEntity(question, questionDto);
+        populateEntity(question, questionDto, questionAuthor);
         return question;
     }
 
@@ -36,27 +37,26 @@ public class QuestionMapper {
                 .collect(Collectors.toList());
     }
 
-    public static List<Question> toEntityList(List<QuestionDto> questionDtos) {
+    public static List<Question> toEntityList(List<QuestionDto> questionDtos, User questionAuthor) {
         return questionDtos.stream()
-                .map(QuestionMapper::toEntity)
+                .map(dto -> QuestionMapper.toEntity(dto, questionAuthor))
                 .collect(Collectors.toList());
     }
 
     private static void populateDto(Question question, QuestionDto dto) {
         dto.setId(question.getId());
-        dto.setAuthor(question.getAuthor());
+        dto.setQuestionAuthor(question.getAuthor().getUserName());
         dto.setTitle(question.getTitle());
         dto.setDescription(question.getDescription());
         dto.setCreationDate(question.getCreationDate());
-        dto.setWasRead(question.getWasRead());
+        dto.setAnswers(AnswerMapper.toDtoList(question.getAnswers()));
     }
 
-    private static void populateEntity(Question entity, QuestionDto questionDto) {
+    private static void populateEntity(Question entity, QuestionDto questionDto, User author) {
         entity.setId(questionDto.getId());
-        entity.setAuthor(questionDto.getAuthor());
+        entity.setAuthor(author);
         entity.setTitle(questionDto.getTitle());
         entity.setDescription(questionDto.getDescription());
         entity.setCreationDate(questionDto.getCreationDate());
-        entity.setWasRead(questionDto.getWasRead());
     }
 }
