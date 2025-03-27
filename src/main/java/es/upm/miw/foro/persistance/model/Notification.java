@@ -23,12 +23,16 @@ public class Notification {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "question_id", nullable = false, referencedColumnName = "id")
+    @JoinColumn(name = "question_id")
     private Question question;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answer_id", nullable = false, referencedColumnName = "id")
+    @JoinColumn(name = "answer_id")
     private Answer answer;
+
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
 
     @Column(name = "is_read", nullable = false)
     private boolean isRead = false;
@@ -39,5 +43,9 @@ public class Notification {
     @PrePersist
     protected void onCreate() {
         this.creationDate = LocalDateTime.now();
+    }
+
+    public void markAsRead() {
+        this.isRead = true;
     }
 }

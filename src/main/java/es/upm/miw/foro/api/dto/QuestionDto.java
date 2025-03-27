@@ -2,8 +2,6 @@ package es.upm.miw.foro.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import es.upm.miw.foro.persistance.model.Answer;
-import es.upm.miw.foro.persistance.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -26,10 +24,10 @@ public class QuestionDto {
     @Schema(hidden = true, description = "Unique identifier of the question")
     private Long id;
 
-    @NotNull(message = "QuestionAuthor cannot be null")
+    @NotNull(message = "Question Author cannot be null")
     @JsonProperty("author")
     @Schema(description = "Name of the user who created the question", example = "John Smith")
-    private String questionAuthor;
+    private String author;
 
     @NotNull(message = "Title cannot be null")
     @Size(max = 60, message = "Title must be at most 60 characters")

@@ -1,9 +1,11 @@
 package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.QuestionDto;
+import es.upm.miw.foro.persistance.model.Answer;
 import es.upm.miw.foro.persistance.model.Question;
 import es.upm.miw.foro.persistance.model.User;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,31 +34,42 @@ public class QuestionMapper {
     }
 
     public static List<QuestionDto> toDtoList(List<Question> questions) {
+        if (questions == null) {
+            return Collections.emptyList();
+        }
         return questions.stream()
                 .map(QuestionMapper::toQuestionDto)
                 .collect(Collectors.toList());
     }
 
     public static List<Question> toEntityList(List<QuestionDto> questionDtos, User questionAuthor) {
+        if (questionDtos == null) {
+            return Collections.emptyList();
+        }
         return questionDtos.stream()
-                .map(dto -> QuestionMapper.toEntity(dto, questionAuthor))
+                .map(dto -> toEntity(dto, questionAuthor))
                 .collect(Collectors.toList());
     }
 
     private static void populateDto(Question question, QuestionDto dto) {
         dto.setId(question.getId());
-        dto.setQuestionAuthor(question.getAuthor().getUserName());
+        dto.setAuthor(question.getAuthor().getUserName());
         dto.setTitle(question.getTitle());
         dto.setDescription(question.getDescription());
         dto.setCreationDate(question.getCreationDate());
         dto.setAnswers(AnswerMapper.toDtoList(question.getAnswers()));
     }
 
-    private static void populateEntity(Question entity, QuestionDto questionDto, User author) {
-        entity.setId(questionDto.getId());
-        entity.setAuthor(author);
-        entity.setTitle(questionDto.getTitle());
-        entity.setDescription(questionDto.getDescription());
-        entity.setCreationDate(questionDto.getCreationDate());
+    private static void populateEntity(Question question, QuestionDto questionDto, User questionAuthor) {
+        question.setId(questionDto.getId());
+        question.setAuthor(questionAuthor);
+        question.setTitle(questionDto.getTitle());
+        question.setDescription(questionDto.getDescription());
+        question.setCreationDate(questionDto.getCreationDate());
+
+        if (questionDto.getAnswers() != null) {
+            List<Answer> answers = AnswerMapper.toEntityList(questionDto.getAnswers(), question);
+            answers.forEach(question::addAnswer);
+        }
     }
 }

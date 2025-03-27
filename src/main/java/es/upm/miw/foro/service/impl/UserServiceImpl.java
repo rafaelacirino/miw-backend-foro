@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
 
             existingUser.setFirstName(userDto.getFirstName());
             existingUser.setLastName(userDto.getLastName());
-            existingUser.setAddress(userDto.getAddress());
+            existingUser.setUserName(userDto.getUserName());
             existingUser.setPhone(userDto.getPhone());
             existingUser.setEmail(userDto.getEmail());
 

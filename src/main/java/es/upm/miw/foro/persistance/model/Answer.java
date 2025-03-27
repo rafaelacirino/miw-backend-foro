@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -33,7 +34,17 @@ public class Answer {
     private LocalDateTime creationDate;
 
     @PrePersist
-    protected void onCreate() {
+    public void onCreate() {
         this.creationDate = LocalDateTime.now();
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+        if (question != null) {
+            List<Answer> answers = question.getAnswers();
+            if (!answers.contains(this)) {
+                answers.add(this);
+            }
+        }
     }
 }

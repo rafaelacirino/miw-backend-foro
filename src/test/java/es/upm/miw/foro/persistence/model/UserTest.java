@@ -115,7 +115,7 @@ class UserTest {
                 1L, "firstName", "lastName", "userName", "phone",
                 "email@email.com", "password", Role.ADMIN, registeredDate);
 
-        String expectedString = "User(id=1, firstName=firstName, lastName=lastName, userName=userName, address=address, phone=phone, " +
+        String expectedString = "User(id=1, firstName=firstName, lastName=lastName, userName=userName, phone=phone, " +
                 "email=email@email.com, password=password, role=ADMIN, registeredDate=2023-01-01T10:00)";
 
         // Act & Assert

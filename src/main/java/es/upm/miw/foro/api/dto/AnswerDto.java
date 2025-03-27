@@ -23,15 +23,15 @@ public class AnswerDto {
     private Long id;
 
     @NotNull(message = "Content cannot be null")
-    @Size(max = 500, message = "Content must be at most 500 characters")
+    @Size(max = 1000, message = "Content must be at most 1000 characters")
     @Schema(description = "Content of the answer", example = "Use @Entity and @Id annotations...")
     private String content;
 
     @NotNull(message = "AnswerAuthor cannot be null")
     @Schema(description = "Name of the user who wrote the answer", example = "Mary Smith")
     @JsonProperty("author")
-    private String answerAuthor;
+    private String author;
 
     @Schema(description = "Date and time when the answer was created", example = "2023-10-01T10:05:00")
-    private LocalDateTime createdDate;
+    private LocalDateTime creationDate;
 }

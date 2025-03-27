@@ -24,11 +24,9 @@ public class NotificationDto {
     @Schema(description = "ID of the user receiving the notification", example = "1")
     private Long userId;
 
-    @NotNull(message = "Question ID cannot be null")
     @Schema(description = "ID of the related question", example = "1")
     private Long questionId;
 
-    @NotNull(message = "Answer ID cannot be null")
     @Schema(description = "ID of the related answer", example = "1")
     private Long answerId;
 

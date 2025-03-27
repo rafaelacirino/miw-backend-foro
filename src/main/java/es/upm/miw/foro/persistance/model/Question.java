@@ -37,7 +37,17 @@ public class Question {
     private List<Answer> answers = new ArrayList<>();
 
     @PrePersist
-    protected void onCreate() {
+    public void onCreate() {
         this.creationDate = LocalDateTime.now();
+    }
+
+    public void addAnswer(Answer answer) {
+        answers.add(answer);
+        answer.setQuestion(this);
+    }
+
+    public void removeAnswer(Answer answer) {
+        answers.remove(answer);
+        answer.setQuestion(null);
     }
 }
