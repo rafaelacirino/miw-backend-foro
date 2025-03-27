@@ -24,8 +24,8 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "user_name", nullable = false, unique = true)
+    private String userName;
 
     @Column(name = "phone")
     private String phone;
