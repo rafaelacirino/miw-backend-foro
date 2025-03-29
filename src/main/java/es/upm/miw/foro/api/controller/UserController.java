@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @ToString
 @RestController
@@ -58,13 +59,14 @@ public class UserController {
     @PostMapping("/register")
     @Operation(summary = "registerUser", description = "Register a new user and insert into DB")
     public ResponseEntity<Object> registerUser(@Valid @RequestBody UserDto userDto) {
-        try{
+        try {
             return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
         } catch (ServiceException e) {
-            HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.CONFLICT;
-            return ResponseEntity.status(status).body(e.getMessage());
+            return ResponseEntity.status(e.getStatus())
+                    .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error while creating User");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred"));
         }
     }
 

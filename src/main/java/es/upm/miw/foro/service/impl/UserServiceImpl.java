@@ -70,6 +70,7 @@ public class UserServiceImpl implements UserService {
     public UserDto registerUser(UserDto userDto) {
         try {
             validateEmail(userDto.getEmail());
+            validateUserName(userDto.getUserName());
             validateUserDto(userDto);
             if (userDto.getRole() == null) {
                 userDto.setRole(Role.MEMBER);
@@ -220,7 +221,13 @@ public class UserServiceImpl implements UserService {
 
     private void validateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new ServiceException("Email " + email + " already exists", HttpStatus.PRECONDITION_FAILED);
+            throw new ServiceException("Email already exists", HttpStatus.CONFLICT);
+        }
+    }
+
+    private void validateUserName(String userName) {
+        if (userRepository.existsByUserName(userName)) {
+            throw new ServiceException("Username already exists", HttpStatus.CONFLICT);
         }
     }
 
@@ -232,14 +239,14 @@ public class UserServiceImpl implements UserService {
                 String message = violation.getMessage();
 
                 if ("email".equals(field) || "password".equals(field)) {
-                    throw new ServiceException(message, HttpStatus.PRECONDITION_FAILED);
+                    throw new ServiceException(message, HttpStatus.BAD_REQUEST);
                 }
             }
             String errorMessage = violations.stream()
                     .map(ConstraintViolation::getMessage)
                     .reduce((msg1, msg2) -> msg1 + ", " + msg2)
                     .orElse("Validation error");
-            throw new ServiceException(errorMessage, HttpStatus.PRECONDITION_FAILED);
+            throw new ServiceException(errorMessage, HttpStatus.BAD_REQUEST);
         }
     }
 }
