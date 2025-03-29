@@ -9,7 +9,7 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
 
     @SuppressWarnings("squid:S2068")
     private static final String PASSWORD_PATTERN =
-            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,12}$";
+            "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
 
     private static final Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
 

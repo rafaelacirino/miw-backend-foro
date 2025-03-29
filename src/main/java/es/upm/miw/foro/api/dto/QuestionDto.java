@@ -26,16 +26,16 @@ public class QuestionDto {
 
     @NotNull(message = "Question Author cannot be null")
     @JsonProperty("author")
-    @Schema(description = "Name of the user who created the question", example = "John Smith")
+    @Schema(description = "Name of the user who created the question", example = "Alex123")
     private String author;
 
     @NotNull(message = "Title cannot be null")
     @Size(max = 60, message = "Title must be at most 60 characters")
-    @Schema(description = "Title of the question", example = "How to implement JPA?")
+    @Schema(description = "Title of the question", example = "How to implement ...?")
     private String title;
 
     @Size(max = 150, message = "Description must be at most 150 characters")
-    @Schema(description = "Brief description of the question", example = "I need help with JPA in Spring Boot")
+    @Schema(description = "Brief description of the question", example = "I need help with ...")
     private String description;
 
     @Schema(hidden = true, description = "Date and time when the question was created", example = "2023-10-01T10:00:00")
