@@ -15,7 +15,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("*")
-                .allowedOrigins("http://localhost:4200/", "https://capturing-foro.onrender.com")
+                .allowedOrigins("http://localhost:4200", "https://capturing-forum.onrender.com")
                 .allowedHeaders("*")
                 .maxAge(3600);
     }
