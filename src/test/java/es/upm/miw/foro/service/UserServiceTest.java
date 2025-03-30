@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -223,11 +224,11 @@ class UserServiceTest {
         userDtoInput.setRegisteredDate(REGISTERED_DATE);
 
         // Act & Assert
-        ServiceException thrown = assertThrows(ServiceException.class, () -> {
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
             userService.createUser(userDtoInput);
         });
 
-        assertEquals("Email " + EMAIL + " already exists", thrown.getMessage());
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
 
         // Verify
         verify(userRepository, times(1)).findByEmail(EMAIL_ADMIN);
@@ -270,7 +271,7 @@ class UserServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> userService.createUser(userDtoInput));
-        assertEquals("Email " + EMAIL + " already exists", exception.getMessage());
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
 
         // Verify
         verify(userRepository, never()).save(any(User.class));
@@ -556,7 +557,7 @@ class UserServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> userService.login(EMAIL, "wrongPassword"));
-        assertEquals("Wrong password", exception.getMessage());
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
 
         // Verify
         verify(userRepository, never()).save(any(User.class));

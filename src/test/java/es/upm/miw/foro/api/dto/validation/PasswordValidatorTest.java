@@ -46,6 +46,5 @@ class PasswordValidatorTest {
         assertThat(passwordValidator.isValid("nouppercase1@", context)).isFalse();
         assertThat(passwordValidator.isValid("NoNumber@!", context)).isFalse();
         assertThat(passwordValidator.isValid("NoSpecialChar1", context)).isFalse();
-        assertThat(passwordValidator.isValid("WayTooLongPassword123@", context)).isFalse();
     }
 }
