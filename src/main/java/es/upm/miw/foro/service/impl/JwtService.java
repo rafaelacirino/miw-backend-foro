@@ -70,10 +70,6 @@ public class JwtService {
                 .orElseThrow(() -> new JWTDecodeException("Invalid token"));
     }
 
-    public String name(String authorization) {
-        return extractClaim(authorization);
-    }
-
     public String role(String token) {
         log.info("Token to decode: {}", token);
         if (token == null || token.split("\\.").length != 3) {
@@ -89,15 +85,6 @@ public class JwtService {
             log.error("Failed to decode token: {}", e.getMessage());
             throw e;
         }
-    }
-
-    private String extractClaim(String token) {
-        return verify(token)
-                .map(jwt -> jwt.getClaim(JwtService.EMAIL_CLAIM).asString())
-                .orElseGet(() -> {
-                    log.info("Fail extract claim: {}", JwtService.EMAIL_CLAIM);
-                    return "";
-                });
     }
 
     public Optional<DecodedJWT> verify(String token) {

@@ -35,6 +35,6 @@ class LoginDtoTest {
     void testToString() {
         LoginDto loginDto = new LoginDto("test@example.com", "password123");
         String expectedToString = "LoginDto(email=test@example.com, password=password123)";
-        assertThat(loginDto.toString()).isEqualTo(expectedToString);
+        assertThat(loginDto.toString()).hasToString(expectedToString);
     }
 }

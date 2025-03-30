@@ -1,6 +1,7 @@
 package es.upm.miw.foro.persistance.repository;
 
 import es.upm.miw.foro.persistance.model.User;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Page<User> findByEmail(String email, Pageable pageable);
 
     Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByUserName(String userName);
 }
