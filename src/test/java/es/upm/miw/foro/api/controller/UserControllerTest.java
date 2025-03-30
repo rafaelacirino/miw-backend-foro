@@ -113,32 +113,33 @@ class UserControllerTest {
         // Arrange
         UserDto dto = new UserDto();
         String errorMessage = "User registration failed";
-        when(userService.registerUser(any(UserDto.class))).thenThrow(new ServiceException(errorMessage));
+        when(userService.registerUser(any(UserDto.class))).thenThrow(new ServiceException(errorMessage, HttpStatus.CONFLICT));
 
         // Act
         ResponseEntity<Object> response = this.userController.registerUser(dto);
 
         // Assert
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals(errorMessage, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
         verify(userService, times(1)).registerUser(dto);
     }
 
     @Test
-    void testRegisterUserServiceExceptionWithCustomStatus() {
+    void testRegisterUserWithBadRequestError() {
         // Arrange
         UserDto dto = new UserDto();
         String errorMessage = "Email already registered";
-        HttpStatus customStatus = HttpStatus.BAD_REQUEST;
         when(userService.registerUser(any(UserDto.class)))
-                .thenThrow(new ServiceException(errorMessage, customStatus));
+                .thenThrow(new ServiceException(errorMessage, HttpStatus.BAD_REQUEST));
 
         // Act
         ResponseEntity<Object> response = this.userController.registerUser(dto);
 
         // Assert
-        assertEquals(customStatus, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals(errorMessage, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
         verify(userService, times(1)).registerUser(dto);
     }
 
@@ -146,7 +147,7 @@ class UserControllerTest {
     void testRegisterUserGenericException() {
         // Arrange
         UserDto dto = new UserDto();
-        String errorMessage = UNEXPECTED_ERROR + " while creating User";
+        String errorMessage = "An unexpected error occurred";
         when(userService.registerUser(any(UserDto.class))).thenThrow(new RuntimeException(UNEXPECTED_ERROR));
 
         // Act
@@ -154,7 +155,8 @@ class UserControllerTest {
 
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals(errorMessage, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
         verify(userService, times(1)).registerUser(dto);
     }
 
@@ -221,9 +223,9 @@ class UserControllerTest {
     @Test
     void testLoginServiceException() {
         // Arrange
-        String errorMessage = "Wrong password";
+        String errorMessage = "Incorrect password";
         LoginDto loginDto = new LoginDto(EMAIL, PASSWORD);
-        when(userService.login(EMAIL, PASSWORD)).thenThrow(new ServiceException(errorMessage));
+        when(userService.login(EMAIL, PASSWORD)).thenThrow(new ServiceException(errorMessage, HttpStatus.UNAUTHORIZED));
 
         // Act
         ResponseEntity<?> response = userController.login(loginDto);
@@ -231,8 +233,8 @@ class UserControllerTest {
         // Assert
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertInstanceOf(String.class, response.getBody());
-        assertEquals(errorMessage, response.getBody());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals(errorMessage, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
         verify(userService, times(1)).login(EMAIL, PASSWORD);
     }
 
@@ -393,14 +395,18 @@ class UserControllerTest {
     void testUpdateUserGenericException() {
         // Arrange
         UserDto dto = new UserDto();
-        when(userService.updateUser(eq(USER_ID), any(UserDto.class))).thenThrow(new RuntimeException(UNEXPECTED_ERROR));
+        String errorMessage = "An unexpected error occurred";
+        when(userService.updateUser(eq(USER_ID), any(UserDto.class)))
+                .thenThrow(new RuntimeException(UNEXPECTED_ERROR));
 
         // Act
         ResponseEntity<Object> response = this.userController.updateUser(USER_ID, dto);
 
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals(UNEXPECTED_ERROR, response.getBody());
+        assertNotNull(response.getBody());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals(errorMessage, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
         verify(userService, times(1)).updateUser(USER_ID, dto);
     }
 
