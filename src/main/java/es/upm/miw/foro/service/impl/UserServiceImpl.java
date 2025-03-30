@@ -106,14 +106,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public String login(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ServiceException("User with email " + email + NOT_FOUND));
+                .orElseThrow(() -> new ServiceException("User with email " + email + NOT_FOUND, HttpStatus.NOT_FOUND));
         if (!passwordEncoder.matches(password, user.getPassword())) {
             if (user.getPassword().equals(password)) {
                 String encodedPassword = passwordEncoder.encode(password);
                 user.setPassword(encodedPassword);
                 userRepository.save(user);
             } else {
-                throw new ServiceException("Wrong password");
+                throw new ServiceException("Incorrect password", HttpStatus.UNAUTHORIZED);
             }
         }
         return jwtService.createToken(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole().name());
@@ -188,14 +188,14 @@ public class UserServiceImpl implements UserService {
         try {
             User currentUser = getAuthenticatedUser();
             if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
-                throw new ServiceException("Unauthorized: Only admins or the user themselves can delete this user");
+                throw new ServiceException("Unauthorized: Only admins or the user themselves can delete this user", HttpStatus.UNAUTHORIZED);
             }
             if (!userRepository.existsById(id)) {
-                throw new ServiceException("User with id " + id + NOT_FOUND);
+                throw new ServiceException("User with id " + id + NOT_FOUND, HttpStatus.NOT_FOUND);
             }
             userRepository.deleteById(id);
         } catch (DataAccessException exception) {
-            throw new RepositoryException("Error deleting User with id " + id, exception);
+            throw new RepositoryException("Error deleting user with id " + id, exception);
         }
     }
 

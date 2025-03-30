@@ -90,7 +90,11 @@ public class UserController {
             String token = userService.login(loginDto.getEmail(), loginDto.getPassword());
             return ResponseEntity.ok(new TokenDto(token));
         } catch (ServiceException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.status(e.getStatus())
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred"));
         }
     }
 
@@ -129,7 +133,8 @@ public class UserController {
             HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.CONFLICT;
             return ResponseEntity.status(status).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred"));
         }
     }
 
