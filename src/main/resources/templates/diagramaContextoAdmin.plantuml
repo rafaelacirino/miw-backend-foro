@@ -1,5 +1,6 @@
 @startuml
 
+
 [*] --> Initial
 
 Initial --> Opened_Questions
