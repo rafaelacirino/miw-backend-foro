@@ -24,8 +24,9 @@ left to right direction
 (Create Comment) as UC18
 (Update Comment) as UC19
 (Delete Comment) as UC20
+(Open Notifications) as UC33
+(Open Notification) as UC34
 
-'añadir una nueva categoria
 (Update Tags) as UC21
 
 UC8 .-up-> UC13 : <<extend>>
@@ -44,6 +45,8 @@ UC16 .-up-> UC14 : <<extend>>
 
 UC19 .-up-> UC18 : <<extend>>
 UC20 .-up-> UC18 : <<extend>>
+UC33 .-down-> UC34 : <<extend>>
+
 
 Member --> UC2
 Member --> UC4
@@ -51,5 +54,6 @@ Member --> UC13
 Member --> UC14
 Member --> UC17
 Member --> UC18
+Member --> UC33
 
 @enduml

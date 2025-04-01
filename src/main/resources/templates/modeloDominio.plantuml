@@ -5,9 +5,9 @@ Forum *-down-> "*" Notification
 Forum *-down-> "*" Question
 User *-down-> Profile
 User .-left-> Role
+Notification .down-> NotificationType
 Question *-down-> "*" Answer
-Question "*" o-down-> "0..*" Category
-Category *-down-> "*" SubCategory
+Question "*" o-down-> "0..*" Tag
 Answer *-down-> "*" Comment
 
 
@@ -15,6 +15,8 @@ class User {
 - id*: Long
 - firstName: String
 - lastName: String
+- userName: String
+- phone: String
 - email: String
 - password: String
 - role: Role
@@ -24,6 +26,11 @@ enum Role {
 - ADMIN
 - CUSTOMER
 - GUEST
+}
+
+enum NotificationType {
+- QUESTION_REPLIED
+- ANSWER_RATED
 }
 
 class Profile {
@@ -56,14 +63,9 @@ class Comment {
 - user: String
 }
 
-class Category {
+class Tag {
 - id*: Long
-- message: String
-}
-
-class SubCategory {
-- id*: Long
-- message: String
+- category: String
 }
 
 class Notification {
@@ -72,6 +74,7 @@ class Notification {
 - date: LocalDateTime
 - wasRead: Boolean
 - user: String
+- notificationType: NotificationType
 }
 
 @enduml

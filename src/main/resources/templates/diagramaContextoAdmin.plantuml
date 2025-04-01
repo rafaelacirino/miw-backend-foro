@@ -5,7 +5,7 @@
 Initial --> Opened_Questions
 
 Opened_Questions --> Managed_Roles : Manage Roles
-Opened_Questions --> Opened_Questions : Delete Content
+Opened_Questions --> Opened_Questions : Delete Question
 'Opened_Questions --> Restored_Content : Restore Content
 Opened_Questions --> Final : Logout
 

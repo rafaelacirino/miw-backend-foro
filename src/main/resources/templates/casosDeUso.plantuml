@@ -1,7 +1,9 @@
 @startuml
+
 actor Guest
 actor Member
 actor Admin
+
 Guest <|-down- Member
 Member <|-down- Admin
 
@@ -28,19 +30,18 @@ left to right direction
 (Update Comment) as UC19
 (Delete Comment) as UC20
 (Create Tag) as UC21
-'añadir una nueva categoria
-(Add Tags) as UC22
-(Delete Tag) as UC23
-'para los users        delete category para el admin
-(Delete Category) as UC24
+(Update Tag) as UC22
+(Delete Tag) as UC24
 (Search Content) as UC25
 (Open Tags) as UC26
 (Search Tags) as UC27
-' (Manage Roles) as UC26
 (Delete Question) as UC28
 (Create User) as UC29
 (Open Users) as UC30
 (Delete Answer) as UC31
+(Open Notifications) as UC33
+(Open Notification) as UC34
+
 Guest --> UC7
 Guest --> UC11
 Guest --> UC25
@@ -48,6 +49,7 @@ Guest --> UC26
 Guest --> UC27
 Guest --> UC1
 Guest --> UC3
+
 Member --> UC2
 Member --> UC4
 Member --> UC5
@@ -66,11 +68,14 @@ Member --> UC19
 Member --> UC20
 Member --> UC21
 Member --> UC22
-Member --> UC23
 Member --> UC32
+Member --> UC33
+Member --> UC34
+
 Admin --> UC24
 Admin --> UC28
 Admin --> UC29
 Admin --> UC30
 Admin --> UC31
+
 @enduml

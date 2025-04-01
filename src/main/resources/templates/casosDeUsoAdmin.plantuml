@@ -4,7 +4,7 @@ actor Admin
 
 left to right direction
 
-(Delete Category) as UC1
+(Delete Tag) as UC1
 (Delete Question) as UC2
 (Create User) as UC3
 (Open Users) as UC4

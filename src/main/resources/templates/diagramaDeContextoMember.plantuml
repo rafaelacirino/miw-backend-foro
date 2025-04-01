@@ -3,15 +3,21 @@
 [*] --> Initial
 
 Initial --> Opened_Questions : Login
-Opened_Questions -> Opened_Question : Open Question
-Opened_Questions -> Opened_MyQuestions : Open MyQuestions
+Opened_Questions --> Opened_Question : Open Question
+Opened_Questions --> Opened_MyQuestions : Open MyQuestions
+Opened_MyQuestions --> Opened_Question : Open Question
+Opened_Questions --> Opened_Notifications : Open Notifications
+
 Opened_Questions --> Opened_Question : Create Question
 Opened_Questions --> Opened_Profile : Open Profile
-' Opened_Questions --> Opened_Question : Search Content
 Opened_Questions --> Filtered_Questions : Filter Questions
 Filtered_Questions --> Opened_Question : Open Question
 Opened_Questions --> Final : Logout
 Filtered_Questions --> Final : Logout
+
+Opened_Notifications --> Opened_Notification : Open Notification
+Opened_Notification --> Opened_Question : Open Question
+
 
 Opened_Questions --> Searched_Content : Search Content
 Searched_Content --> Opened_Question : Open Question
