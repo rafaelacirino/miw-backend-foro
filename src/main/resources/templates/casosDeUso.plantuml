@@ -8,6 +8,7 @@ Guest <|-down- Member
 Member <|-down- Admin
 
 left to right direction
+
 (Login) as UC1
 (Logout) as UC2
 (Sign Up) as UC3
@@ -41,6 +42,9 @@ left to right direction
 (Delete Answer) as UC31
 (Open Notifications) as UC33
 (Open Notification) as UC34
+(Open Dashboard) as UC35
+(Change Password) as UC36
+(Restore Password) as UC37
 
 Guest --> UC7
 Guest --> UC11
@@ -71,11 +75,14 @@ Member --> UC22
 Member --> UC32
 Member --> UC33
 Member --> UC34
+Member --> UC36
+Member --> UC37
 
 Admin --> UC24
 Admin --> UC28
 Admin --> UC29
 Admin --> UC30
 Admin --> UC31
+Admin --> UC35
 
 @enduml

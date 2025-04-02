@@ -7,7 +7,7 @@ state "Decision" as Decision <<choice>>
 
 [*] --> Login : The system shows Login
 
-Login -down-> s1 : The user insert email and password
+Login -down-> s1 : The user inserts email and password
 Login -right-> SignUp: The user requests sign up
 s1 -down-> Decision : The system validates email and password
 

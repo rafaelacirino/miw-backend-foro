@@ -3,16 +3,16 @@
 
 [*] --> Initial
 
-Initial --> Opened_Questions
+Initial --> Opened_Questions: Login
 
-Opened_Questions --> Managed_Roles : Manage Roles
-Opened_Questions --> Opened_Questions : Delete Question
-'Opened_Questions --> Restored_Content : Restore Content
+Opened_Questions --> Opened_Dashboard : Open Dashboard
+Opened_Questions --> Opened_Question : Open Question
+Opened_Question --> Opened_Question : Delete Question \n Delete Answer
 Opened_Questions --> Final : Logout
+Opened_Question --> Final : Logout
 
-Managed_Roles --> Managed_Roles : Update Role
-Managed_Roles --> Managed_Roles : Delete Role
-Managed_Roles --> Final : Logout
+Opened_Dashboard --> Opened_Dashboard : Open Users \n Create User \n Delete Tag
+Opened_Dashboard --> Final : Logout
 
 Final --> [*]
 
