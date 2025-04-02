@@ -1,5 +1,7 @@
 @startuml
 
+header Admin Use Case
+
 actor Admin
 
 left to right direction

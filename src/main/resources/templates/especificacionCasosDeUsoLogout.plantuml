@@ -1,5 +1,7 @@
 @startuml
 
+header Logout Use Case
+
 state " " as Logout
 
 Opened_Questions --> Logout

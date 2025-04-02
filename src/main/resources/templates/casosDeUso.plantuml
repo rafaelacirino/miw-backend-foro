@@ -1,5 +1,7 @@
 @startuml
 
+header Use Case
+
 actor Guest
 actor Member
 actor Admin
@@ -21,7 +23,6 @@ left to right direction
 (Open Questions) as UC11
 (Filter Questions) as UC12
 (Open MyQuestions) as UC13
-(Open MyQuestion) as UC32
 (Create Answer) as UC14
 (Update Answer) as UC15
 (Delete MyAnswer) as UC16
@@ -68,7 +69,6 @@ Member --> UC19
 Member --> UC20
 Member --> UC21
 Member --> UC22
-Member --> UC32
 Member --> UC33
 Member --> UC34
 

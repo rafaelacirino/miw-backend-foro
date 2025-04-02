@@ -1,5 +1,7 @@
 @startuml
 
+header Domain Model
+
 Forum *-down-> "*" User
 Forum *-down-> "*" Notification
 Forum *-down-> "*" Question

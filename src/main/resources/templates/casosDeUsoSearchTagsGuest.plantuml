@@ -1,0 +1,15 @@
+@startuml
+
+header User Search Tags
+
+state "Access Application" as s1
+state "Access Tags" as s2
+state "Search Tags" as s3
+state "Tags" as s4
+
+[*] -down-> s1
+s1 -down-> s2 : User request to access Tags
+s2 -down-> s3 : System shows Tags
+s3 -down-> s4 : User search Tags
+
+@enduml

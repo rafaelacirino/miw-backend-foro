@@ -1,0 +1,13 @@
+@startuml
+
+header User Search Content
+
+state "Access Application" as s1
+state "Search Content" as s2
+state "Opened Questions" as s3
+
+[*] -down-> s1
+s1 -down-> s2 : User request to Search Content
+s2 -down-> s3 : System shows Content
+
+@enduml
