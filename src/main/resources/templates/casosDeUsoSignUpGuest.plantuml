@@ -1,0 +1,30 @@
+@startuml
+
+header User Sign Up
+
+state "Request New User" as s1
+state "Decision" as Decision <<choice>>
+state "Registered User" as s4
+state "Login" as s5
+
+[*] --> SignUp : User requests Sign Up
+
+SignUp -down-> s1 : System requires data
+
+note right of s1
+<b>Required Fields:</b>
+- First Name
+- Last Name
+- Username
+- Phone
+- Email
+- Password
+end note
+
+s1 -down->  Decision : Validate User data
+
+Decision -right-> s1 : [Invalidate]
+Decision -down-> s4 : [Ok]
+s4 -down-> s5 : System confirm registration
+
+@enduml

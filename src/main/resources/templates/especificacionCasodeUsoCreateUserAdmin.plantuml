@@ -1,0 +1,35 @@
+@startuml
+
+header Admin Create User
+
+state "Login" as s1
+state " " as s2
+state "Request New User" as s4
+state "Data Validation" as s5
+state "Decision" as Decision <<choice>>
+
+[*] --> s1 : The System shows Login
+
+s1 --> s4 : Admin requests to create a new user
+
+note right of s4
+<b>Required Fields:</b>
+- First Name
+- Last Name
+- Username
+- Phone
+- Email
+- Password
+- Role
+end note
+
+s4 --> s5 : Admin submits user data
+
+s5 --> Decision : Validate user data
+
+Decision --> s4 : [Data is invalid]
+Decision --> s2 : [Data is valid]
+
+s2 --> Users : System creates the new user
+
+@enduml

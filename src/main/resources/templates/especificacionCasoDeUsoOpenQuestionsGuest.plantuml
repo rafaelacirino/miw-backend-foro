@@ -1,0 +1,13 @@
+@startuml
+
+header User Open Questions
+
+state "Access Application" as s1
+state " " as s2
+state "Opened Questions" as s3
+
+[*] -down-> s1 : User access Application
+s1 -down-> s2 : User requests to read Questions
+s2 -down-> s3 : System shows Questions
+
+@enduml

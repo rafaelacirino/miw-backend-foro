@@ -1,5 +1,7 @@
 @startuml
 
+header Member Use Case
+
 actor Member
 
 left to right direction

@@ -1,5 +1,7 @@
 @startuml
 
+header Guest Context Diagram
+
 [*] --> Initial
 
 Initial --> Opened_Questions
