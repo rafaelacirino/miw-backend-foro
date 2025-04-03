@@ -1,6 +1,6 @@
 @startuml
 
-header Logout Use Case
+header Logout
 
 state " " as Logout
 

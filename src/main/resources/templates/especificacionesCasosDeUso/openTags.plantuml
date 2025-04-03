@@ -1,0 +1,10 @@
+@startuml
+
+header Open Tags
+
+state " " as s1
+
+Opened_Questions -down-> s1 : User requests to access tags
+s1 -down-> Opened_Tags : System shows Open Tags
+
+@enduml

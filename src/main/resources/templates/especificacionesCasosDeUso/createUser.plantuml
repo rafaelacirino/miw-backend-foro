@@ -1,0 +1,35 @@
+@startuml
+
+header Create User
+
+state " " as s1
+state " " as s2
+state " " as s3
+state " " as s4
+state "Decision" as Decision <<choice>>
+
+Opened_Dashboard --> s1 : Admin requests to create a new user
+
+s1 --> s2 : System requires data
+
+note right of s2
+<b>Data:</b>
+- First Name
+- Last Name
+- Username
+- Phone
+- Email
+- Password
+- Role
+end note
+
+s2 --> s3 : Admin submits data
+
+s3 --> Decision : System validates username, phone, email, password
+
+Decision --> s2 : [Invalid]
+Decision --> s4 : [Ok]
+
+s4 --> [*] : System creates the new user
+
+@enduml

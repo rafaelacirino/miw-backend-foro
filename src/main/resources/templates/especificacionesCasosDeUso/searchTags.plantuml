@@ -1,0 +1,10 @@
+@startuml
+
+header Search Tags
+
+state " " as s1
+
+Opened_Tags -down-> s1 : User requests to search tags
+s1 -down-> Searched_Tags : System shows Search Tags
+
+@enduml

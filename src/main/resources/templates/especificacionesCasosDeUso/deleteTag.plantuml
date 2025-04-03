@@ -1,0 +1,18 @@
+@startuml
+
+header Delete Tag
+
+state " " as s1
+state " " as s2
+state "Opened_Dashboard" as s3
+state "Decision" as Decision <<choice>>
+
+Opened_Dashboard -down-> s1 : Admin requests to delete a tag
+s1 -down-> Decision : The system requires confirmation
+
+Decision -down-> s2 : [OK]
+Decision -down-> s1 : [Cancel]
+
+s2 --> s3 : The system deletes the tag
+
+@enduml

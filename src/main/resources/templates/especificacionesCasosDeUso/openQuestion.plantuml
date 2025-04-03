@@ -1,0 +1,16 @@
+@startuml
+
+header Open Question
+
+state " " as s1
+
+Opened_Questions -down-> s1
+Opened_Tags -down-> s1
+Searched_Content -down-> s1 : User requires to open Question
+Filtered_Questions -down-> s1
+Opened_MyQuestions -down-> s1
+Opened_Notification -down-> s1
+
+s1 -down-> Opened_Question : System shows Open Question
+
+@enduml

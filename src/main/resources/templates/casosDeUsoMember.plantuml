@@ -6,11 +6,13 @@ actor Member
 
 left to right direction
 
+(Login) as UC1
 (Logout) as UC2
 
 (Open Profile) as UC4
 (Update Profile) as UC5
 (Delete Profile) as UC6
+(Change Password) as UC36
 
 (Create Question) as UC8
 (Delete Question) as UC9
@@ -29,7 +31,9 @@ left to right direction
 (Open Notifications) as UC33
 (Open Notification) as UC34
 
-(Update Tags) as UC21
+(Update Tag) as UC21
+
+(Restore Password) as UC37
 
 UC8 .-up-> UC13 : <<extend>>
 UC12 .-up-> UC13 : <<extend>>
@@ -41,6 +45,7 @@ UC21 .-up-> UC10 : <<extend>>
 
 UC5 .-up-> UC4 : <<extend>>
 UC6 .-up-> UC4 : <<extend>>
+UC36 .-up-> UC5 : <<extend>>
 
 UC15 .-up-> UC14 : <<extend>>
 UC16 .-up-> UC14 : <<extend>>
@@ -50,6 +55,7 @@ UC20 .-up-> UC18 : <<extend>>
 UC33 .-down-> UC34 : <<extend>>
 
 
+Member --> UC1
 Member --> UC2
 Member --> UC4
 Member --> UC13
@@ -57,5 +63,6 @@ Member --> UC14
 Member --> UC17
 Member --> UC18
 Member --> UC33
+Member --> UC37
 
 @enduml

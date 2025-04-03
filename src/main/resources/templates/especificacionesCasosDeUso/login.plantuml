@@ -1,6 +1,6 @@
 @startuml
 
-header Login Use Case
+header Login
 
 state " " as s1
 state " " as s2

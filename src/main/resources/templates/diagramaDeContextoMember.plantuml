@@ -35,7 +35,7 @@ Opened_MyQuestions --> Opened_MyQuestions : Update Question \n Delete Question
 Opened_MyQuestions --> Final : Logout
 
 Opened_Profile --> Opened_MyQuestions : Open MyQuestions
-Opened_Profile --> Opened_Profile : Update Profile
+Opened_Profile --> Opened_Profile : Update Profile \n Change Password
 Opened_Profile --> Final : Delete Profile
 Opened_Profile --> Final : Logout
 

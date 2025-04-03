@@ -12,8 +12,10 @@ Opened_Question --> Opened_Question : Delete Question \n Delete Answer
 Opened_Questions --> Final : Logout
 Opened_Question --> Final : Logout
 
-Opened_Dashboard --> Opened_Dashboard : Open Users \n Create User \n Delete Tag
+Opened_Dashboard --> Opened_Dashboard : Create User \n Delete Tag
+Opened_Dashboard --> Opened_Users : Open Users
 Opened_Dashboard --> Final : Logout
+Opened_Users--> Final : Logout
 
 Final --> [*]
 

@@ -1,0 +1,31 @@
+@startuml
+
+header Sign Up
+
+state "SignUp" as s1
+state " " as s2
+state "Decision" as Decision <<choice>>
+state " " as s3
+
+[*] --> s1 : User requests Sign Up
+
+s1 -down-> s2 : System requires data
+
+note right of s2
+<b>Data:</b>
+- First Name
+- Last Name
+- Username
+- Phone
+- Email
+- Password
+end note
+
+s2 -down->  Decision : User provides data
+
+Decision -right-> s2 : [Invalid]
+Decision -down-> s3 : [Ok]
+
+s3 --> Login : The System registers user with role Member
+
+@enduml

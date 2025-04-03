@@ -14,9 +14,9 @@ left to right direction
 (Login) as UC1
 (Logout) as UC2
 (Sign Up) as UC3
-(Open MyProfile) as UC4
-(Update MyProfile) as UC5
-(Delete MyProfile) as UC6
+(Open Profile) as UC4
+(Update Profile) as UC5
+(Delete Profile) as UC6
 (Open Question) as UC7
 (Create Question) as UC8
 (Delete MyQuestion) as UC9
@@ -52,9 +52,9 @@ Guest --> UC11
 Guest --> UC25
 Guest --> UC26
 Guest --> UC27
-Guest --> UC1
 Guest --> UC3
 
+Member --> UC1
 Member --> UC2
 Member --> UC4
 Member --> UC5

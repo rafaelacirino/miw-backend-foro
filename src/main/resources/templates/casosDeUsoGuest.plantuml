@@ -2,12 +2,10 @@
 
 header Guest Use Case
 
-
 actor Guest
 
 left to right direction
 
-(Login) as UC1
 (Sign Up) as UC3
 
 (Open Question) as UC7
@@ -18,11 +16,10 @@ left to right direction
 (Open Tags) as UC26
 (Search Tags) as UC27
 
-UC3 .-down-> UC1 : <<extend>>
-UC11 .-down-> UC7 : <<extend>>
-UC11 .-down-> UC12 : <<extend>>
-UC11 .-down-> UC25 : <<extend>>
-UC26 .-down-> UC27 : <<extend>>
+UC7 .-up-> UC11 : <<extend>>
+UC12 .-up-> UC11 : <<extend>>
+UC25 .-up-> UC11 : <<extend>>
+UC27 .-up-> UC26 : <<extend>>
 
 Guest --> UC11
 Guest --> UC3

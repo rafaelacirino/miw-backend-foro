@@ -1,0 +1,18 @@
+@startuml
+
+header Delete Answer
+
+state " " as s1
+state " " as s2
+state "Opened_Question" as s3
+state "Decision" as Decision <<choice>>
+
+Opened_Question -down-> s1 : Admin requests to delete an answer
+s1 -down-> Decision : System requires confirmation
+
+Decision -down-> s2 : [OK]
+Decision -up-> Opened_Question : [Cancel]
+
+s2 --> s3 : System deletes the answer
+
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+
+header Open MyQuestions
+
+state " " as s1
+
+Opened_Questions -down-> s1 : User requests to open MyQuestions
+Opened_Profile -down-> s1
+
+s1 -down-> Opened_MyQuestions : System shows MyQuestions
+
+@enduml

@@ -1,0 +1,13 @@
+@startuml
+
+header Open Users
+
+state " " as s1
+state " " as s2
+
+
+Opened_Dashboard --> s1 : Admin requests to show users
+
+s1 --> [ : System shows users
+
+@enduml

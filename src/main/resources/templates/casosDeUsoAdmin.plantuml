@@ -11,11 +11,18 @@ left to right direction
 (Create User) as UC3
 (Open Users) as UC4
 (Delete Answer) as UC5
+(Open Question) as UC7
+(Open Questions) as UC11
+(Open Dashboard) as UC35
 
-Admin --> UC1
-Admin --> UC2
-Admin --> UC3
-Admin --> UC4
-Admin --> UC5
+UC7 .-up-> UC11 : <<extend>>
+UC2 .-up-> UC7 : <<extend>>
+UC5 .-up-> UC7 : <<extend>>
+UC1 .-up-> UC35 : <<extend>>
+UC3 .-up-> UC35 : <<extend>>
+UC4 .-up-> UC35 : <<extend>>
+
+Admin --> UC11
+Admin --> UC35
 
 @enduml
