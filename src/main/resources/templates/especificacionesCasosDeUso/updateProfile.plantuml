@@ -1,0 +1,34 @@
+@startuml
+
+header Update Profile
+
+state " " as s1
+state " " as s2
+state " " as s3
+state "Change Password" as s4
+state "Opened_Profile" as s5
+state "Opened_Profile" as s6
+state "Decision" as Decision <<choice>>
+
+Opened_Profile -down-> s1 : The system shows data
+
+note right of s1
+<b>Data:</b>
+- First Name
+- Last Name
+- Username
+- Phone
+- Email
+end note
+
+s1 --> s2: The user requests to update
+s2 --> s4: The user requests to change password
+s2 --> Decision: The system validates username, phone and email
+
+Decision --> s3 : [Ok]
+Decision -up-> s1 : [Invalid]
+
+s3 --> s5 : The system shows the updated profile
+s4 --> s6 : The system shows the updated profile
+
+@enduml

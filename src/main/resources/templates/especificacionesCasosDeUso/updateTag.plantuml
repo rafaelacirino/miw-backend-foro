@@ -1,0 +1,22 @@
+@startuml
+
+header Update Tag
+
+state "Create Question" as s0
+state " " as s1
+state " " as s2
+state " " as s3
+state "Opened_Question" as s4
+state "Decision" as Decision <<choice>>
+
+s0 --> s1 : The user enters a tag
+
+s1 --> Decision : The system suggests existing tags or allows creation
+
+Decision --> s2 : [Create tag]
+Decision --> s3 : [Select tag]
+
+s2 --> s4 : The system selects existing tag
+s3 --> s4 : The system creates and assigns tag
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+
+header Delete Profile
+
+state " " as s1
+state " " as s2
+state " " as s3
+state "Decision" as Decision <<choice>>
+
+Opened_Profile -down-> s1 : The system shows data
+
+note right of s1
+<b>Data:</b>
+- First Name
+- Last Name
+- Username
+- Phone
+- Email
+end note
+
+s1 --> s2: The user requests to delete profile
+s2 --> Decision: The system requires confirmation
+
+Decision --> s3 : [Ok]
+Decision -up-> s1 : [Cancel]
+
+s3 --> Login: The system deletes the user
+
+@enduml

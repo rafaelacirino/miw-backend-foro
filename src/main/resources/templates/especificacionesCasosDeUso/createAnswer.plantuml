@@ -1,0 +1,32 @@
+@startuml
+
+header Create Answer
+
+state " " as s1
+state " " as s2
+state " " as s3
+state " " as s4
+state "Decision" as Decision <<choice>>
+
+Opened_Question --> s1 : The user requests to create an answer
+s1 --> s2 : The system requires data
+
+note right of s2
+<b>Data:</b>
+- Content
+end note
+
+s2 --> Decision : The user inserts content
+
+Decision --> s3 : [Ok]
+Decision -up-> s1 : [Cancel]
+
+s3 --> s4 : The system creates Answer
+
+note right of s4
+- Content
+- Date
+- User
+end note
+
+@enduml

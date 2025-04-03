@@ -1,0 +1,11 @@
+@startuml
+
+header Open Dashboard
+
+state " " as s1
+
+Opened_Questions -down-> s1 : The user requests to open dashboard
+s1 -down-> Opened_Dashboard : The system shows Open Dashboard
+
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+
+header Mark Answer As Correct
+
+state " " as s1
+state " " as s2
+state "Opened_Question" as s3
+state "Decision" as Decision <<choice>>
+
+Opened_Question -down-> s1 : User of the question requests to mark answer as correct
+s1 -down-> Decision
+
+Decision -down-> s2 : [OK]
+Decision -up-> Opened_Question : [Cancel]
+
+s2 --> s3 : System marks the answer isCorrect
+
+@enduml

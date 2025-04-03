@@ -1,0 +1,37 @@
+@startuml
+
+header Create Question
+
+state " " as s1
+state " " as s2
+state " " as s3
+state "Create Tag" as s4
+state "Decision" as Decision <<choice>>
+
+Opened_Questions --> s1 : The user requests to create a question
+s1 --> s2 : The system requires data
+
+note right of s2
+<b>Data:</b>
+- Title
+- Description
+- Tags
+end note
+
+s2 --> Decision : The user inserts data
+s2 --> s4 : The user creates tag
+
+Decision --> s3 : [Ok]
+Decision -up-> s1 : [Cancel]
+
+s3 --> Opened_Question : The system creates Question
+
+note right of Opened_Question
+- Title
+- Description
+- Tags
+- Date
+- User
+end note
+
+@enduml

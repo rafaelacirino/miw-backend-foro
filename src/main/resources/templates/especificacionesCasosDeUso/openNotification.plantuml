@@ -1,0 +1,14 @@
+@startuml
+
+header Open Notification
+
+state " " as s1
+state " " as s2
+
+Opened_Questions -down-> s1: The user requests to open notifications
+s1 --> Opened_Notifications : The system Open Notifications
+
+Opened_Notifications -down-> s2: The user requests to open a notification
+s2 --> Opened_Notification : The system Open Notification
+
+@enduml

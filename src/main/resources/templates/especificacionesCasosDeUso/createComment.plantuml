@@ -1,0 +1,34 @@
+@startuml
+
+header Create Comment
+
+state " " as s1
+state " " as s2
+state " " as s3
+state " " as s4
+state "Opened_Question" as s5
+state "Decision" as Decision <<choice>>
+
+Opened_Question --> s1 : The user selects an answer
+s1 --> s2 : The user requests to create a comment
+s2 --> s3 : The system requires data
+
+note right of s3
+<b>Data:</b>
+- Reason
+end note
+
+s3 --> Decision : The user inserts reason
+
+Decision --> s4 : [Ok]
+Decision -up-> s1 : [Cancel]
+
+s4 --> s5 : The system creates Comment
+
+note right of s5
+- Reason
+- Date
+- User
+end note
+
+@enduml
