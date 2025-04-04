@@ -28,7 +28,7 @@ Opened_Questions --> Opened_Tags : Open Tags
 Opened_Tags --> Searched_Tags : Search Tags
 Searched_Tags --> Opened_Question : Open Question
 
-Opened_Question --> Opened_Question : Create Answer \n Update Answer \n Delete Answer \n Mark Answer as Correct \n Create Comment \n Update Comment \n Delete Comment
+Opened_Question --> Opened_Question : Create Answer \n Update Answer \n Delete Answer \n Mark Answer as Correct \n Create Comment \n Update Comment \n Delete Comment \n Update Tag
 Opened_Question --> Final : Logout
 
 Opened_MyQuestions --> Opened_MyQuestions : Update Question \n Delete Question

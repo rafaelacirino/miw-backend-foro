@@ -74,7 +74,7 @@ class Notification {
 - id*: Long
 - message: String
 - date: LocalDateTime
-- wasRead: Boolean
+- isRead: Boolean
 - user: String
 - notificationType: NotificationType
 }
