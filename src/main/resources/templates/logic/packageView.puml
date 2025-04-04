@@ -12,53 +12,53 @@ View ..> Model
 package View {
     boundary SignUpView
         note right of SignUpView
-            +signUp(firstName: String, lastName: String, username: String, email: String, password: String): Boolean
-            +showSignUpError(message: String): void
+            +signUp(firstName: String, lastName: String, username: String, phone: String, email: String, password: String)
+            +showSignUpError(message: String)
         end note
 
     boundary LoginView
     note right of LoginView
-        +login(email: String, password: String): Boolean
-        +showLoginError(message: String): void
+        +login(email: String, password: String)
+        +showLoginError(message: String)
     end note
 
     boundary QuestionsView
     note right of QuestionsView
-        +showQuestions(filter: String): void
-        +logout(): void
+        +showQuestions(filter: String)
+        +logout()
     end note
 
     boundary QuestionView
     note right of QuestionView
-        +showQuestion(questionId: Long): void
+        +showQuestion(questionId: Long)
     end note
 
     boundary AnswerView
     note right of AnswerView
-        +showAnswerForm(questionId: Long): void
-        +showAnswers(questionId: Long): void
+        +showAnswerForm(questionId: Long)
+        +showAnswers(questionId: Long)
     end note
 
     boundary CommentView
     note right of CommentView
-        +showCommentForm(questionId: Long): void
-        +showComments(questionId: Long): void
+        +showCommentForm(questionId: Long)
+        +showComments(questionId: Long)
     end note
 
     boundary NotificationView
     note right of NotificationView
-        +showNotifications(userId: Long): void
-        +markAsRead(notificationId: Long): void
+        +showNotifications(userId: Long)
+        +markAsRead(notificationId: Long)
     end note
 
     boundary TagsView
     note right of TagsView
-        +showTags(): void
+        +showTags()
     end note
 
     boundary ProfileView
         note right of ProfileView
-            +showProfile(userId: Long): void
+            +showProfile(userId: Long)
         end note
 
     SignUpView ..> LoginView

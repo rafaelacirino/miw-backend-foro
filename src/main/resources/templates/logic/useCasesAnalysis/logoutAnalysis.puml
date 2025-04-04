@@ -1,0 +1,19 @@
+@startuml
+
+left to right direction
+
+actor User
+
+package View {
+  [LoginView]
+  [QuestionsView]
+      note right of [QuestionsView]
+          Indicates that can log out through any View
+      end note
+}
+
+User --> [QuestionsView] : 1 : logout()
+[QuestionsView] --> [QuestionsView] : 2 : removeSession()
+[QuestionsView] --> [LoginView] : 3 : updateView()
+
+@enduml

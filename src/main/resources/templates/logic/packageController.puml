@@ -12,32 +12,34 @@ Controller ..> Model
 package Controller {
     control UserController
     note right of UserController
-        +register(userData: UserDTO): Boolean
-        +login(username: String, password: String): AuthToken
-        +updateProfile(userId: Long, profileData: ProfileDTO): Boolean
-        +changePassword(userId: Long, currentPass: String, newPass: String): Boolean
+        +register(userData: UserEntity)
+        +createUser(userDate: UserEntity)
+        +login(username: String, password: String)
+        +updateProfile(userId: Long, profileData: ProfileEntity)
+        +changePassword(userId: Long, currentPass: String, newPass: String)
     end note
 
     control QuestionController
     note right of QuestionController
-        +createQuestion(userId: Long, questionData: QuestionDTO): Long
-        +getQuestion(questionId: Long): QuestionDTO
-        +searchQuestions(query: String): List<QuestionDTO>
-        +deleteQuestion(questionId: Long): Boolean
+        +createQuestion(userId: Long, questionData: QuestionEntity)
+        +getQuestion(questionId: Long)
+        +searchQuestions(query: String)
+        +deleteQuestion(questionId: Long)
     end note
 
     control AnswerController
     note right of AnswerController
-        +addAnswer(questionId: Long, answerData: AnswerDTO): Long
-        +markAsCorrect(answerId: Long): Boolean
-        +getAnswers(questionId: Long): List<AnswerDTO>
+        +addAnswer(questionId: Long, answerData: AnswerEntity)
+        +markAsCorrect(answerId: Long)
+        +getAnswers(questionId: Long)
+        +deleteAnswer(answerId: Long)
     end note
 
     control NotificationController
     note right of NotificationController
-        +getUserNotifications(userId: Long): List<NotificationDTO>
-        +markAsRead(notificationId: Long): Boolean
-        +sendNotification(userId: Long, type: NotificationType): Boolean
+        +getUserNotifications(userId: Long)
+        +markAsRead(notificationId: Long)
+        +sendNotification(userId: Long, type: NotificationType)
     end note
 
     UserController ..> QuestionController

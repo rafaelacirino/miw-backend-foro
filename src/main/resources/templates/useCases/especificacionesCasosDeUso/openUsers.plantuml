@@ -8,6 +8,6 @@ state " " as s2
 
 Opened_Dashboard --> s1 : Admin requests to show users
 
-s1 --> [ : System shows users
+s1 --> s2 : System shows users
 
 @enduml

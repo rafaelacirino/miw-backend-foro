@@ -6,6 +6,7 @@ actor User
 
 package View {
   [LoginView]
+  [QuestionsView]
 }
 
 package Controller {
@@ -13,10 +14,13 @@ package Controller {
 }
 
 package Model {
+    [UserModel]
 }
 
 User --> [LoginView] : 1 : login(email, password)
-[LoginView] --> [LoginController] : 1 login(email, password)
+User --> [QuestionsView] : 4 : updateView()
+[LoginView] --> [LoginController] : 2 : login(email, password)
+[LoginController] --> [UserModel] : 3 findByEmail(email)
 
 
 @enduml

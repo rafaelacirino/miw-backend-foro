@@ -12,43 +12,43 @@ Controller ..> Model
 package Model {
     entity UserEntity as UserEntity
     note right of UserEntity
-        +getUserId(): Long
-        +getFirstName(): String
-        +getLastName(): String
-        +getUserName(): String
-        +getEmail(): String
-        +changePassword(newPassword: String): void
+        +getUserId()
+        +getFirstName()
+        +getLastName()
+        +getUserName()
+        +getEmail()
+        +changePassword(newPassword: String)
     end note
 
     entity QuestionEntity as QuestionEntity
     note right of QuestionEntity
-        +getQuestionId(): Long
-        +getTitle(): String
-        +getDescription(): String
-        +incrementViews(): void
-        +updateContent(newTitle: String, newDescription: String): void
+        +getQuestionId()
+        +getTitle()
+        +getDescription()
+        +incrementViews()
+        +updateContent(newTitle: String, newDescription: String)
     end note
 
     entity AnswerEntity as AnswerEntity
     note right of AnswerEntity
-        +getAnswerId(): Long
-        +getContent(): String
-        +markAsCorrect(): void
-        +updateContent(newContent: String): void
+        +getAnswerId()
+        +getContent()
+        +markAsCorrect()
+        +updateContent(newContent: String)
     end note
 
     entity CommentEntity as CommentEntity
     note right of CommentEntity
-        +getCommentId(): Long
-        +getReason(): String
-        +updateReason(newReason: String): void
+        +getCommentId()
+        +getReason()
+        +updateReason(newReason: String)
     end note
 
     entity NotificationEntity as NotificationEntity
     note right of NotificationEntity
-        +getNotificationId(): Long
-        +getMessage(): String
-        +markAsRead(): void
+        +getNotificationId()
+        +getMessage()
+        +markAsRead()
     end note
 
     entity TagEntity as TagEntity

@@ -9,8 +9,8 @@ package View {
 package Controller {
 }
 
-View --> Controller
-View --> Model
-Controller --> Model
+View .right.> Controller
+View ..> Model
+Controller ..> Model
 
 @enduml
