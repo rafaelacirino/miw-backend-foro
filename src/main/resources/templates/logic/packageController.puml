@@ -1,0 +1,49 @@
+@startuml
+
+package Model {
+}
+
+package View {
+}
+
+View ..> Controller
+Controller ..> Model
+
+package Controller {
+    control UserController
+    note right of UserController
+        +register(userData: UserDTO): Boolean
+        +login(username: String, password: String): AuthToken
+        +updateProfile(userId: Long, profileData: ProfileDTO): Boolean
+        +changePassword(userId: Long, currentPass: String, newPass: String): Boolean
+    end note
+
+    control QuestionController
+    note right of QuestionController
+        +createQuestion(userId: Long, questionData: QuestionDTO): Long
+        +getQuestion(questionId: Long): QuestionDTO
+        +searchQuestions(query: String): List<QuestionDTO>
+        +deleteQuestion(questionId: Long): Boolean
+    end note
+
+    control AnswerController
+    note right of AnswerController
+        +addAnswer(questionId: Long, answerData: AnswerDTO): Long
+        +markAsCorrect(answerId: Long): Boolean
+        +getAnswers(questionId: Long): List<AnswerDTO>
+    end note
+
+    control NotificationController
+    note right of NotificationController
+        +getUserNotifications(userId: Long): List<NotificationDTO>
+        +markAsRead(notificationId: Long): Boolean
+        +sendNotification(userId: Long, type: NotificationType): Boolean
+    end note
+
+    UserController ..> QuestionController
+    UserController ..> AnswerController
+    QuestionController ..> NotificationController
+}
+
+
+@enduml

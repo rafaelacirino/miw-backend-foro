@@ -1,0 +1,68 @@
+@startuml
+
+package View {
+}
+
+package Controller {
+}
+
+View ..> Model
+Controller ..> Model
+
+package Model {
+    entity UserEntity as UserEntity
+    note right of UserEntity
+        +getUserId(): Long
+        +getFirstName(): String
+        +getLastName(): String
+        +getUserName(): String
+        +getEmail(): String
+        +changePassword(newPassword: String): void
+    end note
+
+    entity QuestionEntity as QuestionEntity
+    note right of QuestionEntity
+        +getQuestionId(): Long
+        +getTitle(): String
+        +getDescription(): String
+        +incrementViews(): void
+        +updateContent(newTitle: String, newDescription: String): void
+    end note
+
+    entity AnswerEntity as AnswerEntity
+    note right of AnswerEntity
+        +getAnswerId(): Long
+        +getContent(): String
+        +markAsCorrect(): void
+        +updateContent(newContent: String): void
+    end note
+
+    entity CommentEntity as CommentEntity
+    note right of CommentEntity
+        +getCommentId(): Long
+        +getReason(): String
+        +updateReason(newReason: String): void
+    end note
+
+    entity NotificationEntity as NotificationEntity
+    note right of NotificationEntity
+        +getNotificationId(): Long
+        +getMessage(): String
+        +markAsRead(): void
+    end note
+
+    entity TagEntity as TagEntity
+        note right of TagEntity
+            +getTagId(): Long
+            +getQuestions()
+        end note
+
+    UserEntity ..> QuestionEntity
+    QuestionEntity ..> AnswerEntity
+    QuestionEntity ..> TagEntity
+    AnswerEntity ..> CommentEntity
+    UserEntity ..> NotificationEntity
+}
+
+
+@enduml

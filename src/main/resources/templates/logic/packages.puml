@@ -1,0 +1,16 @@
+@startuml
+
+package Model {
+}
+
+package View {
+}
+
+package Controller {
+}
+
+View --> Controller
+View --> Model
+Controller --> Model
+
+@enduml

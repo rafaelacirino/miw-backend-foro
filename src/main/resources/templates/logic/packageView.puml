@@ -1,0 +1,74 @@
+@startuml
+
+package Model {
+}
+
+package Controller {
+}
+
+View ..> Controller
+View ..> Model
+
+package View {
+    boundary SignUpView
+        note right of SignUpView
+            +signUp(firstName: String, lastName: String, username: String, email: String, password: String): Boolean
+            +showSignUpError(message: String): void
+        end note
+
+    boundary LoginView
+    note right of LoginView
+        +login(email: String, password: String): Boolean
+        +showLoginError(message: String): void
+    end note
+
+    boundary QuestionsView
+    note right of QuestionsView
+        +showQuestions(filter: String): void
+        +logout(): void
+    end note
+
+    boundary QuestionView
+    note right of QuestionView
+        +showQuestion(questionId: Long): void
+    end note
+
+    boundary AnswerView
+    note right of AnswerView
+        +showAnswerForm(questionId: Long): void
+        +showAnswers(questionId: Long): void
+    end note
+
+    boundary CommentView
+    note right of CommentView
+        +showCommentForm(questionId: Long): void
+        +showComments(questionId: Long): void
+    end note
+
+    boundary NotificationView
+    note right of NotificationView
+        +showNotifications(userId: Long): void
+        +markAsRead(notificationId: Long): void
+    end note
+
+    boundary TagsView
+    note right of TagsView
+        +showTags(): void
+    end note
+
+    boundary ProfileView
+        note right of ProfileView
+            +showProfile(userId: Long): void
+        end note
+
+    SignUpView ..> LoginView
+    LoginView ..> QuestionsView
+    QuestionsView ..> QuestionView
+    QuestionsView ..> NotificationView
+    QuestionsView ..> TagsView
+    QuestionsView ..> ProfileView
+    QuestionView ..> AnswerView
+    AnswerView ..> CommentView
+}
+
+@enduml
