@@ -31,7 +31,6 @@ left to right direction
 (Create Comment) as UC18
 (Update Comment) as UC19
 (Delete Comment) as UC20
-(Create Tag) as UC21
 (Update Tag) as UC22
 (Delete Tag) as UC24
 (Search Content) as UC25
@@ -71,7 +70,6 @@ Member --> UC17
 Member --> UC18
 Member --> UC19
 Member --> UC20
-Member --> UC21
 Member --> UC22
 Member --> UC33
 Member --> UC34
