@@ -13,7 +13,7 @@ package Controller {
     control UserController
     note right of UserController
         +register(userData: UserEntity)
-        +createUser(userDate: UserEntity)
+        +createUser(userData: UserEntity)
         +login(username: String, password: String)
         +updateProfile(userId: Long, profileData: ProfileEntity)
         +changePassword(userId: Long, currentPass: String, newPass: String)
@@ -35,6 +35,13 @@ package Controller {
         +deleteAnswer(answerId: Long)
     end note
 
+    control CommentController
+    note right of CommentController
+        +addComment(answerId: Long, commentData: CommentEntity)
+        +deleteComment(commentId: Long)
+        +getComments(answerId: Long)
+    end note
+
     control NotificationController
     note right of NotificationController
         +getUserNotifications(userId: Long)
@@ -42,9 +49,33 @@ package Controller {
         +sendNotification(userId: Long, type: NotificationType)
     end note
 
+    control TagController
+    note right of TagController
+        +createTag(tagData: TagEntity)
+        +updateTag(tagId, data)
+        +getAllTags()
+    end note
+
+    control DashboardController
+    note right of DashboardController
+        +getDashboardData(userId: Long)
+    end note
+
+    control SearchController
+    note right of SearchController
+        +searchContent(query: String)
+        +searchTags(query)
+    end note
+
+
     UserController ..> QuestionController
-    UserController ..> AnswerController
-    QuestionController ..> NotificationController
+    QuestionController ..> AnswerController
+    AnswerController ..> CommentController
+    UserController ..> NotificationController
+    QuestionController ..> TagController
+    UserController ..> DashboardController
+    SearchController ..> QuestionController
+    SearchController ..> TagController
 }
 
 

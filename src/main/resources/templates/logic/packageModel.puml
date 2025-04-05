@@ -16,6 +16,7 @@ package Model {
         +getFirstName()
         +getLastName()
         +getUserName()
+        +getPhone()
         +getEmail()
         +changePassword(newPassword: String)
     end note
@@ -25,7 +26,6 @@ package Model {
         +getQuestionId()
         +getTitle()
         +getDescription()
-        +incrementViews()
         +updateContent(newTitle: String, newDescription: String)
     end note
 
