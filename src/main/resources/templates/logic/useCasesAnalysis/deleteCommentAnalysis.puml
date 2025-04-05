@@ -1,0 +1,30 @@
+@startuml
+
+left to right direction
+
+actor User
+
+package View {
+    [QuestionView]
+    [AnswerView]
+    [CommentView]
+}
+
+package Controller {
+    [CommentController]
+}
+
+package Model {
+    [CommentEntity]
+}
+
+User --> [QuestionView] : 1 : openQuestion(questionId)
+[QuestionView] -left-> [AnswerView] : 2 : showAnswerForm()
+[AnswerView] -left-> [CommentView] : 3 : showCommentForm()
+User --> [CommentView] : 4 : deleteMyComment(commentId)
+[CommentView] --> [CommentController] : 5 : deleteComment(commentId)
+
+[CommentController] --> [CommentEntity] : 6 : findById(commentId)
+[CommentController] --> [CommentEntity] : 7 : delete(commentId)
+
+@enduml

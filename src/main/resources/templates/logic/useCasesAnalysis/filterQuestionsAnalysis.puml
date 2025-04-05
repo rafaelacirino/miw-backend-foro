@@ -1,0 +1,25 @@
+@startuml
+
+left to right direction
+
+actor User
+
+package View {
+    [OpenQuestionsView]
+}
+
+package Controller {
+    [QuestionController]
+}
+
+package Model {
+    [QuestionEntity]
+}
+
+User --> [OpenQuestionsView] : 1 : openQuestionsView()
+User --> [OpenQuestionsView] : 2 : selectFilter(filters)
+[OpenQuestionsView] --> [QuestionController] : 3 : filterQuestions(filters)
+
+[QuestionController] --> [QuestionEntity] : 4 : filterQuestions(filters)
+
+@enduml

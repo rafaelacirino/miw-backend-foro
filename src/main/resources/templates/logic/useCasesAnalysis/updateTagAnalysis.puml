@@ -1,0 +1,29 @@
+@startuml
+
+left to right direction
+
+actor User
+
+package View {
+    [QuestionView]
+}
+
+package Controller {
+    [QuestionController]
+    [TagController]
+}
+
+package Model {
+    [TagEntity]
+    [QuestionEntity]
+}
+
+User --> [QuestionView] : 1a : createQuestion() \n 1b : openMyQuestion(questionId)
+User --> [QuestionView] : 2 : typeTag(tagName)
+[QuestionView] --> [TagController] : 3 : suggestTags(tagName)
+[TagController] --> [TagEntity] : 4 : findTagsByName(tagName)
+
+[QuestionView] --> [QuestionController] : 5 : updateTag(tagName)
+[QuestionController] --> [QuestionEntity] : 6 : updateTag(tagName)
+
+@enduml

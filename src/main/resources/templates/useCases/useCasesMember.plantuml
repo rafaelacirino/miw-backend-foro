@@ -15,19 +15,19 @@ left to right direction
 (Change Password) as UC36
 
 (Create Question) as UC8
-(Delete Question) as UC9
+(Delete MyQuestion) as UC9
 (Update Question) as UC10
 (Open MyQuestion) as UC12
 (Open MyQuestions) as UC13
 
 (Create Answer) as UC14
 (Update Answer) as UC15
-(Delete Answer) as UC16
+(Delete MyAnswer) as UC16
 (Mark Answer as Correct) as UC17
 
 (Create Comment) as UC18
 (Update Comment) as UC19
-(Delete Comment) as UC20
+(Delete MyComment) as UC20
 (Open Notifications) as UC33
 (Open Notification) as UC34
 

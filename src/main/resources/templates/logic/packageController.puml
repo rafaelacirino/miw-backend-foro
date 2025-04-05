@@ -17,6 +17,8 @@ package Controller {
         +login(username: String, password: String)
         +updateProfile(userId: Long, profileData: ProfileEntity)
         +changePassword(userId: Long, currentPass: String, newPass: String)
+        +requestRestorePassword(email: String)
+        +restorePassword(token: String, newPassword: String)
     end note
 
     control QuestionController

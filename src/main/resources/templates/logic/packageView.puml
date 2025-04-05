@@ -24,8 +24,8 @@ package View {
 
     boundary RestorePasswordView
     note right of RestorePasswordView
-        +requestPasswordReset(email: String)
-        +resetPassword(token: String, newPassword: String)
+        +requestRestorePassword(email: String)
+        +restorePassword(token: String, newPassword: String)
     end note
 
     boundary QuestionsView
@@ -37,6 +37,7 @@ package View {
     boundary QuestionView
     note right of QuestionView
         +showQuestion(questionId: Long)
+        +showSelectedTag(tagId: Long)
     end note
 
     boundary AnswerView
@@ -47,7 +48,7 @@ package View {
 
     boundary CommentView
     note right of CommentView
-        +showCommentForm(questionId: Long)
+        +showCommentForm(questionId: Long, answerId: Long)
         +showComments(questionId: Long)
     end note
 

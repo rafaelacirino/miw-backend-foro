@@ -1,0 +1,33 @@
+@startuml
+
+left to right direction
+
+actor User
+
+package View {
+    [SearchView]
+}
+
+package Controller {
+    [SearchController]
+}
+
+package Model {
+    [QuestionEntity]
+    [AnswerEntity]
+    [CommentEntity]
+    [TagEntity]
+}
+
+User --> [SearchView] : 1 : enterSearchQuery(query)
+[SearchView] --> [SearchController] : 2 : searchContent(query)
+
+[SearchController] --> [QuestionEntity] : 3a : searchQuestions(query)
+[SearchController] --> [AnswerEntity] : 3b : searchAnswers(query)
+[SearchController] --> [CommentEntity] : 3c : searchComments(query)
+[SearchController] --> [TagEntity] : 3d : searchTags(query)
+
+[QuestionEntity] -right-> [AnswerEntity]
+[AnswerEntity] -right-> [CommentEntity]
+
+@enduml
