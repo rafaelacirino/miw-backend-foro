@@ -34,6 +34,8 @@ package View {
         +logout()
     end note
 
+    boundary MyQuestionsView
+
     boundary QuestionView
     note right of QuestionView
         +showQuestion(questionId: Long)
@@ -76,12 +78,6 @@ package View {
         +showDashboard(userId: Long)
     end note
 
-    boundary SearchView
-    note right of SearchView
-        +search(query: String)
-        +showSearchResults(results: List)
-    end note
-
     SignUpView ..> LoginView
     LoginView ..> QuestionsView
     LoginView ..> RestorePasswordView
@@ -94,9 +90,8 @@ package View {
     AnswerView ..> CommentView
     NotificationView ..> QuestionView
     TagsView ..> QuestionView
-    QuestionsView ..> SearchView
-    SearchView ..> TagsView
-    SearchView ..> QuestionView
+    QuestionsView .right.> MyQuestionsView
+    ProfileView .right.> MyQuestionsView
 
 }
 
