@@ -1,0 +1,26 @@
+@startuml
+
+left to right direction
+
+actor Admin
+
+package View {
+  [SignUpView]
+  [UserView]
+}
+
+package Controller {
+  [UserController]
+}
+
+package Model {
+    [UserEntity]
+}
+
+Admin --> [SignUpView] : 1 : createUser()
+SignUpView -left-> [UserView] : 4 : updateView()
+[SignUpView] --> [UserController] : 2 : createUser(firstName, lastName, username, phone, email, password, ?role)
+[UserController] --> [UserEntity] : 3 save(user)
+
+
+@enduml

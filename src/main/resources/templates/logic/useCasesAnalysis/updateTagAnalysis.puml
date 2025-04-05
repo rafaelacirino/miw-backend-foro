@@ -18,12 +18,12 @@ package Model {
     [QuestionEntity]
 }
 
-User --> [QuestionView] : 1a : createQuestion() \n 1b : openMyQuestion(questionId)
-User --> [QuestionView] : 2 : typeTag(tagName)
-[QuestionView] --> [TagController] : 3 : suggestTags(tagName)
+User --> [QuestionView] : 1a : createQuestion() \n 1b : openMyQuestion()
+User --> [QuestionView] : 2 : updateTag()
+[QuestionView] --> [TagController] : 3 : showTags(tagName)
 [TagController] --> [TagEntity] : 4 : findTagsByName(tagName)
 
 [QuestionView] --> [QuestionController] : 5 : updateTag(tagName)
-[QuestionController] --> [QuestionEntity] : 6 : updateTag(tagName)
+[QuestionController] --> [QuestionEntity] : 6 : save(tagName)
 
 @enduml

@@ -14,13 +14,13 @@ package Controller {
 }
 
 package Model {
-    [UserModel]
+    [UserEntity]
 }
 
-User --> [LoginView] : 1 : login(email, password)
-User --> [QuestionsView] : 4 : updateView()
+User --> [LoginView] : 1 : login()
+LoginView -left-> [QuestionsView] : 4 : updateView()
 [LoginView] --> [LoginController] : 2 : login(email, password)
-[LoginController] --> [UserModel] : 3 findByEmail(email)
+[LoginController] --> [UserEntity] : 3 findByEmail(email)
 
 
 @enduml

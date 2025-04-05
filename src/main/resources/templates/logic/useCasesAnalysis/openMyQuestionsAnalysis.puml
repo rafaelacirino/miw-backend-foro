@@ -1,0 +1,30 @@
+@startuml
+
+left to right direction
+
+actor User
+
+package View {
+    [QuestionsView]
+    [ProfileView]
+    [MyQuestionsView]
+}
+
+package Controller {
+    [QuestionsController]
+}
+
+package Model {
+    [QuestionEntity]
+}
+
+User --> [QuestionsView] : 1a : openQuestions()
+User --> [ProfileView] : 1b : openProfile()
+ProfileView --> [MyQuestionsView] : 4b : openMyQuestions(userId)
+[QuestionsView] --> [MyQuestionsView] : 4a : openMyQuestions(userId)
+
+[QuestionsView] --> [QuestionsController] : 2a : searchQuestions(content)
+[ProfileView] --> [QuestionsController] : 2b : searchQuestions(content)
+
+[QuestionsController] --> [QuestionEntity] : 3 : findByQuestions(question)
+@enduml

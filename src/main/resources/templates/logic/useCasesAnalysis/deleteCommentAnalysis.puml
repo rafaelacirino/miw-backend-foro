@@ -18,10 +18,10 @@ package Model {
     [CommentEntity]
 }
 
-User --> [QuestionView] : 1 : openQuestion(questionId)
+User --> [QuestionView] : 1 : openQuestion()
 [QuestionView] -left-> [AnswerView] : 2 : showAnswerForm()
 [AnswerView] -left-> [CommentView] : 3 : showCommentForm()
-User --> [CommentView] : 4 : deleteMyComment(commentId)
+User --> [CommentView] : 4 : deleteMyComment()
 [CommentView] --> [CommentController] : 5 : deleteComment(commentId)
 
 [CommentController] --> [CommentEntity] : 6 : findById(commentId)

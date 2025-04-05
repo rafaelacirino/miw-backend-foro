@@ -18,13 +18,13 @@ package Model {
     [QuestionEntity]
 }
 
-User --> [QuestionView] : 1 : openQuestion(questionId)
+User --> [QuestionView] : 1 : openQuestion()
 [QuestionView] -right-> [AnswerView] : 2 : showAnswerForm()
-User --> [AnswerView] : 3 : writeAnswer(content)
+User --> [AnswerView] : 3 : createAnswer()
 [AnswerView] --> [AnswerController] : 4 : createAnswer(questionId, content)
 
 [AnswerController] --> [QuestionEntity] : 5 : findQuestionById(questionId)
-[AnswerController] --> [AnswerEntity] : 6 : create(content, user, date)
-[AnswerEntity] -right-> [QuestionEntity]
+[AnswerController] --> [AnswerEntity] : 6 : save(content, user, date)
+[QuestionEntity] -right-> [AnswerEntity]
 
 @enduml

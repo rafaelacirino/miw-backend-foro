@@ -5,7 +5,7 @@ left to right direction
 actor User
 
 package View {
-    [SearchView]
+    [QuestionsView]
 }
 
 package Controller {
@@ -19,15 +19,13 @@ package Model {
     [TagEntity]
 }
 
-User --> [SearchView] : 1 : enterSearchQuery(query)
-[SearchView] --> [SearchController] : 2 : searchContent(query)
+User --> [QuestionsView] : 1 : searchContent()
+[QuestionsView] --> [SearchController] : 2 : searchContent(content)
 
-[SearchController] --> [QuestionEntity] : 3a : searchQuestions(query)
-[SearchController] --> [AnswerEntity] : 3b : searchAnswers(query)
-[SearchController] --> [CommentEntity] : 3c : searchComments(query)
-[SearchController] --> [TagEntity] : 3d : searchTags(query)
+[SearchController] --> [QuestionEntity] : 3a : findByQuestions(content)
+[SearchController] --> [TagEntity] : 3b : findByTags(content)
 
-[QuestionEntity] -right-> [AnswerEntity]
-[AnswerEntity] -right-> [CommentEntity]
+[QuestionEntity] -right-> [AnswerEntity] : 4 : findByAnswers(content)
+[AnswerEntity] -right-> [CommentEntity] : 5 : findByComments(content)
 
 @enduml

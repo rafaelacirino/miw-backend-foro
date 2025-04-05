@@ -1,0 +1,25 @@
+@startuml
+
+left to right direction
+
+actor User
+
+package View {
+    [TagsView]
+}
+
+package Controller {
+    [TagController]
+}
+
+package Model {
+    [TagEntity]
+}
+
+User --> [TagsView] : 1 : searchTags()
+[TagsView] --> [TagController] : 2 : searchTags(tag)
+
+[TagController] --> [TagEntity] : 3 : findByTag(tag)
+
+
+@enduml
