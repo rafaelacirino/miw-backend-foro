@@ -73,10 +73,8 @@ package View {
         +deleteProfile(userId: Long)
     end note
 
-    boundary DashboardView
-    note right of DashboardView
-        +showDashboard(userId: Long)
-    end note
+    boundary UserView
+
 
     SignUpView ..> LoginView
     LoginView ..> QuestionsView
@@ -85,13 +83,13 @@ package View {
     QuestionsView ..> NotificationView
     QuestionsView ..> TagsView
     QuestionsView ..> ProfileView
-    QuestionsView ..> DashboardView
     QuestionView ..> AnswerView
     AnswerView ..> CommentView
     NotificationView ..> QuestionView
     TagsView ..> QuestionView
     QuestionsView .right.> MyQuestionsView
     ProfileView .right.> MyQuestionsView
+    ProfileView ..> UsersView
 
 }
 

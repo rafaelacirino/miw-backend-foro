@@ -17,6 +17,7 @@ left to right direction
 (Create Question) as UC8
 (Delete MyQuestion) as UC9
 (Update Question) as UC10
+(Open Questions) as UC11
 (Open MyQuestion) as UC12
 (Open MyQuestions) as UC13
 
@@ -35,7 +36,7 @@ left to right direction
 
 (Restore Password) as UC37
 
-UC8 .-up-> UC13 : <<extend>>
+UC8 .-up-> UC11 : <<extend>>
 UC12 .-up-> UC13 : <<extend>>
 UC9 .-up-> UC12 : <<extend>>
 UC10 .-up-> UC12 : <<extend>>
@@ -54,11 +55,13 @@ UC19 .-up-> UC18 : <<extend>>
 UC20 .-up-> UC18 : <<extend>>
 UC33 .-down-> UC34 : <<extend>>
 
+UC13 .-up-> UC4 : <<extend>>
+
 
 Member --> UC1
 Member --> UC2
 Member --> UC4
-Member --> UC13
+Member --> UC11
 Member --> UC14
 Member --> UC17
 Member --> UC18

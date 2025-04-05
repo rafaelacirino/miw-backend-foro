@@ -6,15 +6,16 @@ header Admin Context Diagram
 
 Initial --> Opened_Questions: Login
 
-Opened_Questions --> Opened_Dashboard : Open Dashboard
+Opened_Questions --> Opened_Profile : Open Profile
 Opened_Questions --> Opened_Question : Open Question
 Opened_Question --> Opened_Question : Delete Question \n Delete Answer
 Opened_Questions --> Final : Logout
 Opened_Question --> Final : Logout
 
-Opened_Dashboard --> Opened_Dashboard : Create User \n Delete Tag
-Opened_Dashboard --> Opened_Users : Open Users
-Opened_Dashboard --> Final : Logout
+Opened_Profile --> Opened_Profile : Delete Tag
+Opened_Profile --> Opened_Users : Open Users
+Opened_Users --> Opened_Users : Create User
+Opened_Profile --> Final : Logout
 Opened_Users--> Final : Logout
 
 Final --> [*]

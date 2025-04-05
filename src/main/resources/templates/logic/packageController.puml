@@ -58,11 +58,6 @@ package Controller {
         +getAllTags()
     end note
 
-    control DashboardController
-    note right of DashboardController
-        +getDashboardData(userId: Long)
-    end note
-
     control SearchController
     note right of SearchController
         +searchContent(query: String)
@@ -75,7 +70,6 @@ package Controller {
     AnswerController ..> CommentController
     UserController ..> NotificationController
     QuestionController ..> TagController
-    UserController ..> DashboardController
     SearchController ..> QuestionController
     SearchController ..> TagController
 }

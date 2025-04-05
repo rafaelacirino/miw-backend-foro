@@ -6,9 +6,10 @@ state " " as s1
 state " " as s2
 state " " as s3
 state " " as s4
+state "Opened_Users" as s5
 state "Decision" as Decision <<choice>>
 
-Opened_Dashboard --> s1 : Admin requests to create a new user
+Opened_Users --> s1 : Admin requests to create a new user
 
 s1 --> s2 : System requires data
 
@@ -30,6 +31,6 @@ s3 --> Decision : System validates username, phone, email, password
 Decision --> s2 : [Invalid]
 Decision --> s4 : [Ok]
 
-s4 --> [*] : System creates the new user
+s4 --> s5 : System creates the new user
 
 @enduml

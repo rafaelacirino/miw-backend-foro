@@ -3,11 +3,10 @@
 header Open Users
 
 state " " as s1
-state " " as s2
 
 
-Opened_Dashboard --> s1 : Admin requests to show users
+Opened_Profile --> s1 : Admin requests to show users
 
-s1 --> s2 : System shows users
+s1 --> Opened_Users : System shows users
 
 @enduml

@@ -13,13 +13,13 @@ left to right direction
 (Delete Answer) as UC5
 (Open Question) as UC7
 (Open Questions) as UC11
-(Open Dashboard) as UC35
+(Open Profile) as UC35
 
 UC7 .-up-> UC11 : <<extend>>
 UC2 .-up-> UC7 : <<extend>>
 UC5 .-up-> UC7 : <<extend>>
 UC1 .-up-> UC35 : <<extend>>
-UC3 .-up-> UC35 : <<extend>>
+UC3 .-up-> UC4 : <<extend>>
 UC4 .-up-> UC35 : <<extend>>
 
 Admin --> UC11
