@@ -30,8 +30,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
             throws IOException, ServletException {
+        String path = request.getRequestURI();
+        if (path.matches("/question/getAllQuestions") ||
+                path.matches("/question/\\d+")||
+                path.matches("/question/[^/]+")) {
+            chain.doFilter(request, response);
+            return;
+        }
         String authHeader = request.getHeader(AUTHORIZATION);
         log.info("JWT Header: {}", authHeader);
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
@@ -49,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("User: {}", userEmail);
             if (userEmail == null || userEmail.isEmpty()) {
                 log.error("Failed to extract user email from token");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                chain.doFilter(request, response);
                 return;
             }
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -62,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (JWTDecodeException e) {
             log.error("Failed to decode token: {}", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            chain.doFilter(request, response);
             return;
         }
         chain.doFilter(request, response);

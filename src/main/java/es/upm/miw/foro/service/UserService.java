@@ -1,6 +1,7 @@
 package es.upm.miw.foro.service;
 
 import es.upm.miw.foro.api.dto.UserDto;
+import es.upm.miw.foro.persistance.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +22,6 @@ public interface UserService {
     UserDto updateUser(Long id, UserDto userDto);
 
     void deleteUser(Long id);
+
+    User getAuthenticatedUser();
 }
