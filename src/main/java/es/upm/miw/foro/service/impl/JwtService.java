@@ -21,6 +21,8 @@ public class JwtService {
     private static final String EMAIL_CLAIM = "email";
     private static final String ROLE_CLAIM = "role";
 
+    private static final String PASSWORD_RESET_CLAIM = "pwd_reset";
+
     private final String secret;
     private final String issuer;
     private final int expire;
@@ -94,6 +96,32 @@ public class JwtService {
                     .verify(token));
         } catch (Exception exception) {
             return Optional.empty();
+        }
+    }
+
+    public String createPasswordResetToken(String email) {
+        return JWT.create()
+                .withIssuer(this.issuer)
+                .withSubject(email)
+                .withClaim(PASSWORD_RESET_CLAIM, true)
+                .withIssuedAt(new Date())
+                .withNotBefore(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3600 * 1000L))
+                .sign(Algorithm.HMAC256(this.secret));
+    }
+
+    public String validatePasswordResetToken(String token) {
+        try {
+            DecodedJWT jwt = JWT.require(Algorithm.HMAC256(this.secret))
+                    .withIssuer(this.issuer)
+                    .withClaim(PASSWORD_RESET_CLAIM, true)
+                    .build()
+                    .verify(token);
+
+            return jwt.getSubject();
+        } catch (Exception e) {
+            log.error("Invalid password reset token: {}", e.getMessage());
+            throw new RuntimeException("Invalid or expired password reset token");
         }
     }
 }

@@ -72,6 +72,8 @@ public class SecurityConfiguration {
                                 "/user/",
                                 "/user",
                                 "/actuator/**",
+                                "/account/forgot-password",
+                                "/account/reset-password",
                                 "/").permitAll()
                         .anyRequest().authenticated()
                 )
