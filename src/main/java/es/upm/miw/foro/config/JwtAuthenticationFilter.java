@@ -30,10 +30,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
             throws IOException, ServletException {
-        String path = request.getRequestURI();
-        if (path.matches("/question/getAllQuestions") ||
-                path.matches("/question/\\d+")||
-                path.matches("/question/[^/]+")) {
+        String path = request.getServletPath();
+        String method = request.getMethod();
+        log.info("Request path: {}", path);
+        if ((path.equals("/question/getAllQuestions") && method.equalsIgnoreCase("GET")) ||
+                (path.matches("/question/\\d+") && method.equalsIgnoreCase("GET")) ||
+                (path.matches("/question/search") && method.equalsIgnoreCase("GET"))) {
+            log.info("Skipping JWT filter for path: {} and method: {}", path, method);
             chain.doFilter(request, response);
             return;
         }

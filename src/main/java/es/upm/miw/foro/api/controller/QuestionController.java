@@ -6,6 +6,7 @@ import es.upm.miw.foro.service.QuestionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @ToString
+@Slf4j
 @RestController
 @RequestMapping("/question")
 public class QuestionController {
@@ -33,7 +35,7 @@ public class QuestionController {
     @PostMapping("/create")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
-    public ResponseEntity<QuestionDto> createQuestion(@RequestBody QuestionDto questionDto) {
+    public ResponseEntity<QuestionDto> createQuestion(@Valid @RequestBody QuestionDto questionDto) {
         try {
             return new ResponseEntity<>(questionService.createQuestion(questionDto),HttpStatus.CREATED);
         } catch (ServiceException e) {
@@ -58,8 +60,8 @@ public class QuestionController {
         }
     }
 
-    @GetMapping("/{title}")
-    public ResponseEntity<List<QuestionDto>> getQuestionByTitle(@Valid @PathVariable String title) {
+    @GetMapping("/search")
+    public ResponseEntity<List<QuestionDto>> getQuestionByTitle(@RequestParam String title) {
         try {
             List<QuestionDto> questions = questionService.getQuestionByTitle(title);
             return ResponseEntity.ok(questions);
@@ -107,17 +109,18 @@ public class QuestionController {
 
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    @PreAuthorize("hasRole('ADMIN') or @questionServiceImpl.isQuestionAuthor(#id, #username)")
+    @PreAuthorize("hasRole('ADMIN') or @questionServiceImpl.isQuestionAuthor(#id, authentication.name)")
     public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         try {
             questionService.deleteQuestion(id);
             return ResponseEntity.noContent().build();
         } catch (ServiceException e) {
-            if (e.getMessage().contains("Unauthorized")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            if (e.getMessage().contains("Unauthorized") || e.getMessage().contains("authorized")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
+            log.error("Unexpected error while deleting question", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

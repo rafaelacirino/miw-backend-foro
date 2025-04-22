@@ -3,6 +3,7 @@ package es.upm.miw.foro.persistance.repository;
 import es.upm.miw.foro.persistance.model.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +17,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     List<Question> findByTitleContainingIgnoreCase(String title);
 
-    Optional<Question> findByTitle(String title);
+    @EntityGraph(attributePaths = {"author"})
+    Optional<Question> findById(Long id);
 }
