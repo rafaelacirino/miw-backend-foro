@@ -69,12 +69,19 @@ public class SecurityConfiguration {
                                 "/v3/api-docs/**",
                                 "/user/register",
                                 "/user/login",
+                                "/question/getAllQuestions",
+                                "/question/{id:\\\\d+}",
+                                "/question/search",
+                                "/question/{title}",
                                 "/user/",
                                 "/user",
+                                "/question",
+                                "/question/",
                                 "/actuator/**",
                                 "/account/forgot-password",
                                 "/account/reset-password",
                                 "/").permitAll()
+                        .requestMatchers("/question/create").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
@@ -119,5 +126,4 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

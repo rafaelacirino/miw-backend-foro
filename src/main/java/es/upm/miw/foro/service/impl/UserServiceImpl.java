@@ -206,7 +206,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private User getAuthenticatedUser() {
+    @Override
+    public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             log.warn("Authentication is null");

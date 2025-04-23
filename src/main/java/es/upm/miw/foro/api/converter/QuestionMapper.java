@@ -4,11 +4,13 @@ import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.persistance.model.Answer;
 import es.upm.miw.foro.persistance.model.Question;
 import es.upm.miw.foro.persistance.model.User;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class QuestionMapper {
 
     public QuestionMapper() {
@@ -53,7 +55,20 @@ public class QuestionMapper {
 
     private static void populateDto(Question question, QuestionDto dto) {
         dto.setId(question.getId());
-        dto.setAuthor(question.getAuthor().getUserName());
+        //dto.setAuthor(question.getAuthor().getUserName());
+        if (question.getAuthor() != null) {
+            String userName = question.getAuthor().getUserName();
+            if (userName != null) {
+                dto.setAuthor(userName);
+                log.info("Mapped author for question {}: {}", question.getId(), userName);
+            } else {
+                log.warn("userName is null for author of question {}", question.getId());
+                dto.setAuthor("Unknown");
+            }
+        } else {
+            log.warn("Author is null for question {}", question.getId());
+            dto.setAuthor("Unknown");
+        }
         dto.setTitle(question.getTitle());
         dto.setDescription(question.getDescription());
         dto.setCreationDate(question.getCreationDate());
