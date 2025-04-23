@@ -24,7 +24,7 @@ public class PasswordResetService {
     @Value("${app.environment:dev}")
     public String environment;
 
-    public void sendPasswordResetEmail(String email) {
+    public boolean sendPasswordResetEmail(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent()) {
@@ -34,15 +34,16 @@ public class PasswordResetService {
                     token);
             try {
                 emailService.sendPasswordResetEmail(email, resetLink);
+                return true;
             } catch (Exception e) {
-                log.error("Error at sending email", e);
+                return false;
             }
         } else {
-            log.info("User with email not found {}", email);
+            return false;
         }
     }
 
-    public void resetPassword(String token, String newPassword) {
+    public void  resetPassword(String token, String newPassword) {
         try {
             String email = jwtService.validatePasswordResetToken(token);
             User user = userRepository.findByEmail(email)
