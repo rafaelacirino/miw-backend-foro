@@ -29,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -53,7 +54,7 @@ class UserServiceTest {
     @Mock
     private Validator validator;
 
-    private static final Long USER_ID = 1L;
+    private static final UUID USER_ID = UUID.randomUUID();
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String USERNAME = "username";
@@ -93,7 +94,7 @@ class UserServiceTest {
     void testCreateUser_success() {
         // Arrange
         User authenticatedUser = new User();
-        authenticatedUser.setId(2L);
+        authenticatedUser.setId(UUID.randomUUID());
         authenticatedUser.setEmail(EMAIL_ADMIN);
         authenticatedUser.setRole(Role.ADMIN);
 
@@ -195,7 +196,7 @@ class UserServiceTest {
     void testCreateUser_failure() {
         // Arrange
         User authenticatedUser = new User();
-        authenticatedUser.setId(2L);
+        authenticatedUser.setId(UUID.randomUUID());
         authenticatedUser.setEmail(EMAIL_ADMIN);
         authenticatedUser.setFirstName(FIRST_NAME);
         authenticatedUser.setLastName(LAST_NAME);
@@ -448,7 +449,7 @@ class UserServiceTest {
     void testGetUserById_unauthorized() {
         // Arrange
         User authenticatedUser = new User();
-        authenticatedUser.setId(2L);
+        authenticatedUser.setId(UUID.randomUUID());
         authenticatedUser.setEmail(EMAIL);
         authenticatedUser.setRole(Role.MEMBER);
 
@@ -465,7 +466,7 @@ class UserServiceTest {
         assertEquals("Unauthorized: Only admins or the user themselves can get this user", exception.getMessage());
 
         // Verify
-        verify(userRepository, never()).findById(anyLong());
+        verify(userRepository, never()).findById(any(UUID.class));
     }
 
     @Test

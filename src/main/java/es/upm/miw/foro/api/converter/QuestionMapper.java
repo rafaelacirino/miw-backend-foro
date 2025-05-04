@@ -4,11 +4,12 @@ import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.persistance.model.Answer;
 import es.upm.miw.foro.persistance.model.Question;
 import es.upm.miw.foro.persistance.model.User;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Slf4j
 public class QuestionMapper {
@@ -21,9 +22,16 @@ public class QuestionMapper {
         if (question == null) {
             return null;
         }
+
         QuestionDto questionDto = new QuestionDto();
         populateDto(question, questionDto);
-        return questionDto;
+
+        try {
+            return questionDto;
+        } catch (ConstraintViolationException e) {
+            log.error("DTO validation failed for question {}: {}", question.getId(), e.getMessage());
+            return null;
+        }
     }
 
     public static Question toEntity(QuestionDto questionDto, User questionAuthor) {
@@ -41,7 +49,7 @@ public class QuestionMapper {
         }
         return questions.stream()
                 .map(QuestionMapper::toQuestionDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static List<Question> toEntityList(List<QuestionDto> questionDtos, User questionAuthor) {
@@ -50,29 +58,38 @@ public class QuestionMapper {
         }
         return questionDtos.stream()
                 .map(dto -> toEntity(dto, questionAuthor))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static void populateDto(Question question, QuestionDto dto) {
-        dto.setId(question.getId());
-        //dto.setAuthor(question.getAuthor().getUserName());
-        if (question.getAuthor() != null) {
-            String userName = question.getAuthor().getUserName();
-            if (userName != null) {
-                dto.setAuthor(userName);
-                log.info("Mapped author for question {}: {}", question.getId(), userName);
-            } else {
-                log.warn("userName is null for author of question {}", question.getId());
-                dto.setAuthor("Unknown");
-            }
-        } else {
-            log.warn("Author is null for question {}", question.getId());
-            dto.setAuthor("Unknown");
+        if (question == null || dto == null) {
+            return;
         }
+
+        dto.setId(question.getId());
         dto.setTitle(question.getTitle());
         dto.setDescription(question.getDescription());
         dto.setCreationDate(question.getCreationDate());
-        dto.setAnswers(AnswerMapper.toDtoList(question.getAnswers()));
+        dto.setViews(question.getViews() != null ? question.getViews() : 0);
+
+        try {
+            String authorName = Optional.ofNullable(question.getAuthor())
+                    .map(User::getUserName)
+                    .orElse("Unknown");
+            dto.setAuthor(authorName);
+        } catch (Exception e) {
+            log.error("Error mapping author for question {}: {}", question.getId(), e.getMessage());
+            dto.setAuthor("Unknown");
+        }
+
+        try {
+            dto.setAnswers(Optional.ofNullable(question.getAnswers())
+                    .map(AnswerMapper::toDtoList)
+                    .orElse(Collections.emptyList()));
+        } catch (Exception e) {
+            log.error("Error mapping answers for question {}: {}", question.getId(), e.getMessage());
+            dto.setAnswers(Collections.emptyList());
+        }
     }
 
     private static void populateEntity(Question question, QuestionDto questionDto, User questionAuthor) {
@@ -81,6 +98,7 @@ public class QuestionMapper {
         question.setTitle(questionDto.getTitle());
         question.setDescription(questionDto.getDescription());
         question.setCreationDate(questionDto.getCreationDate());
+        question.setViews(questionDto.getViews() != null ? questionDto.getViews() : 0);
 
         if (questionDto.getAnswers() != null) {
             List<Answer> answers = AnswerMapper.toEntityList(questionDto.getAnswers(), question);

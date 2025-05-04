@@ -27,7 +27,7 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private static final Long USER_ID = 1L;
+    private static final UUID USER_ID = UUID.randomUUID();
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
@@ -239,7 +239,7 @@ class UserControllerTest {
     }
 
    @Test
-    void testGetAllUsers() {
+    void testGetUsers() {
         // Arrange
         UserDto userDto = new UserDto();
         userDto.setId(USER_ID);
@@ -252,7 +252,7 @@ class UserControllerTest {
         when(userService.getAllUsers(null, null, null, pageable)).thenReturn(userPage);
 
         // Act
-        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+        ResponseEntity<Page<UserDto>> response = userController.getUsers(null, null, null,
                                                                     0, 10, "id", "asc");
 
         // Assert
@@ -264,7 +264,7 @@ class UserControllerTest {
     }
 
     @Test
-    void testGetAllUsersWithDescending() {
+    void testGetUsersWithDescending() {
         // Arrange
         UserDto userDto = new UserDto();
         userDto.setId(USER_ID);
@@ -277,7 +277,7 @@ class UserControllerTest {
         when(userService.getAllUsers(null, null, null, pageable)).thenReturn(userPage);
 
         // Act
-        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+        ResponseEntity<Page<UserDto>> response = userController.getUsers(null, null, null,
                                                                     0, 10, "id", "desc");
 
         // Assert
@@ -289,7 +289,7 @@ class UserControllerTest {
     }
 
    @Test
-    void testGetAllUsers_withFilters() {
+    void testGetUsers_withFilters() {
         // Arrange
         UserDto userDto = new UserDto();
         userDto.setId(USER_ID);
@@ -302,7 +302,7 @@ class UserControllerTest {
         when(userService.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL, pageable)).thenReturn(userPage);
 
         // Act
-        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(FIRST_NAME, LAST_NAME, EMAIL,
+        ResponseEntity<Page<UserDto>> response = userController.getUsers(FIRST_NAME, LAST_NAME, EMAIL,
                                                                         0, 10, "id", "asc");
 
         // Assert
@@ -313,14 +313,14 @@ class UserControllerTest {
     }
 
     @Test
-    void testGetAllUsersServiceException() {
+    void testGetUsersServiceException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         when(userService.getAllUsers(null, null, null, pageable))
                 .thenThrow(new ServiceException("Unauthorized: Only admins can list users"));
 
         // Act
-        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+        ResponseEntity<Page<UserDto>> response = userController.getUsers(null, null, null,
                 0, 10, "id", "asc");
 
         // Assert
@@ -330,14 +330,14 @@ class UserControllerTest {
     }
 
     @Test
-    void testGetAllUsersGenericException() {
+    void testGetUsersGenericException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         when(userService.getAllUsers(null, null, null, pageable))
                 .thenThrow(new RuntimeException(UNEXPECTED_ERROR));
 
         // Act
-        ResponseEntity<Page<UserDto>> response = userController.getAllUsers(null, null, null,
+        ResponseEntity<Page<UserDto>> response = userController.getUsers(null, null, null,
                 0, 10, "id", "asc");
 
         // Assert

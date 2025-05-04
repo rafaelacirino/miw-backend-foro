@@ -3,6 +3,7 @@ package es.upm.miw.foro.config;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import es.upm.miw.foro.service.impl.JwtService;
+import es.upm.miw.foro.util.ApiPath;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,10 +34,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         String method = request.getMethod();
         log.info("Request path: {}", path);
-        if ((path.equals("/question/getAllQuestions") && method.equalsIgnoreCase("GET")) ||
-                (path.matches("/question/\\d+") && method.equalsIgnoreCase("GET")) ||
-                (path.matches("/question/search") && method.equalsIgnoreCase("GET"))) {
-            log.info("Skipping JWT filter for path: {} and method: {}", path, method);
+        if (("GET".equalsIgnoreCase(method)) && (path.equals(ApiPath.QUESTIONS) ||
+                path.matches(ApiPath.QUESTIONS + "/\\d+") ||
+                path.equals(ApiPath.QUESTION_SEARCH))) {
             chain.doFilter(request, response);
             return;
         }

@@ -5,9 +5,9 @@ import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
+import es.upm.miw.foro.util.ApiPath;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +20,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 @ToString
 @RestController
-@RequestMapping("/user")
+@RequestMapping(ApiPath.USERS)
 public class UserController {
 
     private final UserService userService;
@@ -35,14 +35,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
-    @Operation(summary = "redirectToSwagger", description = "Method to redirect to Swagger in production")
-    public void redirectToSwagger(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/swagger-ui/index.html");
-    }
-
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create")
+    @PostMapping
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "createUser", description = "Create a new User when role is ADMIN and insert into DB")
     public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto userDto) {
@@ -73,7 +67,7 @@ public class UserController {
     @GetMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "getUserById", description = "Get User by ID")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(userService.getUserById(id));
         } catch (ServiceException e) {
@@ -98,17 +92,17 @@ public class UserController {
         }
     }
 
-    @GetMapping("/getAllUsers")
+    @GetMapping
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "getAllUsers", description = "Returns all Users based on filters")
-    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(required = false) String firstName,
-                                                     @RequestParam(required = false) String lastName,
-                                                     @RequestParam(required = false) String email,
-                                                     @RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "10") int size,
-                                                     @RequestParam(defaultValue = "id") String sortBy,
-                                                     @RequestParam(defaultValue = "asc") String sortDirection) {
+    @Operation(summary = "getUsers", description = "Returns all Users based on filters")
+    public ResponseEntity<Page<UserDto>> getUsers(@RequestParam(required = false) String firstName,
+                                                  @RequestParam(required = false) String lastName,
+                                                  @RequestParam(required = false) String email,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  @RequestParam(defaultValue = "id") String sortBy,
+                                                  @RequestParam(defaultValue = "asc") String sortDirection) {
 
         Pageable pageable = PageRequest.of(page, size,
                 "desc".equalsIgnoreCase(sortDirection) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending());
@@ -122,10 +116,10 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "updateUser", description = "Update User into DB")
-    public ResponseEntity<Object> updateUser( @Valid @PathVariable Long id,
+    public ResponseEntity<Object> updateUser( @Valid @PathVariable UUID id,
                                               @RequestBody UserDto userDto) {
         try {
             return ResponseEntity.ok(userService.updateUser(id, userDto));
@@ -138,10 +132,10 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "deleteUser", description = "Delete User by Id")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         try {
             userService.deleteUser(id);
             return ResponseEntity.noContent().build();

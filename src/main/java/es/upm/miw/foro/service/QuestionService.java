@@ -4,21 +4,27 @@ import es.upm.miw.foro.api.dto.QuestionDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface QuestionService {
 
     QuestionDto createQuestion(QuestionDto questionDto);
 
-    QuestionDto getQuestionById(Long id);
+    QuestionDto getQuestionById(UUID id);
 
-    List<QuestionDto> getQuestionByTitle(String title);
+    List<QuestionDto> getQuestionsByTitle(String title);
 
-    Page<QuestionDto> getAllQuestions(String title, Pageable pageable);
+    Page<QuestionDto> getQuestions(String title, Pageable pageable);
 
-    QuestionDto updateQuestion(Long id, QuestionDto questionDto);
+    QuestionDto updateQuestion(UUID id, QuestionDto questionDto);
 
-    boolean isQuestionAuthor(Long questionId, String username);
+    void deleteQuestion(UUID id);
 
-    void deleteQuestion(Long id);
+    boolean isQuestionAuthor(UUID questionId, String username);
+
+    Page<QuestionDto> getMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable);
+
+    void incrementViews(UUID id);
 }

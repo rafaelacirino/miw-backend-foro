@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,12 +36,12 @@ class UserSpecificationTest {
     @Mock
     private Predicate predicate;
 
-    private static final Long USER_ID = 1L;
+    private static final UUID USER_ID = UUID.randomUUID();;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
-    private static final LocalDateTime REGISTRED_DATE = LocalDateTime.now();
+    private static final LocalDateTime REGISTERED_DATE = LocalDateTime.now();
 
 
     @BeforeEach
@@ -58,7 +59,7 @@ class UserSpecificationTest {
         dto.setEmail(EMAIL);
         dto.setPassword(PASSWORD);
         dto.setRole(Role.MEMBER);
-        dto.setRegisteredDate(REGISTRED_DATE);
+        dto.setRegisteredDate(REGISTERED_DATE);
 
         when(root.get(anyString())).thenReturn(path);
         when(criteriaBuilder.equal(any(), any())).thenReturn(predicate);

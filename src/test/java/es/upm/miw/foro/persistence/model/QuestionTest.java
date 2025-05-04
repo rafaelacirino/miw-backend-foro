@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,6 +29,8 @@ class QuestionTest {
     private Answer mockAnswer2;
 
     private Question question;
+
+    private final Integer views = 0;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +53,7 @@ class QuestionTest {
         assertNull(question.getCreationDate());
         assertNotNull(question.getAnswers());
         assertTrue(question.getAnswers().isEmpty());
+        assertNotNull(question.getViews());
     }
 
     @Test
@@ -58,19 +62,21 @@ class QuestionTest {
         LocalDateTime creationDate = LocalDateTime.now();
         List<Answer> answers = new ArrayList<>();
         answers.add(mockAnswer1);
+        UUID questionId = UUID.randomUUID();
 
         question = new Question(
-                1L, mockUser, "How to implement JPA?", "I need help with JPA in Spring Boot.",
-                creationDate, answers);
+                questionId, mockUser, "How to implement JPA?", "I need help with JPA in Spring Boot.",
+                creationDate, answers, views);
 
         // Assert
-        assertEquals(1L, question.getId());
+        assertEquals(questionId, question.getId());
         assertEquals(mockUser, question.getAuthor());
         assertEquals("How to implement JPA?", question.getTitle());
         assertEquals("I need help with JPA in Spring Boot.", question.getDescription());
         assertEquals(creationDate, question.getCreationDate());
         assertEquals(1, question.getAnswers().size());
         assertTrue(question.getAnswers().contains(mockAnswer1));
+        assertEquals(views, question.getViews());
     }
 
     @Test
@@ -79,23 +85,26 @@ class QuestionTest {
         LocalDateTime creationDate = LocalDateTime.now();
         List<Answer> answers = new ArrayList<>();
         answers.add(mockAnswer1);
+        UUID questionId = UUID.randomUUID();
 
         question = new Question();
-        question.setId(1L);
+        question.setId(questionId);
         question.setAuthor(mockUser);
         question.setTitle("How to implement JPA?");
         question.setDescription("I need help with JPA in Spring Boot.");
         question.setCreationDate(creationDate);
         question.setAnswers(answers);
+        question.setViews(views);
 
         // Assert
-        assertEquals(1L, question.getId());
+        assertEquals(questionId, question.getId());
         assertEquals(mockUser, question.getAuthor());
         assertEquals("How to implement JPA?", question.getTitle());
         assertEquals("I need help with JPA in Spring Boot.", question.getDescription());
         assertEquals(creationDate, question.getCreationDate());
         assertEquals(1, question.getAnswers().size());
         assertTrue(question.getAnswers().contains(mockAnswer1));
+        assertEquals(views, question.getViews());
     }
 
     @Test
@@ -149,20 +158,21 @@ class QuestionTest {
     @Test
     void testToString() {
         // Arrange
-        LocalDateTime creationDate = LocalDateTime.of(2023, 1, 1, 10, 0);
+        LocalDateTime creationDate = LocalDateTime.of(2025, 1, 1, 10, 0);
         List<Answer> answers = new ArrayList<>();
         answers.add(mockAnswer1);
+        UUID questionId = UUID.randomUUID();
 
         question = new Question(
-                1L, mockUser, "How to implement JPA?", "I need help with JPA in Spring Boot.",
-                creationDate, answers);
+                questionId, mockUser, "How to implement...", "I need help with...",
+                creationDate, answers, views);
 
-        when(mockUser.toString()).thenReturn("User(id=1, firstName=John, lastName=Doe)");
+        when(mockUser.toString()).thenReturn("User(id=1, firstName=Alex, lastName=Ye)");
         when(mockAnswer1.toString()).thenReturn("Answer(id=1, content=Use @Entity)");
 
-        String expectedString = "Question(id=1, author=User(id=1, firstName=John, lastName=Doe), " +
-                "title=How to implement JPA?, description=I need help with JPA in Spring Boot., " +
-                "creationDate=2023-01-01T10:00, answers=[Answer(id=1, content=Use @Entity)])";
+        String expectedString = "Question(id=1, author=User(id=1, firstName=Alex, lastName=Ye), " +
+                "title=How to implement..., description=I need help with..., " +
+                "creationDate=2025-01-01T10:00, answers=[Answer(id=1, content=Use @Entity)], views=0)";
 
         // Act & Assert
         assertEquals(expectedString, question.toString());

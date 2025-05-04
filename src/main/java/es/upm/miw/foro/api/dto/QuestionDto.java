@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -22,11 +23,10 @@ import java.util.List;
 public class QuestionDto {
 
     @Schema(hidden = true, description = "Unique identifier of the question")
-    private Long id;
+    private UUID id;
 
-    @NotNull(message = "Question Author cannot be null")
     @JsonProperty("author")
-    @Schema(description = "Name of the user who created the question", example = "Alex123")
+    @Schema(description = "Name of the user who created the question", example = "alex123")
     private String author;
 
     @NotNull(message = "Title cannot be null")
@@ -38,9 +38,12 @@ public class QuestionDto {
     @Schema(description = "Brief description of the question", example = "I need help with ...")
     private String description;
 
-    @Schema(hidden = true, description = "Date and time when the question was created", example = "2023-10-01T10:00:00")
+    @Schema(hidden = true, description = "Date and time when the question was created", example = "2025-01-01T12:00:00")
     private LocalDateTime creationDate;
 
     @Schema(description = "List of answers to the question")
     private List<AnswerDto> answers= new ArrayList<>();
+
+    @Schema(description = "Views for the question", example = "0")
+    private Integer views;
 }

@@ -8,19 +8,20 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
-    private static final Long USER_ID = 1L;
+    private static final UUID USER_ID = UUID.randomUUID();
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String USER_NAME = "UserName";
     private static final String PHONE_NUMBER = "UserPhoneNumber";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
-    private static final LocalDateTime REGISTRED_DATE = LocalDateTime.now();
+    private static final LocalDateTime REGISTERED_DATE = LocalDateTime.now();
 
     @Test
     void testConstructorThrowsUnsupportedOperationException() {
@@ -123,7 +124,7 @@ class UserMapperTest {
         user.setEmail(EMAIL);
         user.setPassword(PASSWORD);
         user.setRole(Role.ADMIN);
-        user.setRegisteredDate(REGISTRED_DATE);
+        user.setRegisteredDate(REGISTERED_DATE);
 
         return user;
     }
@@ -138,7 +139,7 @@ class UserMapperTest {
         userDto.setEmail(EMAIL);
         userDto.setPassword(PASSWORD);
         userDto.setRole(Role.ADMIN);
-        userDto.setRegisteredDate(REGISTRED_DATE);
+        userDto.setRegisteredDate(REGISTERED_DATE);
 
         return userDto;
     }

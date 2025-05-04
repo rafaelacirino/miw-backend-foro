@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Builder
 @Data
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 public class UserDto {
 
     @Schema(hidden = true)
-    private Long id;
+    private UUID id;
 
     @NotBlank(groups = {UserValidation.class}, message = "First name is required")
     @Size(max = 15, message = "First name must be at most 15 characters")

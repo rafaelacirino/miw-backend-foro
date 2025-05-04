@@ -4,6 +4,7 @@ package es.upm.miw.foro.config;
 import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.persistance.model.User;
 import es.upm.miw.foro.persistance.repository.UserRepository;
+import es.upm.miw.foro.util.ApiPath;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -65,23 +66,24 @@ public class SecurityConfiguration {
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/user/register",
-                                "/user/login",
-                                "/question/getAllQuestions",
-                                "/question/{id:\\\\d+}",
-                                "/question/search",
-                                "/question/{title}",
-                                "/user/",
-                                "/user",
-                                "/question",
-                                "/question/",
-                                "/actuator/**",
-                                "/account/forgot-password",
-                                "/account/reset-password",
-                                "/").permitAll()
-                        .requestMatchers("/question/create").hasAnyRole("ADMIN", "USER")
+                                ApiPath.SWAGGER_UI,
+                                ApiPath.SWAGGER_API_DOCS,
+                                ApiPath.ROOT,
+                                ApiPath.USERS,
+                                ApiPath.USER_LOGIN,
+                                ApiPath.USER_REGISTER,
+
+                                ApiPath.QUESTIONS,
+                                ApiPath.QUESTION_ID,
+                                ApiPath.QUESTION_SEARCH,
+                                ApiPath.QUESTION_MY,
+                                ApiPath.QUESTION_VIEWS,
+
+                                ApiPath.ACTUATOR,
+                                ApiPath.ACCOUNT_FORGOT_PASSWORD,
+                                ApiPath.ACCOUNT_RESET_PASSWORD
+                                ).permitAll()
+                        .requestMatchers(ApiPath.QUESTION_CREATE).hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
@@ -95,7 +97,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200", "https://capturing-forum.onrender.com"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

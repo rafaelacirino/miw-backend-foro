@@ -10,15 +10,21 @@ import es.upm.miw.foro.persistance.model.User;
 import es.upm.miw.foro.persistance.repository.QuestionRepository;
 import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.service.UserService;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,15 +33,18 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionRepository questionRepository;
     private final UserService userService;
+    private final Validator validator;
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, UserService userService) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, UserService userService, Validator validator) {
         this.questionRepository = questionRepository;
         this.userService = userService;
+        this.validator = validator;
     }
 
     @Override
     public QuestionDto createQuestion(QuestionDto questionDto) {
         try {
+            validateQuestionDto(questionDto);
             User author = userService.getAuthenticatedUser();
             questionDto.setAnswers(null);
             Question question = QuestionMapper.toEntity(questionDto, author);
@@ -49,10 +58,10 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDto getQuestionById(Long id) {
+    public QuestionDto getQuestionById(UUID id) {
         try {
             Question question = questionRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("Question not found with id: " + id));
+                    .orElseThrow(() -> new ServiceException("Question not found"));
             return QuestionMapper.toQuestionDto(question);
         } catch (DataAccessException e) {
             throw new RepositoryException("Error while retrieving question", e);
@@ -63,10 +72,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<QuestionDto> getQuestionByTitle(String title) {
+    public List<QuestionDto> getQuestionsByTitle(String title) {
         try {
             List<Question> questions = questionRepository.findByTitleContainingIgnoreCase(title);
-            return questions.stream().map(QuestionMapper::toQuestionDto).collect(Collectors.toList());
+            return questions.stream().map(QuestionMapper::toQuestionDto).toList();
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error while getting question with title: " + title, exception);
         }
@@ -74,7 +83,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionDto> getAllQuestions(String title, Pageable pageable) {
+    public Page<QuestionDto> getQuestions(String title, Pageable pageable) {
         try {
             log.info("Fetching questions with title: {}, pageable: {}", title, pageable);
             Page<Question> questionPage;
@@ -93,8 +102,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDto updateQuestion(Long id, QuestionDto questionDto) {
+    public QuestionDto updateQuestion(UUID id, QuestionDto questionDto) {
         try {
+            validateQuestionDto(questionDto);
             User authenticatedUser = userService.getAuthenticatedUser();
 
             Question existingQuestion = questionRepository.findById(id)
@@ -116,14 +126,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public boolean isQuestionAuthor(Long questionId, String email) {
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new ServiceException("Question not found with id: " + questionId));
-        return question.getAuthor().getEmail().equals(email);
-    }
-
-    @Override
-    public void deleteQuestion(Long id) {
+    public void deleteQuestion(UUID id) {
         try {
             User authenticatedUser = userService.getAuthenticatedUser();
 
@@ -138,6 +141,41 @@ public class QuestionServiceImpl implements QuestionService {
             throw new RepositoryException("Error while deleting question", exception);
         } catch (Exception e) {
             throw new ServiceException("Unexpected error while deleting question", e);
+        }
+    }
+
+    @Override
+    public boolean isQuestionAuthor(UUID questionId, String email) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ServiceException("Question not found with id: " + questionId));
+        return question.getAuthor().getEmail().equals(email);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<QuestionDto> getMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable) {
+        try {
+            Page<Question> page = questionRepository.findMyQuestions(email, title, fromDate, pageable);
+            return page.map(QuestionMapper::toQuestionDto);
+        } catch (Exception e) {
+            throw new ServiceException("Error retrieving user questions with filters", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void incrementViews(UUID id) {
+        questionRepository.incrementViews(id);
+    }
+
+
+    private void validateQuestionDto(QuestionDto dto) {
+        Set<ConstraintViolation<QuestionDto>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            String errorMessage = violations.stream()
+                    .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                    .collect(Collectors.joining(", "));
+            throw new ServiceException(errorMessage, HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -9,16 +9,18 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class QuestionMapperTest {
 
-    private static final Long ID = 1L;
+    private static final UUID ID = UUID.randomUUID();
     private static final String AUTHOR = "author";
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
     private static final LocalDateTime DATE = LocalDateTime.now();
+    private static final Integer VIEWS = 1;
 
     @Test
     void testToConstructorThrowsUnsupportedOperationException() {
@@ -41,6 +43,7 @@ class QuestionMapperTest {
         assertEquals(question.getDescription(), questionDto.getDescription());
         assertEquals(question.getCreationDate(), questionDto.getCreationDate());
         assertEquals(1, questionDto.getAnswers().size());
+        assertEquals(question.getViews(), questionDto.getViews());
     }
 
    @Test
@@ -59,6 +62,7 @@ class QuestionMapperTest {
         assertEquals(questionDto.getTitle(), question.getTitle());
         assertEquals(questionDto.getDescription(), question.getDescription());
         assertEquals(questionDto.getCreationDate(), question.getCreationDate());
+        assertEquals(questionDto.getViews(), question.getViews());
     }
 
     @Test
@@ -117,6 +121,7 @@ class QuestionMapperTest {
         Answer answer = createAnswerEntity();
         answer.setAuthor(createUser());
         question.addAnswer(answer);
+        question.setViews(VIEWS);
 
         return question;
     }
@@ -128,6 +133,8 @@ class QuestionMapperTest {
         question.setTitle(TITLE);
         question.setDescription(DESCRIPTION);
         question.setCreationDate(DATE);
+        question.setViews(VIEWS);
+
         return question;
     }
 
@@ -138,6 +145,8 @@ class QuestionMapperTest {
         questionDto.setTitle(TITLE);
         questionDto.setDescription(DESCRIPTION);
         questionDto.setCreationDate(DATE);
+        questionDto.setViews(VIEWS);
+
         return questionDto;
     }
 
@@ -145,6 +154,7 @@ class QuestionMapperTest {
         User user = new User();
         user.setId(ID);
         user.setUserName(AUTHOR);
+
         return user;
     }
 
@@ -152,6 +162,7 @@ class QuestionMapperTest {
         Answer answer = new Answer();
         answer.setId(ID);
         answer.setContent("Sample content");
+
         return answer;
     }
 }

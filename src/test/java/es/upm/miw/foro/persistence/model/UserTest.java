@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @TestConfig
 class UserTest {
+
+    private static final UUID USER_ID = UUID.randomUUID();
 
     @Mock
     private UserRepository userRepository;
@@ -38,12 +41,13 @@ class UserTest {
     void testAllArgsConstructor() {
         // Arrange
         LocalDateTime registeredDate = LocalDateTime.now();
+
         User user = new User(
-                1L, "firstName", "lastName", "userName", "phone",
+                USER_ID, "firstName", "lastName", "userName", "phone",
                 "email@email.com", "password", Role.ADMIN, registeredDate);
 
         // Assert
-        assertEquals(1L, user.getId());
+        assertEquals(USER_ID, user.getId());
         assertEquals("firstName", user.getFirstName());
         assertEquals("lastName", user.getLastName());
         assertEquals("userName", user.getUserName());
@@ -59,7 +63,7 @@ class UserTest {
         // Arrange
         User user = new User();
         LocalDateTime registeredDate = LocalDateTime.now();
-        user.setId(1L);
+        user.setId(USER_ID);
         user.setFirstName("firstName");
         user.setLastName("lastName");
         user.setUserName("userName");
@@ -69,7 +73,7 @@ class UserTest {
         user.setRole(Role.ADMIN);
         user.setRegisteredDate(registeredDate);
 
-        assertEquals(1L, user.getId());
+        assertEquals(USER_ID, user.getId());
         assertEquals("firstName", user.getFirstName());
         assertEquals("lastName", user.getLastName());
         assertEquals("userName", user.getUserName());
@@ -85,7 +89,7 @@ class UserTest {
         // Arrange
         LocalDateTime registeredDate = LocalDateTime.now();
         User user = new User(
-                1L, "firstName", "lastName", "userName", "phone",
+                USER_ID, "firstName", "lastName", "userName", "phone",
                 "email@email.com", "password", Role.ADMIN, registeredDate);
 
         when(userRepository.save(user)).thenReturn(user);
@@ -110,13 +114,13 @@ class UserTest {
     @Test
     void testToString() {
         // Arrange
-        LocalDateTime registeredDate = LocalDateTime.of(2023, 1, 1, 10, 0);
+        LocalDateTime registeredDate = LocalDateTime.of(2025, 1, 1, 10, 0);
         User user = new User(
-                1L, "firstName", "lastName", "userName", "phone",
+                USER_ID, "firstName", "lastName", "userName", "phone",
                 "email@email.com", "password", Role.ADMIN, registeredDate);
 
         String expectedString = "User(id=1, firstName=firstName, lastName=lastName, userName=userName, phone=phone, " +
-                "email=email@email.com, password=password, role=ADMIN, registeredDate=2023-01-01T10:00)";
+                "email=email@email.com, password=password, role=ADMIN, registeredDate=2025-01-01T10:00)";
 
         // Act & Assert
         assertEquals(expectedString, user.toString());
