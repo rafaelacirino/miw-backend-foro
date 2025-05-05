@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 public class AnswerDto {
 
     @Schema(hidden = true, description = "Unique identifier of the answer")
-    private Long id;
+    private UUID id;
 
     @NotNull(message = "Content cannot be null")
     @Size(max = 1000, message = "Content must be at most 1000 characters")
@@ -32,6 +33,6 @@ public class AnswerDto {
     @JsonProperty("author")
     private String author;
 
-    @Schema(description = "Date and time when the answer was created", example = "2023-10-01T10:05:00")
+    @Schema(description = "Date and time when the answer was created", example = "2025-01-01T10:00:00")
     private LocalDateTime creationDate;
 }

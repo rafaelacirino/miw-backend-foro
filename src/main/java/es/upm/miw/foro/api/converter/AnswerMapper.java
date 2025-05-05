@@ -6,7 +6,6 @@ import es.upm.miw.foro.persistance.model.Question;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AnswerMapper {
 
@@ -38,13 +37,13 @@ public class AnswerMapper {
         }
         return answers.stream()
                 .map(AnswerMapper::toAnswerDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static List<Answer> toEntityList(List<AnswerDto> answerDtos, Question question) {
         return answerDtos.stream()
                 .map(dto -> toEntity(dto, question))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static void populateDto(Answer answer, AnswerDto answerDto) {

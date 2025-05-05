@@ -4,6 +4,7 @@ import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.persistance.model.Answer;
 import es.upm.miw.foro.persistance.model.Question;
 import es.upm.miw.foro.persistance.model.User;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -11,12 +12,15 @@ import org.mockito.Mock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @TestConfig
 class AnswerTest {
+
+    private static final UUID ANSWER_ID = UUID.randomUUID();
 
     @Mock
     private Question mockQuestion;
@@ -52,10 +56,10 @@ class AnswerTest {
         LocalDateTime creationDate = LocalDateTime.now();
 
         answer = new Answer(
-                1L, "Use @Entity and @Id annotations...", mockQuestion, mockUser, creationDate);
+                ANSWER_ID, "Use @Entity and @Id annotations...", mockQuestion, mockUser, creationDate);
 
         // Assert
-        assertEquals(1L, answer.getId());
+        assertEquals(ANSWER_ID, answer.getId());
         assertEquals("Use @Entity and @Id annotations...", answer.getContent());
         assertEquals(mockQuestion, answer.getQuestion());
         assertEquals(mockUser, answer.getAuthor());
@@ -68,14 +72,14 @@ class AnswerTest {
         LocalDateTime creationDate = LocalDateTime.now();
 
         answer = new Answer();
-        answer.setId(1L);
+        answer.setId(ANSWER_ID);
         answer.setContent("Use @Entity and @Id annotations...");
         answer.setQuestion(mockQuestion);
         answer.setAuthor(mockUser);
         answer.setCreationDate(creationDate);
 
         // Assert
-        assertEquals(1L, answer.getId());
+        assertEquals(ANSWER_ID, answer.getId());
         assertEquals("Use @Entity and @Id annotations...", answer.getContent());
         assertEquals(mockQuestion, answer.getQuestion());
         assertEquals(mockUser, answer.getAuthor());
@@ -116,16 +120,16 @@ class AnswerTest {
     @Test
     void testToString() {
         // Arrange
-        LocalDateTime creationDate = LocalDateTime.of(2023, 1, 1, 10, 0);
+        LocalDateTime creationDate = LocalDateTime.of(2025, 1, 1, 10, 0);
 
         answer = new Answer(
-                1L, "Use @Entity and @Id annotations...", mockQuestion, mockUser, creationDate);
+                ANSWER_ID, "Use @Entity and @Id annotations...", mockQuestion, mockUser, creationDate);
 
-        when(mockQuestion.toString()).thenReturn("Question(id=1, title=How to implement JPA?)");
-        when(mockUser.toString()).thenReturn("User(id=1, firstName=John, lastName=Doe)");
+        when(mockQuestion.toString()).thenReturn("Question(id=1, title=How to implement...)");
+        when(mockUser.toString()).thenReturn("User(id=1, firstName=Alex, lastName=Ye)");
 
         String expectedString = "Answer(id=1, content=Use @Entity and @Id annotations..., " +
-                "question=Question(id=1, title=How to implement JPA?), author=User(id=1, firstName=John, lastName=Doe), " +
+                "question=Question(id=1, title=How to implement...), author=User(id=1, firstName=Alex, lastName=Ye), " +
                 "creationDate=2023-01-01T10:00)";
 
         // Act & Assert
