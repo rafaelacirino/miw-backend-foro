@@ -16,15 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,17 +71,6 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<QuestionDto> getQuestionsByTitle(String title) {
-        try {
-            List<Question> questions = questionRepository.findByTitleContainingIgnoreCase(title);
-            return questions.stream().map(QuestionMapper::toQuestionDto).toList();
-        } catch (DataAccessException exception) {
-            throw new RepositoryException("Error while getting question with title: " + title, exception);
-        }
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Page<QuestionDto> getQuestions(String title, Pageable pageable) {
         try {
             log.info("Fetching questions with title: {}, pageable: {}", title, pageable);
@@ -98,6 +86,30 @@ public class QuestionServiceImpl implements QuestionService {
         } catch (DataAccessException exception) {
             log.error("Error while getting questions", exception);
             throw new RepositoryException("Error while getting questions", exception);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<QuestionDto> searchQuestions(String query, Pageable pageable) {
+        try {
+            Page<Question> questions = questionRepository.searchByTitleOrDescriptionContainingIgnoreCase(
+                    query, pageable);
+
+            List<Question> combinedResults = new ArrayList<>(questions.getContent());
+
+            List<Question> uniqueResults = combinedResults.stream()
+                    .distinct()
+                    .skip(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .toList();
+
+            return new PageImpl<>(
+                    uniqueResults.stream().map(QuestionMapper::toQuestionDto).toList(),
+                    pageable,
+                    questions.getTotalElements());
+        } catch (DataAccessException e) {
+            throw new RepositoryException("Error searching questions", e);
         }
     }
 

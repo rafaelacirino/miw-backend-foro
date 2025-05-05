@@ -75,14 +75,17 @@ public class QuestionController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<QuestionDto>> getQuestionByTitle(@RequestParam String title) {
+    public ResponseEntity<Page<QuestionDto>> searchQuestions(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         try {
-            List<QuestionDto> questions = questionService.getQuestionsByTitle(title);
-            return ResponseEntity.ok(questions);
+            Page<QuestionDto> results = questionService.searchQuestions(query, PageRequest.of(page, size));
+            return ResponseEntity.ok(results);
         } catch (ServiceException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

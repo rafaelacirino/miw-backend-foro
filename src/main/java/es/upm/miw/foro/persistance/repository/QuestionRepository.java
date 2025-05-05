@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,7 +22,12 @@ public interface QuestionRepository extends JpaRepository<Question, UUID> {
 
     Page<Question> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    List<Question> findByTitleContainingIgnoreCase(String title);
+    @Query("""
+    SELECT q FROM Question q
+    WHERE LOWER(q.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(q.description) LIKE LOWER(CONCAT('%', :query, '%'))
+    """)
+    Page<Question> searchByTitleOrDescriptionContainingIgnoreCase(
+            @Param("query") String query, Pageable pageable);
 
     @Override
     @EntityGraph(attributePaths = {"author", "answers"})

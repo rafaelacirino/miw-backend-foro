@@ -14,9 +14,9 @@ public interface QuestionService {
 
     QuestionDto getQuestionById(UUID id);
 
-    List<QuestionDto> getQuestionsByTitle(String title);
-
     Page<QuestionDto> getQuestions(String title, Pageable pageable);
+
+    Page<QuestionDto> searchQuestions(String query, Pageable pageable);
 
     QuestionDto updateQuestion(UUID id, QuestionDto questionDto);
 
