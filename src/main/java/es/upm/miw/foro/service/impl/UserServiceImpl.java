@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -90,7 +89,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(UUID id) {
+    public UserDto getUserById(Long id) {
         try {
             User currentUser = getAuthenticatedUser();
             if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
@@ -155,7 +154,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UUID id, UserDto userDto) {
+    public UserDto updateUser(Long id, UserDto userDto) {
         try {
             User currentUser = getAuthenticatedUser();
             if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
@@ -192,7 +191,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(UUID id) {
+    public void deleteUser(Long id) {
         try {
             User currentUser = getAuthenticatedUser();
             if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {

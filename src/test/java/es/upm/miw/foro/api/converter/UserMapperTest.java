@@ -8,13 +8,12 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
-    private static final UUID USER_ID = UUID.randomUUID();
+    private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String USER_NAME = "UserName";

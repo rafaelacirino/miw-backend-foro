@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 public class Notification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notification_seq")
+    @SequenceGenerator(name = "notification_seq", sequenceName = "notification_seq", allocationSize = 1)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,7 +43,7 @@ public class Notification {
     private LocalDateTime creationDate;
 
     @PrePersist
-    protected void onCreate() {
+    public void onCreate() {
         this.creationDate = LocalDateTime.now();
     }
 

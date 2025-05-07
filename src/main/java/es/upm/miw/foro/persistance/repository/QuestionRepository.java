@@ -15,10 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface QuestionRepository extends JpaRepository<Question, UUID> {
+public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Page<Question> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
@@ -29,9 +28,8 @@ public interface QuestionRepository extends JpaRepository<Question, UUID> {
     Page<Question> searchByTitleOrDescriptionContainingIgnoreCase(
             @Param("query") String query, Pageable pageable);
 
-    @Override
     @EntityGraph(attributePaths = {"author", "answers"})
-    Optional<Question> findById(UUID id);
+    Optional<Question> findById(Long id);
 
     default Page<Question> findMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable) {
         return findAll(
@@ -47,5 +45,5 @@ public interface QuestionRepository extends JpaRepository<Question, UUID> {
     @Transactional
     @Modifying
     @Query("UPDATE Question q SET q.views = q.views + 1 WHERE q.id = :id")
-    void incrementViews(@Param("id") UUID id);
+    void incrementViews(@Param("id") Long id);
 }

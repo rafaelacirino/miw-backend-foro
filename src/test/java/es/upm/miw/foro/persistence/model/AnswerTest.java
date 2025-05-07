@@ -4,7 +4,6 @@ import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.persistance.model.Answer;
 import es.upm.miw.foro.persistance.model.Question;
 import es.upm.miw.foro.persistance.model.User;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,7 +11,6 @@ import org.mockito.Mock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -20,7 +18,7 @@ import static org.mockito.Mockito.*;
 @TestConfig
 class AnswerTest {
 
-    private static final UUID ANSWER_ID = UUID.randomUUID();
+    private static final Long ANSWER_ID = 1L;
 
     @Mock
     private Question mockQuestion;
@@ -130,7 +128,7 @@ class AnswerTest {
 
         String expectedString = "Answer(id=1, content=Use @Entity and @Id annotations..., " +
                 "question=Question(id=1, title=How to implement...), author=User(id=1, firstName=Alex, lastName=Ye), " +
-                "creationDate=2023-01-01T10:00)";
+                "creationDate=2025-01-01T10:00)";
 
         // Act & Assert
         assertEquals(expectedString, answer.toString());

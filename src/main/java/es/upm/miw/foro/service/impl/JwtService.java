@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -46,7 +45,7 @@ public class JwtService {
         return null;
     }
 
-    public String createToken(UUID id, String firstName, String lastName, String email, String role) {
+    public String createToken(Long id, String firstName, String lastName, String email, String role) {
         return JWT.create()
                 .withIssuer(this.issuer)
                 .withIssuedAt(new Date())

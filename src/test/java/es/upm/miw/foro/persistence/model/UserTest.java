@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -16,7 +15,7 @@ import static org.mockito.Mockito.*;
 @TestConfig
 class UserTest {
 
-    private static final UUID USER_ID = UUID.randomUUID();
+    private static final Long USER_ID = 1L;
 
     @Mock
     private UserRepository userRepository;

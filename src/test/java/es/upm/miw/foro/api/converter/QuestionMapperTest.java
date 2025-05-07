@@ -9,13 +9,12 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class QuestionMapperTest {
 
-    private static final UUID ID = UUID.randomUUID();
+    private static final Long ID = 1L;
     private static final String AUTHOR = "author";
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";

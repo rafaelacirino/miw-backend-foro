@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +19,7 @@ class JwtServiceTest {
     @Autowired
     private JwtService jwtService;
 
-    private static final UUID ID = UUID.randomUUID();
+    private static final Long ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";

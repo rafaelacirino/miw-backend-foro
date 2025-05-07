@@ -22,8 +22,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 @ToString
 @Slf4j
@@ -55,7 +53,7 @@ public class QuestionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<QuestionDto> getQuestionById(@Valid @PathVariable UUID id) {
+    public ResponseEntity<QuestionDto> getQuestionById(@Valid @PathVariable Long id) {
         try {
             QuestionDto questionDto = questionService.getQuestionById(id);
 
@@ -109,7 +107,7 @@ public class QuestionController {
     @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
-    public ResponseEntity<QuestionDto> updateQuestion(@PathVariable UUID id,
+    public ResponseEntity<QuestionDto> updateQuestion(@PathVariable Long id,
                                                       @RequestBody QuestionDto questionDto) {
         try {
             QuestionDto updateQuestion = questionService.updateQuestion(id, questionDto);
@@ -127,7 +125,7 @@ public class QuestionController {
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN') or @questionServiceImpl.isQuestionAuthor(#id, authentication.name)")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         try {
             questionService.deleteQuestion(id);
             return ResponseEntity.noContent().build();
@@ -167,7 +165,7 @@ public class QuestionController {
     }
 
     @PatchMapping("/{id}/views")
-    public ResponseEntity<Void> incrementViews(@PathVariable UUID id) {
+    public ResponseEntity<Void> incrementViews(@PathVariable Long id) {
         questionService.incrementViews(id);
         return ResponseEntity.noContent().build();
     }

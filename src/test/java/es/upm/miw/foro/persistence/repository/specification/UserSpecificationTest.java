@@ -12,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,7 +35,7 @@ class UserSpecificationTest {
     @Mock
     private Predicate predicate;
 
-    private static final UUID USER_ID = UUID.randomUUID();;
+    private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";

@@ -4,12 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -19,10 +17,10 @@ import java.util.UUID;
 public class Question {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
-    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "question_seq")
+    @SequenceGenerator(name = "question_seq", sequenceName = "question_seq", allocationSize = 1)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false, referencedColumnName = "id")

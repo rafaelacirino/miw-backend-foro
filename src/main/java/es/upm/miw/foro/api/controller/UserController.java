@@ -21,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.UUID;
 
 @ToString
 @RestController
@@ -67,7 +66,7 @@ public class UserController {
     @GetMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "getUserById", description = "Get User by ID")
-    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(userService.getUserById(id));
         } catch (ServiceException e) {
@@ -119,7 +118,7 @@ public class UserController {
     @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "updateUser", description = "Update User into DB")
-    public ResponseEntity<Object> updateUser( @Valid @PathVariable UUID id,
+    public ResponseEntity<Object> updateUser( @Valid @PathVariable Long id,
                                               @RequestBody UserDto userDto) {
         try {
             return ResponseEntity.ok(userService.updateUser(id, userDto));
@@ -135,7 +134,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "deleteUser", description = "Delete User by Id")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
             return ResponseEntity.noContent().build();

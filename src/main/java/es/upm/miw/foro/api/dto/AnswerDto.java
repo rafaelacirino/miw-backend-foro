@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -21,7 +20,7 @@ import java.util.UUID;
 public class AnswerDto {
 
     @Schema(hidden = true, description = "Unique identifier of the answer")
-    private UUID id;
+    private Long id;
 
     @NotNull(message = "Content cannot be null")
     @Size(max = 1000, message = "Content must be at most 1000 characters")

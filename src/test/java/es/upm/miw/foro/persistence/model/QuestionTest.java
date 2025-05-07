@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,6 +30,7 @@ class QuestionTest {
     private Question question;
 
     private final Integer views = 0;
+    private static final Long ID = 1L;
 
     @BeforeEach
     void setUp() {
@@ -62,14 +62,13 @@ class QuestionTest {
         LocalDateTime creationDate = LocalDateTime.now();
         List<Answer> answers = new ArrayList<>();
         answers.add(mockAnswer1);
-        UUID questionId = UUID.randomUUID();
 
         question = new Question(
-                questionId, mockUser, "How to implement JPA?", "I need help with JPA in Spring Boot.",
+                ID, mockUser, "How to implement JPA?", "I need help with JPA in Spring Boot.",
                 creationDate, answers, views);
 
         // Assert
-        assertEquals(questionId, question.getId());
+        assertEquals(ID, question.getId());
         assertEquals(mockUser, question.getAuthor());
         assertEquals("How to implement JPA?", question.getTitle());
         assertEquals("I need help with JPA in Spring Boot.", question.getDescription());
@@ -85,10 +84,9 @@ class QuestionTest {
         LocalDateTime creationDate = LocalDateTime.now();
         List<Answer> answers = new ArrayList<>();
         answers.add(mockAnswer1);
-        UUID questionId = UUID.randomUUID();
 
         question = new Question();
-        question.setId(questionId);
+        question.setId(ID);
         question.setAuthor(mockUser);
         question.setTitle("How to implement JPA?");
         question.setDescription("I need help with JPA in Spring Boot.");
@@ -97,7 +95,7 @@ class QuestionTest {
         question.setViews(views);
 
         // Assert
-        assertEquals(questionId, question.getId());
+        assertEquals(ID, question.getId());
         assertEquals(mockUser, question.getAuthor());
         assertEquals("How to implement JPA?", question.getTitle());
         assertEquals("I need help with JPA in Spring Boot.", question.getDescription());
@@ -161,10 +159,9 @@ class QuestionTest {
         LocalDateTime creationDate = LocalDateTime.of(2025, 1, 1, 10, 0);
         List<Answer> answers = new ArrayList<>();
         answers.add(mockAnswer1);
-        UUID questionId = UUID.randomUUID();
 
         question = new Question(
-                questionId, mockUser, "How to implement...", "I need help with...",
+                ID, mockUser, "How to implement...", "I need help with...",
                 creationDate, answers, views);
 
         when(mockUser.toString()).thenReturn("User(id=1, firstName=Alex, lastName=Ye)");

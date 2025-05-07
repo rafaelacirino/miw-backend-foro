@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +22,7 @@ import java.util.UUID;
 public class QuestionDto {
 
     @Schema(hidden = true, description = "Unique identifier of the question")
-    private UUID id;
+    private Long id;
 
     @JsonProperty("author")
     @Schema(description = "Name of the user who created the question", example = "alex123")

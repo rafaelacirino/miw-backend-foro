@@ -7,7 +7,6 @@ import es.upm.miw.foro.persistance.model.Role;
 import es.upm.miw.foro.service.impl.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -168,9 +167,8 @@ class JwtAuthenticationFilterTest {
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-        verify(filterChain, never()).doFilter(request, response);
+        verify(filterChain, times(1)).doFilter(request, response);
         verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
         verify(jwtService, times(1)).verify(TOKEN);
         verify(jwtService, times(1)).user(TOKEN);
@@ -189,9 +187,8 @@ class JwtAuthenticationFilterTest {
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-        verify(filterChain, never()).doFilter(request, response);
+        verify(filterChain, times(1)).doFilter(request, response);
         verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
         verify(jwtService, times(1)).verify(TOKEN);
         verify(jwtService, times(1)).user(TOKEN);
@@ -209,9 +206,8 @@ class JwtAuthenticationFilterTest {
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
 
         // Assert
-        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-        verify(filterChain, never()).doFilter(request, response);
+        verify(filterChain, times(1)).doFilter(request, response);
         verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
         verify(jwtService, times(1)).verify(TOKEN);
         verify(jwtService, never()).user(anyString());

@@ -57,7 +57,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDto getQuestionById(UUID id) {
+    public QuestionDto getQuestionById(Long id) {
         try {
             Question question = questionRepository.findById(id)
                     .orElseThrow(() -> new ServiceException("Question not found"));
@@ -114,7 +114,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDto updateQuestion(UUID id, QuestionDto questionDto) {
+    public QuestionDto updateQuestion(Long id, QuestionDto questionDto) {
         try {
             validateQuestionDto(questionDto);
             User authenticatedUser = userService.getAuthenticatedUser();
@@ -138,7 +138,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void deleteQuestion(UUID id) {
+    public void deleteQuestion(Long id) {
         try {
             User authenticatedUser = userService.getAuthenticatedUser();
 
@@ -157,7 +157,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public boolean isQuestionAuthor(UUID questionId, String email) {
+    public boolean isQuestionAuthor(Long questionId, String email) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ServiceException("Question not found with id: " + questionId));
         return question.getAuthor().getEmail().equals(email);
@@ -176,7 +176,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public void incrementViews(UUID id) {
+    public void incrementViews(Long id) {
         questionRepository.incrementViews(id);
     }
 

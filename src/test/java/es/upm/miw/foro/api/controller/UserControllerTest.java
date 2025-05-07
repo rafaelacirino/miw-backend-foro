@@ -27,7 +27,7 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    private static final UUID USER_ID = UUID.randomUUID();
+    private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
     private static final String EMAIL = "email@email.com";
@@ -204,9 +204,8 @@ class UserControllerTest {
     @Test
     void testLoginSuccess() {
         // Arrange
-        String token = UUID.randomUUID().toString();
         LoginDto loginDto = new LoginDto(EMAIL, PASSWORD);
-        when(userService.login(EMAIL, PASSWORD)).thenReturn(token);
+        when(userService.login(EMAIL, PASSWORD)).thenReturn(String.valueOf(USER_ID));
 
         // Act
         ResponseEntity<?> response = userController.login(loginDto);
@@ -216,7 +215,7 @@ class UserControllerTest {
         assertNotNull(response.getBody());
         assertInstanceOf(TokenDto.class, response.getBody());
         TokenDto tokenDto = (TokenDto) response.getBody();
-        assertEquals(token, tokenDto.getToken());
+        assertEquals(String.valueOf(USER_ID), tokenDto.getToken());
         verify(userService, times(1)).login(EMAIL, PASSWORD);
     }
 
