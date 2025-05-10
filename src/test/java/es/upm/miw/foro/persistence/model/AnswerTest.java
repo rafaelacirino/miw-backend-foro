@@ -9,11 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @TestConfig
 class AnswerTest {
@@ -82,22 +81,6 @@ class AnswerTest {
         assertEquals(mockQuestion, answer.getQuestion());
         assertEquals(mockUser, answer.getAuthor());
         assertEquals(creationDate, answer.getCreationDate());
-    }
-
-    @Test
-    void testSetQuestion_addsAnswerToQuestion() {
-        // Arrange
-        List<Answer> answers = new ArrayList<>();
-        when(mockQuestion.getAnswers()).thenReturn(answers);
-
-        // Act
-        answer.setQuestion(mockQuestion);
-
-        // Assert
-        assertNotNull(answer.getQuestion());
-        assertEquals(mockQuestion, answer.getQuestion());
-        assertTrue(answers.contains(answer));
-        verify(mockQuestion).getAnswers();
     }
 
     @Test

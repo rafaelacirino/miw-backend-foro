@@ -3,16 +3,23 @@ package es.upm.miw.foro.api.converter;
 import es.upm.miw.foro.api.dto.AnswerDto;
 import es.upm.miw.foro.persistance.model.Answer;
 import es.upm.miw.foro.persistance.model.Question;
+import es.upm.miw.foro.persistance.model.User;
 
 import java.util.Collections;
 import java.util.List;
 
 public class AnswerMapper {
 
-    private AnswerMapper() {
+    public AnswerMapper() {
         throw new UnsupportedOperationException("Utility class");
     }
 
+    /**
+     * Converts an Answer entity to an AnswerDto.
+     *
+     * @param answer the Answer entity to convert
+     * @return the corresponding AnswerDto, or null if the input is null
+     */
     public static AnswerDto toAnswerDto(Answer answer) {
         if (answer == null) {
             return null;
@@ -22,12 +29,18 @@ public class AnswerMapper {
         return answerDto;
     }
 
-    public static Answer toEntity(AnswerDto answerDto, Question question) {
+    /**
+     * Converts an AnswerDto to an entity Answer.
+     *
+     * @param answerDto the AnswerDto to convert
+     * @return the corresponding Answer, or null if the input is null
+     */
+    public static Answer toEntity(AnswerDto answerDto, Question question, User author) {
         if (answerDto == null) {
             return null;
         }
         Answer answer = new Answer();
-        populateEntity(answer, answerDto, question);
+        populateEntity(answer, answerDto, question, author);
         return answer;
     }
 
@@ -40,9 +53,9 @@ public class AnswerMapper {
                 .toList();
     }
 
-    public static List<Answer> toEntityList(List<AnswerDto> answerDtos, Question question) {
+    public static List<Answer> toEntityList(List<AnswerDto> answerDtos, Question question, User author) {
         return answerDtos.stream()
-                .map(dto -> toEntity(dto, question))
+                .map(dto -> toEntity(dto, question, author))
                 .toList();
     }
 
@@ -53,10 +66,10 @@ public class AnswerMapper {
         answerDto.setCreationDate(answer.getCreationDate());
     }
 
-    public static void populateEntity(Answer entity, AnswerDto answerDto, Question question) {
+    public static void populateEntity(Answer entity, AnswerDto answerDto, Question question, User author) {
         entity.setId(answerDto.getId());
         entity.setContent(answerDto.getContent());
-        entity.setCreationDate(answerDto.getCreationDate());
         entity.setQuestion(question);
+        entity.setAuthor(author);
     }
 }

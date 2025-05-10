@@ -45,6 +45,22 @@ class QuestionMapperTest {
         assertEquals(question.getViews(), questionDto.getViews());
     }
 
+    @Test
+    void toQuestionDto_withValidEntity_returnsPopulatedDto() {
+        // Arrange
+        Question question = new Question();
+        question.setId(1L);
+        question.setTitle("Test");
+        question.setDescription("Description");
+
+        // Act
+        QuestionDto dto = QuestionMapper.toQuestionDto(question);
+
+        // Assert
+        assertNotNull(dto);
+        assertEquals("Test", dto.getTitle());
+    }
+
    @Test
     void testEntity_shouldMapDtoToEntity() {
         // Arrange
@@ -62,6 +78,26 @@ class QuestionMapperTest {
         assertEquals(questionDto.getDescription(), question.getDescription());
         assertEquals(questionDto.getCreationDate(), question.getCreationDate());
         assertEquals(questionDto.getViews(), question.getViews());
+    }
+
+    @Test
+    void toDtoList_withNullList_shouldReturnEmptyList() {
+        // Act
+        List<QuestionDto> result = QuestionMapper.toDtoList(null);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void toEntityList_withNullList_shouldReturnEmptyList() {
+        // Act
+        List<Question> result = QuestionMapper.toEntityList(null, createUser());
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -98,6 +134,19 @@ class QuestionMapperTest {
 
         // Assert
         assertNull(dto);
+    }
+
+    @Test
+    void toQuestionDto_whenAnswersAreNull_shouldReturnDtoWithNullAnswers() {
+        // Arrange
+        Question question = createQuestionEntity();
+        question.setAnswers(null);
+
+        // Act
+        QuestionDto dto = QuestionMapper.toQuestionDto(question);
+
+        // Assert
+        assertNull(dto.getAnswers(), "Answers should be null in DTO if not present in entity");
     }
 
     @Test

@@ -82,14 +82,11 @@ public class QuestionMapper {
             dto.setAuthor("Unknown");
         }
 
-        try {
-            dto.setAnswers(Optional.ofNullable(question.getAnswers())
-                    .map(AnswerMapper::toDtoList)
-                    .orElse(Collections.emptyList()));
-        } catch (Exception e) {
-            log.error("Error mapping answers for question {}: {}", question.getId(), e.getMessage());
-            dto.setAnswers(Collections.emptyList());
-        }
+        dto.setAnswers(
+                question.getAnswers() != null
+                        ? AnswerMapper.toDtoList(question.getAnswers())
+                        : null
+        );
     }
 
     private static void populateEntity(Question question, QuestionDto questionDto, User questionAuthor) {
@@ -101,7 +98,7 @@ public class QuestionMapper {
         question.setViews(questionDto.getViews() != null ? questionDto.getViews() : 0);
 
         if (questionDto.getAnswers() != null) {
-            List<Answer> answers = AnswerMapper.toEntityList(questionDto.getAnswers(), question);
+            List<Answer> answers = AnswerMapper.toEntityList(questionDto.getAnswers(), question, questionAuthor);
             answers.forEach(question::addAnswer);
         }
     }

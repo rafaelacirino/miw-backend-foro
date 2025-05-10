@@ -51,6 +51,8 @@ public class QuestionServiceImpl implements QuestionService {
             return QuestionMapper.toQuestionDto(savedQuestion);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error while saving question", exception);
+        } catch (ServiceException exception) {
+            throw exception;
         } catch (Exception exception) {
             throw new ServiceException("Unexpected error while creating question", exception);
         }
@@ -64,6 +66,8 @@ public class QuestionServiceImpl implements QuestionService {
             return QuestionMapper.toQuestionDto(question);
         } catch (DataAccessException e) {
             throw new RepositoryException("Error while retrieving question", e);
+        } catch (ServiceException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException("Unexpected error while getting question", e);
         }
@@ -132,6 +136,8 @@ public class QuestionServiceImpl implements QuestionService {
             return QuestionMapper.toQuestionDto(updatedQuestion);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error while updating question", exception);
+        } catch (ServiceException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException("Unexpected error while updating question", e);
         }
@@ -151,6 +157,8 @@ public class QuestionServiceImpl implements QuestionService {
             questionRepository.delete(question);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error while deleting question", exception);
+        } catch (ServiceException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException("Unexpected error while deleting question", e);
         }
@@ -169,6 +177,8 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             Page<Question> page = questionRepository.findMyQuestions(email, title, fromDate, pageable);
             return page.map(QuestionMapper::toQuestionDto);
+        } catch (ServiceException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException("Error retrieving user questions with filters", e);
         }
