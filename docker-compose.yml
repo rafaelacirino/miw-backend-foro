@@ -38,6 +38,9 @@ services:                               # Define los servicios: son contenedores
       # createUser: elimina el esquema existente antes de crearlo nuevamente
       # createUser-drop: parecido al anterior, pero lo elimina al detener
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
     labels:
       - "es.upm.miw.foro=app"
 volumes:
