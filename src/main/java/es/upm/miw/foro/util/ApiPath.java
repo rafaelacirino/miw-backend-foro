@@ -20,6 +20,8 @@ public class ApiPath {
     public static final String QUESTION_MY = QUESTIONS + "/my";
     public static final String QUESTION_VIEWS = QUESTION_ID + "/views";
 
+    public static final String ANSWERS = "/answers";
+
     public static final String ACTUATOR = "/actuator/**";
 
     public static final String ACCOUNT_FORGOT_PASSWORD = "/account/forgot-password";

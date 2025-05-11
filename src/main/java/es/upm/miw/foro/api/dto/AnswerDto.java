@@ -27,6 +27,9 @@ public class AnswerDto {
     @Schema(description = "Content of the answer", example = "Use @Entity and @Id annotations...")
     private String content;
 
+    @NotNull(message = "Unique identifier of the question")
+    private Long questionId;
+
     @NotNull(message = "AnswerAuthor cannot be null")
     @Schema(description = "Name of the user who wrote the answer", example = "Mary Smith")
     @JsonProperty("author")

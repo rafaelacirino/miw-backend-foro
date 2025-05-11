@@ -35,8 +35,6 @@ public class UserMapper {
                 .toList();
     }
 
-    // Replace this usage of 'Stream. collect(Collectors. toList())'
-    // with 'Stream. toList()' and ensure that the list is unmodified.
     public static List<User> toEntityList(List<UserDto> userDtoList) {
         return userDtoList.stream()
                 .map(UserMapper::toEntity)
