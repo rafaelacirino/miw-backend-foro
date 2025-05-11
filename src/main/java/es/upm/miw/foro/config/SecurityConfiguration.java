@@ -1,9 +1,9 @@
 package es.upm.miw.foro.config;
 
 
-import es.upm.miw.foro.persistance.model.Role;
-import es.upm.miw.foro.persistance.model.User;
-import es.upm.miw.foro.persistance.repository.UserRepository;
+import es.upm.miw.foro.persistence.model.Role;
+import es.upm.miw.foro.persistence.model.User;
+import es.upm.miw.foro.persistence.repository.UserRepository;
 import es.upm.miw.foro.util.ApiPath;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

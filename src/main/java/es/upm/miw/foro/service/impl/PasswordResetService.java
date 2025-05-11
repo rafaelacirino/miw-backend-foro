@@ -2,8 +2,8 @@ package es.upm.miw.foro.service.impl;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import es.upm.miw.foro.exception.ServiceException;
-import es.upm.miw.foro.persistance.model.User;
-import es.upm.miw.foro.persistance.repository.UserRepository;
+import es.upm.miw.foro.persistence.model.User;
+import es.upm.miw.foro.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

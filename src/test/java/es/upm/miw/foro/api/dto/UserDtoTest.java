@@ -1,6 +1,6 @@
 package es.upm.miw.foro.api.dto;
 
-import es.upm.miw.foro.persistance.model.Role;
+import es.upm.miw.foro.persistence.model.Role;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

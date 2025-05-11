@@ -1,7 +1,7 @@
 package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.UserDto;
-import es.upm.miw.foro.persistance.model.User;
+import es.upm.miw.foro.persistence.model.User;
 
 import java.util.List;
 

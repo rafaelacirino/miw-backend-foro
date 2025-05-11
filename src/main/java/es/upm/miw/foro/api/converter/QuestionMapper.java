@@ -1,9 +1,9 @@
 package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.QuestionDto;
-import es.upm.miw.foro.persistance.model.Answer;
-import es.upm.miw.foro.persistance.model.Question;
-import es.upm.miw.foro.persistance.model.User;
+import es.upm.miw.foro.persistence.model.Answer;
+import es.upm.miw.foro.persistence.model.Question;
+import es.upm.miw.foro.persistence.model.User;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
