@@ -1,6 +1,7 @@
 package es.upm.miw.foro.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import es.upm.miw.foro.persistance.model.NotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -30,8 +31,11 @@ public class NotificationDto {
     @Schema(description = "ID of the related answer", example = "1")
     private Long answerId;
 
+    @Schema(hidden = true)
+    private NotificationType type;
+
     @Schema(description = "Indicates if the notification has been read", example = "false")
-    private boolean isRead;
+    private boolean read;
 
     @Schema(description = "Date and time when the notification was created", example = "2023-10-01T10:05:00")
     private LocalDateTime creationDate;

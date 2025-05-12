@@ -24,14 +24,14 @@ public class AnswerDto {
 
     @NotNull(message = "Content cannot be null")
     @Size(max = 1000, message = "Content must be at most 1000 characters")
-    @Schema(description = "Content of the answer", example = "Use @Entity and @Id annotations...")
+    @Schema(description = "Content of the answer", example = "The answer is ...")
     private String content;
 
     @NotNull(message = "Unique identifier of the question")
     private Long questionId;
 
     @NotNull(message = "AnswerAuthor cannot be null")
-    @Schema(description = "Name of the user who wrote the answer", example = "Mary Smith")
+    @Schema(description = "Name of the user who wrote the answer", example = "me123")
     @JsonProperty("author")
     private String author;
 

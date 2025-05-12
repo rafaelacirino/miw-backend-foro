@@ -32,12 +32,12 @@ public class Notification {
     @JoinColumn(name = "answer_id")
     private Answer answer;
 
-    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
     private NotificationType type;
 
     @Column(name = "is_read", nullable = false)
-    private boolean isRead = false;
+    private boolean read = false;
 
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
@@ -48,6 +48,6 @@ public class Notification {
     }
 
     public void markAsRead() {
-        this.isRead = true;
+        this.read = true;
     }
 }

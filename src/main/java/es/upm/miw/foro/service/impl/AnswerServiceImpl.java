@@ -48,14 +48,18 @@ public class AnswerServiceImpl implements AnswerService {
     public AnswerDto createAnswer(AnswerDto answerDto) {
         try {
             validateAnswerDto(answerDto);
+            System.out.println("Validating user...");
             User author = userService.getAuthenticatedUser();
+            System.out.println("Validate user...");
             Question question = questionRepository.findById(answerDto.getQuestionId())
                     .orElseThrow(() -> new ServiceException("Question not found"));
 
             Answer answer = AnswerMapper.toEntity(answerDto, question);
+            answer.setAuthor(author);
             Answer savedAnswer = answerRepository.save(answer);
 
             if (!question.getAuthor().getId().equals(author.getId())) {
+                System.out.println("Sending notification...");
                 notificationService.notifyNewAnswer(question.getAuthor(), question, savedAnswer);
             }
 
