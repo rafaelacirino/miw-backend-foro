@@ -1,7 +1,7 @@
 package es.upm.miw.foro.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import es.upm.miw.foro.persistance.model.NotificationType;
+import es.upm.miw.foro.persistence.model.NotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
