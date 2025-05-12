@@ -1,4 +1,4 @@
-package es.upm.miw.foro.persistance.model;
+package es.upm.miw.foro.persistence.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(name = "views", nullable = false)
     private Integer views = 0;
 
     @PrePersist

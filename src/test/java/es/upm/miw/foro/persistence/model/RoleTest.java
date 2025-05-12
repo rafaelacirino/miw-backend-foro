@@ -1,6 +1,5 @@
 package es.upm.miw.foro.persistence.model;
 
-import es.upm.miw.foro.persistance.model.Role;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

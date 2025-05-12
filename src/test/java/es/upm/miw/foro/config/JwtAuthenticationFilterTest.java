@@ -3,7 +3,7 @@ package es.upm.miw.foro.config;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import es.upm.miw.foro.TestConfig;
-import es.upm.miw.foro.persistance.model.Role;
+import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.service.impl.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

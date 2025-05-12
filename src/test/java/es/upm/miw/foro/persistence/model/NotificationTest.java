@@ -1,7 +1,6 @@
 package es.upm.miw.foro.persistence.model;
 
 import es.upm.miw.foro.TestConfig;
-import es.upm.miw.foro.persistance.model.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

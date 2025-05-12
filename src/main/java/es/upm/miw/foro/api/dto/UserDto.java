@@ -3,7 +3,7 @@ package es.upm.miw.foro.api.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import es.upm.miw.foro.api.dto.validation.UserValidation;
 import es.upm.miw.foro.api.dto.validation.ValidPassword;
-import es.upm.miw.foro.persistance.model.Role;
+import es.upm.miw.foro.persistence.model.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,9 +1,8 @@
 package es.upm.miw.foro.persistence.repository.specification;
 
 import es.upm.miw.foro.api.dto.UserDto;
-import es.upm.miw.foro.persistance.model.Role;
-import es.upm.miw.foro.persistance.model.User;
-import es.upm.miw.foro.persistance.repository.specification.UserSpecification;
+import es.upm.miw.foro.persistence.model.Role;
+import es.upm.miw.foro.persistence.model.User;
 import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

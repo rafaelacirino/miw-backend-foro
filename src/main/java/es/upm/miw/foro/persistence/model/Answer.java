@@ -1,12 +1,12 @@
-package es.upm.miw.foro.persistance.model;
+package es.upm.miw.foro.persistence.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +22,7 @@ public class Answer {
     private Long id;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Size(max = 1000, message = "Content must be at most 1000 characters")
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,15 +39,5 @@ public class Answer {
     @PrePersist
     public void onCreate() {
         this.creationDate = LocalDateTime.now();
-    }
-
-    public void setQuestion(Question question) {
-        this.question = question;
-        if (question != null) {
-            List<Answer> answers = question.getAnswers();
-            if (!answers.contains(this)) {
-                answers.add(this);
-            }
-        }
     }
 }

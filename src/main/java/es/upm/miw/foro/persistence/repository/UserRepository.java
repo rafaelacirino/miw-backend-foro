@@ -1,6 +1,6 @@
-package es.upm.miw.foro.persistance.repository;
+package es.upm.miw.foro.persistence.repository;
 
-import es.upm.miw.foro.persistance.model.User;
+import es.upm.miw.foro.persistence.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

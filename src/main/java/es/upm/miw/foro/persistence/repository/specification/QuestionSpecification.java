@@ -1,6 +1,6 @@
-package es.upm.miw.foro.persistance.repository.specification;
+package es.upm.miw.foro.persistence.repository.specification;
 
-import es.upm.miw.foro.persistance.model.Question;
+import es.upm.miw.foro.persistence.model.Question;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
