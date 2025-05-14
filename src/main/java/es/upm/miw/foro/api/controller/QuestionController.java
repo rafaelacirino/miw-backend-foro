@@ -100,6 +100,8 @@ public class QuestionController {
            Page<QuestionDto> questionPage = questionService.getQuestions(title, pageable);
            return ResponseEntity.ok(questionPage);
        } catch (ServiceException e) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+       } catch (Exception e) {
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
        }
     }

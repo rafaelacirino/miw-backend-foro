@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @SpringBootApplication
-@EntityScan("es.upm.miw.foro.persistance.model")
+@EntityScan("es.upm.miw.foro.persistence.model")
 @EnableMethodSecurity(prePostEnabled = true)
-@EnableJpaRepositories
+@EnableJpaRepositories("es.upm.miw.foro.persistence.repository")
 public class Application {
 
 	public static void main(String[] args) {

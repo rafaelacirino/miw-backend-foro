@@ -1,6 +1,5 @@
 package es.upm.miw.foro.persistence.model;
 
-import es.upm.miw.foro.persistance.model.NotificationType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

@@ -1,7 +1,7 @@
-package es.upm.miw.foro.persistance.repository;
+package es.upm.miw.foro.persistence.repository;
 
-import es.upm.miw.foro.persistance.model.Question;
-import es.upm.miw.foro.persistance.repository.specification.QuestionSpecification;
+import es.upm.miw.foro.persistence.model.Question;
+import es.upm.miw.foro.persistence.repository.specification.QuestionSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

@@ -1,9 +1,7 @@
 package es.upm.miw.foro.persistence.model;
 
 import es.upm.miw.foro.TestConfig;
-import es.upm.miw.foro.persistance.model.Role;
-import es.upm.miw.foro.persistance.model.User;
-import es.upm.miw.foro.persistance.repository.UserRepository;
+import es.upm.miw.foro.persistence.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 

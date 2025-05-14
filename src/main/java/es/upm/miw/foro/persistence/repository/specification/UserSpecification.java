@@ -1,7 +1,7 @@
-package es.upm.miw.foro.persistance.repository.specification;
+package es.upm.miw.foro.persistence.repository.specification;
 
 import es.upm.miw.foro.api.dto.UserDto;
-import es.upm.miw.foro.persistance.model.User;
+import es.upm.miw.foro.persistence.model.User;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;

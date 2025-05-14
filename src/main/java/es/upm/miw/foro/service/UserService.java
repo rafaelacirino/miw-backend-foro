@@ -1,7 +1,7 @@
 package es.upm.miw.foro.service;
 
 import es.upm.miw.foro.api.dto.UserDto;
-import es.upm.miw.foro.persistance.model.User;
+import es.upm.miw.foro.persistence.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
