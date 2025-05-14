@@ -1,7 +1,6 @@
-package es.upm.miw.foro.persistance.repository;
+package es.upm.miw.foro.persistence.repository;
 
-import es.upm.miw.foro.persistance.model.Notification;
-import es.upm.miw.foro.persistance.model.NotificationType;
+import es.upm.miw.foro.persistence.model.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

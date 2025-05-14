@@ -1,7 +1,7 @@
 package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.NotificationDto;
-import es.upm.miw.foro.persistance.model.Notification;
+import es.upm.miw.foro.persistence.model.Notification;
 
 import java.util.List;
 

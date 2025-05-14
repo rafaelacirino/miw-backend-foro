@@ -1,10 +1,10 @@
 package es.upm.miw.foro.service;
 
 import es.upm.miw.foro.api.dto.NotificationDto;
-import es.upm.miw.foro.persistance.model.Answer;
-import es.upm.miw.foro.persistance.model.Notification;
-import es.upm.miw.foro.persistance.model.Question;
-import es.upm.miw.foro.persistance.model.User;
+import es.upm.miw.foro.persistence.model.Answer;
+import es.upm.miw.foro.persistence.model.Notification;
+import es.upm.miw.foro.persistence.model.Question;
+import es.upm.miw.foro.persistence.model.User;
 
 import java.util.List;
 
