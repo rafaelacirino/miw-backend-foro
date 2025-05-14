@@ -13,15 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @ToString
 @Slf4j
 @RestController
-@RequestMapping(ApiPath.ANSWERS)
+@RequestMapping(ApiPath.QUESTIONS)
 public class AnswerController {
 
     private final AnswerService answerService;
@@ -31,12 +30,13 @@ public class AnswerController {
         this.answerService = answerService;
     }
 
-    @PostMapping
+    @PostMapping("/{questionId}/answers")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
-    public ResponseEntity<AnswerDto> createAnswer(@Valid @RequestBody AnswerDto answerDto) {
+    public ResponseEntity<AnswerDto> createAnswer(@PathVariable Long questionId,
+                                                  @Valid @RequestBody AnswerDto answerDto) {
         try {
-            return new ResponseEntity<>(answerService.createAnswer(answerDto), HttpStatus.CREATED);
+            return new ResponseEntity<>(answerService.createAnswer(questionId, answerDto), HttpStatus.CREATED);
         } catch (ServiceException e) {
             if (e.getMessage().contains(StatusMsg.UNAUTHORIZED)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -44,6 +44,18 @@ public class AnswerController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/{questionId}/answers")
+    public ResponseEntity<List<AnswerDto>> getAnswersByQuestion(@PathVariable Long questionId) {
+        try {
+            List<AnswerDto> answers = answerService.getAnswersByQuestionId(questionId);
+            return ResponseEntity.ok(answers);
+        } catch (ServiceException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

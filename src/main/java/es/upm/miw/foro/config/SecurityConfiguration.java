@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -83,6 +84,7 @@ public class SecurityConfiguration {
                                 ApiPath.ACCOUNT_FORGOT_PASSWORD,
                                 ApiPath.ACCOUNT_RESET_PASSWORD
                                 ).permitAll()
+                        .requestMatchers(HttpMethod.GET, ApiPath.ANSWERS).permitAll()
                         .requestMatchers(ApiPath.QUESTION_CREATE).hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
