@@ -27,14 +27,14 @@ public class AnswerDto {
     @Schema(description = "Content of the answer", example = "The answer is ...")
     private String content;
 
-    @NotNull(message = "Unique identifier of the question")
+//    @NotNull(message = "Unique identifier of the question")
     private Long questionId;
 
-    @NotNull(message = "AnswerAuthor cannot be null")
-    @Schema(description = "Name of the user who wrote the answer", example = "me123")
+//    @NotNull(message = "AnswerAuthor cannot be null")
     @JsonProperty("author")
+    @Schema(description = "Name of the user who wrote the answer", example = "me123")
     private String author;
 
-    @Schema(description = "Date and time when the answer was created", example = "2025-01-01T10:00:00")
+    @Schema(hidden = true, description = "Date and time when the answer was created", example = "2025-01-01T10:00:00")
     private LocalDateTime creationDate;
 }

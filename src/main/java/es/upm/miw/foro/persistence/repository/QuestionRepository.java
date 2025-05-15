@@ -28,7 +28,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     Page<Question> searchByTitleOrDescriptionContainingIgnoreCase(
             @Param("query") String query, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"author", "answers"})
+    @EntityGraph(attributePaths = {"author", "answers", "answers.author"})
     Optional<Question> findById(Long id);
 
     default Page<Question> findMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable) {

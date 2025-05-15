@@ -63,6 +63,8 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             Question question = questionRepository.findById(id)
                     .orElseThrow(() -> new ServiceException("Question not found"));
+            Hibernate.initialize(question.getAuthor());
+            Hibernate.initialize(question.getAnswers());
             return QuestionMapper.toQuestionDto(question);
         } catch (DataAccessException e) {
             throw new RepositoryException("Error while retrieving question", e);
