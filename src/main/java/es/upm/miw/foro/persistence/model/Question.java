@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -41,6 +43,16 @@ public class Question {
     @Column(name = "views", nullable = false)
     private Integer views = 0;
 
+    @ElementCollection
+    @CollectionTable(name = "question_viewed_by", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "session_id")
+    private Set<String> viewedBySessions = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "question_viewed_by_users", joinColumns = @JoinColumn(name = "question_id"))
+    @Column(name = "user_id")
+    private Set<Long> viewedByUsers = new HashSet<>();
+
     @PrePersist
     public void onCreate() {
         this.creationDate = LocalDateTime.now();
@@ -54,6 +66,22 @@ public class Question {
     public void removeAnswer(Answer answer) {
         answers.remove(answer);
         answer.setQuestion(null);
+    }
+
+    public boolean incrementViewsIfNew(String sessionId, Long userId) {
+        boolean isNewView = false;
+
+        if (userId != null) {
+            isNewView = viewedByUsers.add(userId);
+        } else if (sessionId != null) {
+            isNewView = viewedBySessions.add(sessionId);
+        }
+
+        if (isNewView) {
+            this.views++;
+        }
+
+        return isNewView;
     }
 
 }

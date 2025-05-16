@@ -9,6 +9,8 @@ import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.service.impl.QuestionServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -518,14 +520,20 @@ class QuestionServiceTest {
     }
 
     @Test
-    void testIncrementViews_success() {
+    void testRegisterView_incrementsViewForNewSession() {
         // Arrange
-        doNothing().when(questionRepository).incrementViews(QUESTION_ID);
+        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        HttpSession mockSession = mock(HttpSession.class);
+        when(mockRequest.getSession()).thenReturn(mockSession);
+        when(mockSession.getId()).thenReturn("session-abc");
 
         // Act
-        assertDoesNotThrow(() -> questionService.incrementViews(QUESTION_ID));
+        questionService.registerView(QUESTION_ID, mockRequest);
 
-        // Verify
-        verify(questionRepository, times(1)).incrementViews(QUESTION_ID);
+        // Assert
+        assertEquals(1, question.getViews());
+        assertTrue(question.getViewedBySessions().contains("session-abc"));
     }
 }

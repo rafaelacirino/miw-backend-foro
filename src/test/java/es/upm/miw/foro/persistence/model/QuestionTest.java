@@ -7,7 +7,9 @@ import org.mockito.Mock;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -26,8 +28,11 @@ class QuestionTest {
 
     private Question question;
 
-    private final Integer views = 0;
     private static final Long ID = 1L;
+
+    private final Integer views = 0;
+    Set<String> viewedBySessions = new HashSet<>();
+    Set<Long> viewedByUsers = new HashSet<>();
 
     @BeforeEach
     void setUp() {
@@ -51,6 +56,8 @@ class QuestionTest {
         assertNotNull(question.getAnswers());
         assertTrue(question.getAnswers().isEmpty());
         assertNotNull(question.getViews());
+        assertEquals(0, question.getViewedBySessions().size());
+        assertEquals(0, question.getViewedByUsers().size());
     }
 
     @Test
@@ -62,7 +69,7 @@ class QuestionTest {
 
         question = new Question(
                 ID, mockUser, "How to implement JPA?", "I need help with JPA in Spring Boot.",
-                creationDate, answers, views);
+                creationDate, answers, views, viewedBySessions, viewedByUsers);
 
         // Assert
         assertEquals(ID, question.getId());
@@ -136,6 +143,41 @@ class QuestionTest {
     }
 
     @Test
+    void testIncrementViewsIfNew_withSessionId() {
+        // Act
+        boolean result = question.incrementViewsIfNew("session-123", null);
+
+        // Assert
+        assertTrue(result);
+        assertEquals(1, question.getViews());
+        assertTrue(question.getViewedBySessions().contains("session-123"));
+    }
+
+    @Test
+    void testIncrementViewsIfNew_withUserId() {
+        // Act
+        boolean result = question.incrementViewsIfNew(null, 5L);
+
+        // Assert
+        assertTrue(result);
+        assertEquals(1, question.getViews());
+        assertTrue(question.getViewedByUsers().contains(5L));
+    }
+
+    @Test
+    void testIncrementViewsIfAlreadyViewed() {
+        // Arrange
+        question.incrementViewsIfNew("session-123", null);
+
+        // Act
+        boolean result = question.incrementViewsIfNew("session-123", null);
+
+        // Assert
+        assertFalse(result);
+        assertEquals(1, question.getViews()); // no incrementa
+    }
+
+    @Test
     void testOnCreate_setsCreationDate() {
         // Arrange
         question = new Question();
@@ -159,14 +201,15 @@ class QuestionTest {
 
         question = new Question(
                 ID, mockUser, "How to implement...", "I need help with...",
-                creationDate, answers, views);
+                creationDate, answers, views, viewedBySessions, viewedByUsers);
 
         when(mockUser.toString()).thenReturn("User(id=1, firstName=Alex, lastName=Ye)");
         when(mockAnswer1.toString()).thenReturn("Answer(id=1, content=Use @Entity)");
 
         String expectedString = "Question(id=1, author=User(id=1, firstName=Alex, lastName=Ye), " +
                 "title=How to implement..., description=I need help with..., " +
-                "creationDate=2025-01-01T10:00, answers=[Answer(id=1, content=Use @Entity)], views=0)";
+                "creationDate=2025-01-01T10:00, answers=[Answer(id=1, content=Use @Entity)], " +
+                "views=0, viewedBySessions=[], viewedByUsers=[])";
 
         // Act & Assert
         assertEquals(expectedString, question.toString());

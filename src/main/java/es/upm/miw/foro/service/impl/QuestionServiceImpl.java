@@ -10,6 +10,7 @@ import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -186,10 +187,21 @@ public class QuestionServiceImpl implements QuestionService {
         }
     }
 
-    @Override
     @Transactional
-    public void incrementViews(Long id) {
-        questionRepository.incrementViews(id);
+    public void registerView(Long questionId, HttpServletRequest request) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RepositoryException("Question not found"));
+
+        String sessionId = request.getSession().getId();
+        User user;
+        try {
+            user = userService.getAuthenticatedUser();
+        } catch (ServiceException ex) {
+            user = null;
+        }
+
+        Long userId = user != null ? user.getId() : null;
+        question.incrementViewsIfNew(sessionId, userId);
     }
 
 

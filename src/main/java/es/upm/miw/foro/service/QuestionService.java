@@ -1,6 +1,7 @@
 package es.upm.miw.foro.service;
 
 import es.upm.miw.foro.api.dto.QuestionDto;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,5 +25,5 @@ public interface QuestionService {
 
     Page<QuestionDto> getMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable);
 
-    void incrementViews(Long id);
+    void registerView(Long questionId, HttpServletRequest request);
 }

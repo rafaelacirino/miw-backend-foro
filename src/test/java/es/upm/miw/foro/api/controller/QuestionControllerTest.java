@@ -288,15 +288,4 @@ class QuestionControllerTest {
         assertEquals(page, response.getBody());
         verify(questionService, times(1)).getMyQuestions(USER_EMAIL, TITLE, CREATION_DATE, pageable);
     }
-
-    @Test
-    void testIncrementViews() {
-        // Act
-        ResponseEntity<Void> response = this.questionController.incrementViews(QUESTION_ID);
-
-        // Assert
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(questionService, times(1)).incrementViews(QUESTION_ID);
-    }
 }

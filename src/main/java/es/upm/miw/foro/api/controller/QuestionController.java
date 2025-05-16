@@ -6,6 +6,7 @@ import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.util.ApiPath;
 import es.upm.miw.foro.util.StatusMsg;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -167,8 +168,8 @@ public class QuestionController {
     }
 
     @PatchMapping("/{id}/views")
-    public ResponseEntity<Void> incrementViews(@PathVariable Long id) {
-        questionService.incrementViews(id);
+    public ResponseEntity<Void> registerView(@PathVariable Long id, HttpServletRequest request) {
+        questionService.registerView(id, request);
         return ResponseEntity.noContent().build();
     }
 }
