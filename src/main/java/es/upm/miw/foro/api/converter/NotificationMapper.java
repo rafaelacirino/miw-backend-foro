@@ -44,6 +44,7 @@ public class NotificationMapper {
     private static void populateDto(Notification notification, NotificationDto notificationDto) {
         notificationDto.setId(notification.getId());
         notificationDto.setUserId(notification.getUser() != null ? notification.getUser().getId() : null);
+        notificationDto.setMessage(generateMessage(notification));
         notificationDto.setQuestionId(notification.getQuestion() != null ? notification.getQuestion().getId() : null);
         notificationDto.setAnswerId(notification.getAnswer() != null ? notification.getAnswer().getId() : null);
         notificationDto.setType(notification.getType());
@@ -56,5 +57,12 @@ public class NotificationMapper {
         entity.setType(notificationDto.getType());
         entity.setRead(notificationDto.isRead());
         entity.setCreationDate(notificationDto.getCreationDate());
+    }
+
+    private static String generateMessage(Notification notification) {
+        return switch (notification.getType()) {
+            case QUESTION_REPLIED -> "You have an answer";
+            case ANSWER_RATED -> "Answer rated";
+        };
     }
 }

@@ -25,6 +25,9 @@ public class NotificationDto {
     @Schema(description = "ID of the user receiving the notification", example = "1")
     private Long userId;
 
+    @Schema(description = "Notification message to display", example = "Your question has been answered")
+    private String message;
+
     @Schema(description = "ID of the related question", example = "1")
     private Long questionId;
 
