@@ -23,6 +23,7 @@ public class ApiPath {
     public static final String ANSWERS = QUESTIONS + "/*/answers";
 
     public static final String NOTIFICATIONS = "/notifications";
+    public static final String TOPIC_NOTIFICATIONS = "/topic/notifications/";
 
     public static final String ACTUATOR = "/actuator/**";
 

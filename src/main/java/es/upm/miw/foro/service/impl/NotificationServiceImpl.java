@@ -7,6 +7,7 @@ import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.*;
 import es.upm.miw.foro.persistence.repository.NotificationRepository;
 import es.upm.miw.foro.service.NotificationService;
+import es.upm.miw.foro.util.ApiPath;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.dao.DataAccessException;
@@ -44,7 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         NotificationDto dto = NotificationMapper.toNotificationDto(savedNotification);
 
-        messagingTemplate.convertAndSend("/topic/notifications/" + user.getId(), dto);
+        messagingTemplate.convertAndSend(ApiPath.TOPIC_NOTIFICATIONS + user.getId(), dto);
     }
 
     @Override
