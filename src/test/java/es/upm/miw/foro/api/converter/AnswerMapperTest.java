@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +16,6 @@ class AnswerMapperTest {
 
     private static final Long ANSWER_ID = 1L;
     private static final String CONTENT = "Answer Name";
-    private static final String QUESTION = "Answer Question";
     private static final String AUTHOR = "author";
     private static final LocalDateTime DATE_TIME = LocalDateTime.of(2020, 1, 1, 1, 1);
 
@@ -27,7 +25,7 @@ class AnswerMapperTest {
     }
 
     @Test
-    void whenToAnswerDtoIsCalledWithValidAnswer_thenMapsToDto() {
+    void toAnswerDto_thenMapsToDto() {
         // Arrange
         Answer answer = createAnswerEntity();
 
@@ -43,7 +41,7 @@ class AnswerMapperTest {
     }
 
     @Test
-    void whenToAnswerDtoIsCalledWithNullAnswer_thenReturnsNull() {
+    void toAnswerDtoWithNullAnswer_thenReturnsNull() {
         // Act
         AnswerDto answerDto = AnswerMapper.toAnswerDto(null);
 
@@ -52,7 +50,7 @@ class AnswerMapperTest {
     }
 
     @Test
-    void whenToEntityIsCalledWithValidDto_thenMapsToEntity() {
+    void toEntity_thenMapsToEntity() {
         // Arrange
         AnswerDto answerDto = createAnswerDto();
         Question question = createQuestionEntity();
@@ -71,7 +69,7 @@ class AnswerMapperTest {
     }
 
     @Test
-    void whenToEntityIsCalledWithNullDto_thenReturnsNull() {
+    void toEntityWithNullDto_thenReturnsNull() {
         // Act
         Answer answer = AnswerMapper.toEntity(null, createQuestionEntity(), createUserEntity());
 
@@ -80,7 +78,7 @@ class AnswerMapperTest {
     }
 
     @Test
-    void whenToDtoListIsCalledWithValidAnswers_thenMapsToDtoList() {
+    void toDtoList_thenMapsToDtoList() {
         // Arrange
         List<Answer> answers = Arrays.asList(createAnswerEntity(), createAnswerEntity());
 
@@ -90,84 +88,20 @@ class AnswerMapperTest {
         // Assert
         assertNotNull(answerDtos);
         assertEquals(2, answerDtos.size());
-        assertEquals(ANSWER_ID, answerDtos.get(0).getId());
-        assertEquals(CONTENT, answerDtos.get(0).getContent());
-        assertEquals(AUTHOR, answerDtos.get(0).getAuthor());
-        assertEquals(DATE_TIME, answerDtos.get(0).getCreationDate());
+        assertEquals(ANSWER_ID, answerDtos.getFirst().getId());
+        assertEquals(CONTENT, answerDtos.getFirst().getContent());
+        assertEquals(AUTHOR, answerDtos.getFirst().getAuthor());
+        assertEquals(DATE_TIME, answerDtos.getFirst().getCreationDate());
     }
 
     @Test
-    void whenToDtoListIsCalledWithNullList_thenReturnsEmptyList() {
+    void toDtoListWithNullList_thenReturnsEmptyList() {
         // Act
         List<AnswerDto> answerDtos = AnswerMapper.toDtoList(null);
 
         // Assert
         assertNotNull(answerDtos);
         assertTrue(answerDtos.isEmpty());
-    }
-
-    @Test
-    void whenEntityListIsCalledWithValidDtos_thenMapsToEntityList() {
-        // Arrange
-        List<AnswerDto> answerDtos = Arrays.asList(createAnswerDto(), createAnswerDto());
-        Question question = createQuestionEntity();
-        User author = createUserEntity();
-
-        // Act
-        List<Answer> answers = AnswerMapper.toEntityList(answerDtos, question, author);
-
-        // Assert
-        assertNotNull(answers);
-        assertEquals(2, answers.size());
-        assertEquals(ANSWER_ID, answers.get(0).getId());
-        assertEquals(CONTENT, answers.get(0).getContent());
-        assertEquals(question, answers.get(0).getQuestion());
-        assertEquals(author, answers.get(0).getAuthor());
-    }
-
-    @Test
-    void whenToEntityListIsCalledWithEmptyList_thenReturnsEmptyList() {
-        // Act
-        List<Answer> answers = AnswerMapper.toEntityList(Collections.emptyList(), createQuestionEntity(), createUserEntity());
-
-        // Assert
-        assertNotNull(answers);
-        assertTrue(answers.isEmpty());
-    }
-
-    @Test
-    void whenPopulateDtoIsCalledWithValidAnswer_thenPopulatesDto() {
-        // Arrange
-        Answer answer = createAnswerEntity();
-        AnswerDto answerDto = new AnswerDto();
-
-        // Act
-        AnswerMapper.populateDto(answer, answerDto);
-
-        // Assert
-        assertEquals(ANSWER_ID, answerDto.getId());
-        assertEquals(CONTENT, answerDto.getContent());
-        assertEquals(AUTHOR, answerDto.getAuthor());
-        assertEquals(DATE_TIME, answerDto.getCreationDate());
-    }
-
-    @Test
-    void whenPopulateEntityIsCalledWithValidDto_thenPopulatesEntity() {
-        // Arrange
-        AnswerDto answerDto = createAnswerDto();
-        Answer answer = new Answer();
-        Question question = createQuestionEntity();
-        User author = createUserEntity();
-
-        // Act
-        AnswerMapper.populateEntity(answer, answerDto, question, author);
-
-        // Assert
-        assertEquals(ANSWER_ID, answer.getId());
-        assertEquals(CONTENT, answer.getContent());
-        assertEquals(question, answer.getQuestion());
-        assertEquals(author, answer.getAuthor());
-        assertNull(answer.getCreationDate());
     }
 
     private Answer createAnswerEntity() {

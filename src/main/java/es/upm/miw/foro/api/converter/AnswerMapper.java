@@ -14,12 +14,6 @@ public class AnswerMapper {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    /**
-     * Converts an Answer entity to an AnswerDto.
-     *
-     * @param answer the Answer entity to convert
-     * @return the corresponding AnswerDto, or null if the input is null
-     */
     public static AnswerDto toAnswerDto(Answer answer) {
         if (answer == null) {
             return null;
@@ -29,12 +23,6 @@ public class AnswerMapper {
         return answerDto;
     }
 
-    /**
-     * Converts an AnswerDto to an entity Answer.
-     *
-     * @param answerDto the AnswerDto to convert
-     * @return the corresponding Answer, or null if the input is null
-     */
     public static Answer toEntity(AnswerDto answerDto, Question question, User author) {
         if (answerDto == null) {
             return null;
