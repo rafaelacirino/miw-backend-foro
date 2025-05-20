@@ -24,7 +24,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -488,7 +487,7 @@ class QuestionServiceTest {
     void testGetMyQuestions_success() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-        LocalDate fromDate = LocalDate.now().minusDays(10);
+        LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
         when(questionRepository.findMyQuestions(EMAIL, TITLE, fromDate, pageable)).thenReturn(questionPage);
 
@@ -508,7 +507,7 @@ class QuestionServiceTest {
     void testGetMyQuestions_unexpectedException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-        LocalDate fromDate = LocalDate.now().minusDays(10);
+        LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
         when(questionRepository.findMyQuestions(EMAIL, TITLE, fromDate, pageable)).thenThrow(new RuntimeException("Unexpected error"));
 
         // Act & Assert

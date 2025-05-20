@@ -17,10 +17,13 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,9 +50,9 @@ public class AnswerServiceImpl implements AnswerService {
     public AnswerDto createAnswer(Long questionId, AnswerDto answerDto) {
         try {
             validateAnswerDto(answerDto);
-            System.out.println("Validating user...");
+            log.info("Validating user...");
             User author = userService.getAuthenticatedUser();
-            System.out.println("Validate user...");
+            log.info("Validate user...");
             Question question = questionRepository.findById(questionId)
                     .orElseThrow(() -> new ServiceException("Question not found"));
 
@@ -57,7 +60,7 @@ public class AnswerServiceImpl implements AnswerService {
             Answer savedAnswer = answerRepository.save(answer);
 
             if (!question.getAuthor().getId().equals(author.getId())) {
-                System.out.println("Sending notification...");
+                log.info("Sending notification...");
                 notificationService.notifyNewAnswer(question.getAuthor(), question, savedAnswer);
             }
 
@@ -86,6 +89,21 @@ public class AnswerServiceImpl implements AnswerService {
         } catch (Exception e) {
             throw new ServiceException("Unexpected error fetching answers", e);
         }
+    }
+
+    @Override
+    public AnswerDto updateAnswer(Long questionId, AnswerDto answerDto) {
+        return null;
+    }
+
+    @Override
+    public Page<AnswerDto> getMyAnswers(String author, String content, LocalDateTime creationDate, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public void deleteAnswer(Long id) {
+
     }
 
     private void validateAnswerDto(AnswerDto dto) {

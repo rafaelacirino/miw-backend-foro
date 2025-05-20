@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface QuestionService {
 
@@ -23,7 +23,7 @@ public interface QuestionService {
 
     boolean isQuestionAuthor(Long questionId, String username);
 
-    Page<QuestionDto> getMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable);
+    Page<QuestionDto> getMyQuestions(String email, String title, LocalDateTime fromDate, Pageable pageable);
 
     void registerView(Long questionId, HttpServletRequest request);
 }

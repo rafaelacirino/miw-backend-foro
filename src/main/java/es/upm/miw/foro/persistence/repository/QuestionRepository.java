@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -31,7 +31,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @EntityGraph(attributePaths = {"author", "answers", "answers.author"})
     Optional<Question> findById(Long id);
 
-    default Page<Question> findMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable) {
+    default Page<Question> findMyQuestions(String email, String title, LocalDateTime fromDate, Pageable pageable) {
         return findAll(
                 Specification.where(QuestionSpecification.findByAuthorEmail(email))
                         .and(QuestionSpecification.titleContains(title))

@@ -4,7 +4,7 @@ import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.util.ApiPath;
-import es.upm.miw.foro.util.StatusMsg;
+import es.upm.miw.foro.util.MessageUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -15,14 +15,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @ToString
 @Slf4j
@@ -44,7 +43,7 @@ public class QuestionController {
         try {
             return new ResponseEntity<>(questionService.createQuestion(questionDto),HttpStatus.CREATED);
         } catch (ServiceException e) {
-            if (e.getMessage().contains(StatusMsg.UNAUTHORIZED)) {
+            if (e.getMessage().contains(MessageUtil.UNAUTHORIZED)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -116,7 +115,7 @@ public class QuestionController {
             QuestionDto updateQuestion = questionService.updateQuestion(id, questionDto);
             return ResponseEntity.ok(updateQuestion);
         } catch (ServiceException e) {
-            if (e.getMessage().contains(StatusMsg.UNAUTHORIZED)) {
+            if (e.getMessage().contains(MessageUtil.UNAUTHORIZED)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -133,7 +132,7 @@ public class QuestionController {
             questionService.deleteQuestion(id);
             return ResponseEntity.noContent().build();
         } catch (ServiceException e) {
-            if (e.getMessage().contains(StatusMsg.UNAUTHORIZED) || e.getMessage().contains("authorized")) {
+            if (e.getMessage().contains(MessageUtil.UNAUTHORIZED) || e.getMessage().contains("authorized")) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -149,7 +148,7 @@ public class QuestionController {
     public ResponseEntity<Page<QuestionDto>> getMyQuestions(
             Authentication authentication,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) LocalDateTime fromDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "creationDate") String sortBy,

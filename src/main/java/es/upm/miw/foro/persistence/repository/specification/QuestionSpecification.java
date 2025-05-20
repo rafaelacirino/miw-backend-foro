@@ -3,7 +3,7 @@ package es.upm.miw.foro.persistence.repository.specification;
 import es.upm.miw.foro.persistence.model.Question;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class QuestionSpecification {
 
@@ -18,10 +18,10 @@ public class QuestionSpecification {
                         cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
     }
 
-    public static Specification<Question> createdAfter(LocalDate fromDate) {
+    public static Specification<Question> createdAfter(LocalDateTime fromDate) {
         return (root, query, cb) ->
                 fromDate == null ?
                         cb.conjunction() :
-                        cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate.atStartOfDay());
+                        cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate);
     }
 }

@@ -4,7 +4,7 @@ import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.QuestionService;
-import es.upm.miw.foro.util.StatusMsg;
+import es.upm.miw.foro.util.MessageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +38,7 @@ class QuestionControllerTest {
     private static final Long QUESTION_ID = 1L;
     private static final String TITLE = "Question title";
     private static final String DESCRIPTION = "Question description";
-    private static final LocalDate CREATION_DATE = LocalDate.now();
+    private static final LocalDateTime CREATION_DATE = LocalDateTime.now();
     private static final String USER_EMAIL = "user@email.com";
     private static final String UNEXPECTED_ERROR = "Unexpected error";
 
@@ -291,7 +291,7 @@ class QuestionControllerTest {
         // Arrange
         QuestionDto dto = new QuestionDto();
         when(questionService.updateQuestion(anyLong(), any(QuestionDto.class)))
-                .thenThrow(new ServiceException(StatusMsg.UNAUTHORIZED));
+                .thenThrow(new ServiceException(MessageUtil.UNAUTHORIZED));
 
         // Act
         ResponseEntity<QuestionDto> response = questionController.updateQuestion(QUESTION_ID, dto);
@@ -345,7 +345,7 @@ class QuestionControllerTest {
     @Test
     void testDeleteQuestionForbidden() {
         // Arrange
-        doThrow(new ServiceException(StatusMsg.UNAUTHORIZED))
+        doThrow(new ServiceException(MessageUtil.UNAUTHORIZED))
                 .when(questionService).deleteQuestion(anyLong());
 
         // Act
@@ -391,7 +391,7 @@ class QuestionControllerTest {
         List<QuestionDto> questions = Collections.singletonList(new QuestionDto());
         Page<QuestionDto> page = new PageImpl<>(questions);
 
-        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDate.class), any(Pageable.class)))
+        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDateTime.class), any(Pageable.class)))
                                                                                                     .thenReturn(page);
 
         // Act
@@ -409,7 +409,7 @@ class QuestionControllerTest {
     @Test
     void testGetMyQuestionsInternalError() {
         // Arrange
-        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDate.class), any(Pageable.class)))
+        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDateTime.class), any(Pageable.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Act

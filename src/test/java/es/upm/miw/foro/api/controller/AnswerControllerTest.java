@@ -4,7 +4,7 @@ import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.AnswerDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.AnswerService;
-import es.upm.miw.foro.util.StatusMsg;
+import es.upm.miw.foro.util.MessageUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -64,7 +64,7 @@ class AnswerControllerTest {
     void testCreateAnswerUnauthorized() {
         // Arrange
         when(answerService.createAnswer(anyLong(), any(AnswerDto.class)))
-                .thenThrow(new ServiceException(StatusMsg.UNAUTHORIZED));
+                .thenThrow(new ServiceException(MessageUtil.UNAUTHORIZED));
 
         // Act
         ResponseEntity<AnswerDto> response = answerController.createAnswer(questionId, answerDto);
@@ -115,7 +115,7 @@ class AnswerControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        assertEquals(answerDto, response.getBody().getFirst());
+        assertEquals(answerDto, response.getBody().get(0));
         verify(answerService, times(1)).getAnswersByQuestionId(questionId);
     }
 

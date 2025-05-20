@@ -4,7 +4,7 @@ import es.upm.miw.foro.api.dto.AnswerDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.AnswerService;
 import es.upm.miw.foro.util.ApiPath;
-import es.upm.miw.foro.util.StatusMsg;
+import es.upm.miw.foro.util.MessageUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.ToString;
@@ -38,7 +38,7 @@ public class AnswerController {
         try {
             return new ResponseEntity<>(answerService.createAnswer(questionId, answerDto), HttpStatus.CREATED);
         } catch (ServiceException e) {
-            if (e.getMessage().contains(StatusMsg.UNAUTHORIZED)) {
+            if (e.getMessage().contains(MessageUtil.UNAUTHORIZED)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
