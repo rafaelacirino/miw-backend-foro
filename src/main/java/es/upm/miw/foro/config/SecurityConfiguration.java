@@ -85,6 +85,7 @@ public class SecurityConfiguration {
                                 ApiPath.ACCOUNT_RESET_PASSWORD
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, ApiPath.ANSWERS).permitAll()
+                        .requestMatchers("/ws-notifications/**").permitAll()
                         .requestMatchers(ApiPath.QUESTION_CREATE).hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )

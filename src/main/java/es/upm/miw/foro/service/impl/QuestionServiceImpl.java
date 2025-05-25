@@ -78,20 +78,30 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionDto> getQuestions(String title, Pageable pageable) {
+    public Page<QuestionDto> getQuestions(String title, Pageable pageable, boolean unanswered) {
         try {
-            log.info("Fetching questions with title: {}, pageable: {}", title, pageable);
             Page<Question> questionPage;
+
             if (title != null && !title.isBlank()) {
-                questionPage = questionRepository.findByTitleContainingIgnoreCase(title, pageable);
+                questionPage = unanswered
+                        ? questionRepository.findByTitleContainingIgnoreCaseAndAnswersEmpty(title, pageable)
+                        : questionRepository.findByTitleContainingIgnoreCase(title, pageable);
             } else {
-                questionPage = questionRepository.findAll(pageable);
+                questionPage = unanswered
+                        ? questionRepository.findByAnswersEmpty(pageable)
+                        : questionRepository.findAll(pageable);
             }
-            questionPage.forEach(question ->
-                Hibernate.initialize(question.getAuthor()));
+
+            questionPage.forEach(question -> {
+                Hibernate.initialize(question.getAuthor());
+                if (question.getAnswers() != null) {
+                    Hibernate.initialize(question.getAnswers());
+                }
+            });
+
             return questionPage.map(QuestionMapper::toQuestionDto);
         } catch (DataAccessException exception) {
-            log.error("Error while getting questions", exception);
+            log.error("Error while getting filtered questions", exception);
             throw new RepositoryException("Error while getting questions", exception);
         }
     }

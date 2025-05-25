@@ -221,13 +221,13 @@ class QuestionServiceTest {
         when(questionRepository.findByTitleContainingIgnoreCase(TITLE, pageable)).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(TITLE, pageable);
+        Page<QuestionDto> result = questionService.getQuestions(TITLE, pageable, false);
 
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals(QUESTION_ID, result.getContent().get(0).getId());
-        assertEquals(TITLE, result.getContent().get(0).getTitle());
+        assertEquals(QUESTION_ID, result.getContent().getFirst().getId());
+        assertEquals(TITLE, result.getContent().getFirst().getTitle());
 
         // Verify
         verify(questionRepository, times(1)).findByTitleContainingIgnoreCase(TITLE, pageable);
@@ -242,12 +242,12 @@ class QuestionServiceTest {
         when(questionRepository.findAll(pageable)).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(null, pageable);
+        Page<QuestionDto> result = questionService.getQuestions(null, pageable, false);
 
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals(QUESTION_ID, result.getContent().get(0).getId());
+        assertEquals(QUESTION_ID, result.getContent().getFirst().getId());
 
         // Verify
         verify(questionRepository, times(1)).findAll(pageable);
@@ -261,7 +261,7 @@ class QuestionServiceTest {
         when(questionRepository.findAll(pageable)).thenThrow(new DataAccessException("DB error") {});
 
         // Act & Assert
-        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, pageable));
+        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, pageable, false));
         assertEquals("Error while getting questions", exception.getMessage());
 
         // Verify
