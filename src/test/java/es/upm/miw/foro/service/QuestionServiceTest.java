@@ -221,7 +221,7 @@ class QuestionServiceTest {
         when(questionRepository.findByTitleContainingIgnoreCase(TITLE, pageable)).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(TITLE, pageable, false);
+        Page<QuestionDto> result = questionService.getQuestions(TITLE, false, pageable);
 
         // Assert
         assertNotNull(result);
@@ -242,7 +242,7 @@ class QuestionServiceTest {
         when(questionRepository.findAll(pageable)).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(null, pageable, false);
+        Page<QuestionDto> result = questionService.getQuestions(null, false, pageable);
 
         // Assert
         assertNotNull(result);
@@ -261,7 +261,7 @@ class QuestionServiceTest {
         when(questionRepository.findAll(pageable)).thenThrow(new DataAccessException("DB error") {});
 
         // Act & Assert
-        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, pageable, false));
+        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, false, pageable));
         assertEquals("Error while getting questions", exception.getMessage());
 
         // Verify

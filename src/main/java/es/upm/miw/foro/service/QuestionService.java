@@ -13,7 +13,7 @@ public interface QuestionService {
 
     QuestionDto getQuestionById(Long id);
 
-    Page<QuestionDto> getQuestions(String title, Pageable pageable, boolean unanswered);
+    Page<QuestionDto> getQuestions(String title, boolean unanswered, Pageable pageable);
 
     Page<QuestionDto> searchQuestions(String query, Pageable pageable);
 

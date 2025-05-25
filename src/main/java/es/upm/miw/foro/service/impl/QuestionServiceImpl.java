@@ -83,7 +83,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionDto> getQuestions(String title, Pageable pageable, boolean unanswered) {
+    public Page<QuestionDto> getQuestions(String title, boolean unanswered, Pageable pageable) {
         try {
             Page<Question> questionPage;
 

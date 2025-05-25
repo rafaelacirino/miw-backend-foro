@@ -90,15 +90,15 @@ public class QuestionController {
     @GetMapping
     public ResponseEntity<Page<QuestionDto>> getQuestions(
             @RequestParam(required = false) String title,
+            @RequestParam(required = false) Boolean unanswered,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "creationDate") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam(required = false) Boolean unanswered) {
+            @RequestParam(defaultValue = "asc") String sortDirection) {
 
        try {
            Pageable pageable = PageRequest.of(page, size, "desc".equalsIgnoreCase(sortDirection) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending());
-           Page<QuestionDto> questionPage = questionService.getQuestions(title, pageable, unanswered);
+           Page<QuestionDto> questionPage = questionService.getQuestions(title, unanswered, pageable);
            return ResponseEntity.ok(questionPage);
        } catch (ServiceException e) {
            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
