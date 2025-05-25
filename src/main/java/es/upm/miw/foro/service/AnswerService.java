@@ -13,9 +13,11 @@ public interface AnswerService {
 
     List<AnswerDto> getAnswersByQuestionId(Long questionId);
 
-    AnswerDto updateAnswer(Long questionId, AnswerDto answerDto);
+    AnswerDto updateAnswer(Long id, AnswerDto answerDto);
 
-    Page<AnswerDto> getMyAnswers(String author, String content, LocalDateTime creationDate, Pageable pageable);
+    Page<AnswerDto> getMyAnswers(String email, String question, String content, LocalDateTime creationDate, Pageable pageable);
 
     void deleteAnswer(Long id);
+
+    boolean isAnswerAuthor(Long answerId, String username);
 }

@@ -10,17 +10,23 @@ import jakarta.validation.Valid;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ToString
 @Slf4j
 @RestController
-@RequestMapping(ApiPath.QUESTIONS)
+@RequestMapping(ApiPath.ANSWERS)
 public class AnswerController {
 
     private final AnswerService answerService;
@@ -30,7 +36,7 @@ public class AnswerController {
         this.answerService = answerService;
     }
 
-    @PostMapping("/{questionId}/answers")
+    @PostMapping("/{questionId}")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     public ResponseEntity<AnswerDto> createAnswer(@PathVariable Long questionId,
@@ -47,7 +53,7 @@ public class AnswerController {
         }
     }
 
-    @GetMapping("/{questionId}/answers")
+    @GetMapping("/{questionId}")
     public ResponseEntity<List<AnswerDto>> getAnswersByQuestion(@PathVariable Long questionId) {
         try {
             List<AnswerDto> answers = answerService.getAnswersByQuestionId(questionId);
@@ -56,6 +62,67 @@ public class AnswerController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/myAnswers")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
+    public ResponseEntity<Page<AnswerDto>> getMyAnswers(
+            Authentication authentication,
+            @RequestParam(required = false) String question,
+            @RequestParam(required = false) String content,
+            @RequestParam(required = false) LocalDateTime creationDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "creationDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+
+        try {
+            String email = authentication.getName();
+            Pageable pageable = PageRequest.of(page, size, "desc".equalsIgnoreCase(sortDirection) ?
+                                                            Sort.by(sortBy).descending() : Sort.by(sortBy).ascending());
+            Page<AnswerDto> myAnswers = answerService.getMyAnswers(email, question, content, creationDate, pageable);
+            return ResponseEntity.ok(myAnswers);
+        } catch (Exception e) {
+            log.error("Error getting questions for current user", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
+    public ResponseEntity<AnswerDto> updateAnswer(@PathVariable Long id,
+                                                  @RequestBody AnswerDto answerDto) {
+        try {
+            AnswerDto updatedAnswer = answerService.updateAnswer(id, answerDto);
+            return ResponseEntity.ok(updatedAnswer);
+        } catch (ServiceException e) {
+            log.warn("ServiceException: {}", e.getMessage());
+            if (e.getMessage().contains(MessageUtil.UNAUTHORIZED)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('ADMIN') or @answerServiceImpl.isAnswerAuthor(#id, authentication.name)")
+    public ResponseEntity<Void> deleteAnswer(@PathVariable Long id) {
+        try {
+            answerService.deleteAnswer(id);
+            return ResponseEntity.noContent().build();
+        } catch (ServiceException e) {
+            if (e.getMessage().contains(MessageUtil.UNAUTHORIZED) || e.getMessage().contains("authorized")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }

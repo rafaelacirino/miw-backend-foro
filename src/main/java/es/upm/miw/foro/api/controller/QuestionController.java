@@ -142,7 +142,7 @@ public class QuestionController {
         }
     }
 
-    @GetMapping("/my")
+    @GetMapping("/myQuestions")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
     public ResponseEntity<Page<QuestionDto>> getMyQuestions(

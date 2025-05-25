@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -489,7 +490,7 @@ class QuestionServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.findMyQuestions(EMAIL, TITLE, fromDate, pageable)).thenReturn(questionPage);
+        when(questionRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(questionPage);
 
         // Act
         Page<QuestionDto> result = questionService.getMyQuestions(EMAIL, TITLE, fromDate, pageable);
@@ -500,7 +501,7 @@ class QuestionServiceTest {
         assertEquals(QUESTION_ID, result.getContent().get(0).getId());
 
         // Verify
-        verify(questionRepository, times(1)).findMyQuestions(EMAIL, TITLE, fromDate, pageable);
+        verify(questionRepository, times(1)).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test
@@ -508,14 +509,15 @@ class QuestionServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
-        when(questionRepository.findMyQuestions(EMAIL, TITLE, fromDate, pageable)).thenThrow(new RuntimeException("Unexpected error"));
+        when(questionRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenThrow(new RuntimeException("Unexpected error"));
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.getMyQuestions(EMAIL, TITLE, fromDate, pageable));
         assertEquals("Error retrieving user questions with filters", exception.getMessage());
 
         // Verify
-        verify(questionRepository, times(1)).findMyQuestions(EMAIL, TITLE, fromDate, pageable);
+        verify(questionRepository, times(1)).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test

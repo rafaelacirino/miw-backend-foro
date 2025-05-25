@@ -8,6 +8,7 @@ import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
+import es.upm.miw.foro.persistence.repository.specification.QuestionSpecification;
 import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.service.UserService;
 import es.upm.miw.foro.util.MessageUtil;
@@ -20,6 +21,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -181,7 +183,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional(readOnly = true)
     public Page<QuestionDto> getMyQuestions(String email, String title, LocalDateTime fromDate, Pageable pageable) {
         try {
-            Page<Question> page = questionRepository.findMyQuestions(email, title, fromDate, pageable);
+            Specification<Question> spec = QuestionSpecification.buildQuestionSpecification(email, title, fromDate);
+            Page<Question> page = questionRepository.findAll(spec, pageable);
             return page.map(QuestionMapper::toQuestionDto);
         } catch (ServiceException e) {
             throw e;
