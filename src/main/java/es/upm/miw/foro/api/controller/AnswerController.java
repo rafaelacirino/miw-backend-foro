@@ -76,7 +76,7 @@ public class AnswerController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "creationDate") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection) {
+            @RequestParam(defaultValue = "desc") String sortDirection) {
 
         try {
             String email = authentication.getName();
@@ -99,7 +99,6 @@ public class AnswerController {
             AnswerDto updatedAnswer = answerService.updateAnswer(id, answerDto);
             return ResponseEntity.ok(updatedAnswer);
         } catch (ServiceException e) {
-            log.warn("ServiceException: {}", e.getMessage());
             if (e.getMessage().contains(MessageUtil.UNAUTHORIZED)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
