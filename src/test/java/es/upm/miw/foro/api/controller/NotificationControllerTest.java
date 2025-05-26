@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -33,51 +34,58 @@ class NotificationControllerTest {
 
     private User testUser;
     private NotificationDto notificationDto;
+    private static final Long ID = 1L;
+    private static final String USER_EMAIL = "user@email.com";
 
     @BeforeEach
     void setUp() {
+        testUser = new User();
+        testUser.setId(ID);
+        testUser.setEmail(USER_EMAIL);
         notificationDto = NotificationDto.builder()
-                .id(1L)
-                .userId(1L)
+                .id(ID)
+                .userId(ID)
                 .message("Your question has been answered")
-                .questionId(1L)
-                .answerId(1L)
+                .questionId(ID)
+                .answerId(ID)
                 .type(NotificationType.QUESTION_REPLIED)
                 .read(false)
                 .creationDate(LocalDateTime.now())
                 .build();
 
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn(USER_EMAIL);
         when(userService.getAuthenticatedUser()).thenReturn(testUser);
     }
 
-//    @Test
-//    void testGetNotifications() {
-//        // Arrange
-//        List<NotificationDto> notifications = List.of(notificationDto);
-//        when(notificationService.getUserNotifications(anyLong())).thenReturn(notifications);
-//
-//        // Act
-//        List<NotificationDto> result = notificationController.getNotifications();
-//
-//        // Assert
-//        assertNotNull(result);
-//        assertEquals(1, result.size());
-//        assertEquals(notificationDto, result.getFirst());
-//        verify(notificationService, times(1)).getUserNotifications(testUser.getId());
-//    }
-//
-//    @Test
-//    void testGetNotificationsEmptyList() {
-//        // Arrange
-//        when(notificationService.getUserNotifications(anyLong())).thenReturn(Collections.emptyList());
-//
-//        // Act
-//        List<NotificationDto> result = notificationController.getNotifications();
-//
-//        // Assert
-//        assertNotNull(result);
-//        assertTrue(result.isEmpty());
-//    }
+    @Test
+    void testGetNotifications() {
+        // Arrange
+        List<NotificationDto> notifications = List.of(notificationDto);
+        when(notificationService.getUserNotifications(anyLong())).thenReturn(notifications);
+
+        // Act
+        List<NotificationDto> result = notificationController.getNotifications();
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(notificationDto, result.getFirst());
+        verify(notificationService, times(1)).getUserNotifications(testUser.getId());
+    }
+
+    @Test
+    void testGetNotificationsEmptyList() {
+        // Arrange
+        when(notificationService.getUserNotifications(anyLong())).thenReturn(Collections.emptyList());
+
+        // Act
+        List<NotificationDto> result = notificationController.getNotifications();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
 
     @Test
     void testMarkAsRead() {
