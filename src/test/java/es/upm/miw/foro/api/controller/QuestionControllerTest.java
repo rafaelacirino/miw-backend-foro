@@ -4,7 +4,7 @@ import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.QuestionService;
-import es.upm.miw.foro.util.StatusMsg;
+import es.upm.miw.foro.util.MessageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +38,7 @@ class QuestionControllerTest {
     private static final Long QUESTION_ID = 1L;
     private static final String TITLE = "Question title";
     private static final String DESCRIPTION = "Question description";
-    private static final LocalDate CREATION_DATE = LocalDate.now();
+    private static final LocalDateTime CREATION_DATE = LocalDateTime.now();
     private static final String USER_EMAIL = "user@email.com";
     private static final String UNEXPECTED_ERROR = "Unexpected error";
 
@@ -182,17 +182,17 @@ class QuestionControllerTest {
         // Arrange
         Page<QuestionDto> questionPage = new PageImpl<>(List.of(new QuestionDto()));
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        when(questionService.getQuestions(null, pageable, false)).thenReturn(questionPage);
+        when(questionService.getQuestions(null, false, pageable)).thenReturn(questionPage);
 
         // Act
-        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(null, 0, 10,
-                                                                                "id", "asc", false);
+        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(null, false, 0, 10,
+                                                                                "id", "asc");
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, Objects.requireNonNull(response.getBody()).getTotalElements());
         assertNotNull(response.getBody());
-        verify(questionService, times(1)).getQuestions(null, pageable, false);
+        verify(questionService, times(1)).getQuestions(null, false, pageable);
     }
 
     @Test
@@ -203,15 +203,15 @@ class QuestionControllerTest {
         dto.setTitle(TITLE);
         Page<QuestionDto> questionPage = new PageImpl<>(List.of(dto));
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-        when(questionService.getQuestions(null, pageable, false)).thenReturn(questionPage);
+        when(questionService.getQuestions(null, false, pageable)).thenReturn(questionPage);
 
         // Act
-        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(null, 0, 10,
-                                                                                        "id", "desc", false);
+        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(null, false, 0, 10,
+                                                                                        "id", "desc");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, Objects.requireNonNull(response.getBody()).getTotalElements());
         assertNotNull(response.getBody());
-        verify(questionService, times(1)).getQuestions(null, pageable, false);
+        verify(questionService, times(1)).getQuestions(null, false, pageable);
     }
 
     @Test
@@ -222,17 +222,17 @@ class QuestionControllerTest {
         dto.setTitle(TITLE);
         Page<QuestionDto> questionPage = new PageImpl<>(List.of(dto));
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        when(questionService.getQuestions(TITLE, pageable, false)).thenReturn(questionPage);
+        when(questionService.getQuestions(TITLE, false, pageable)).thenReturn(questionPage);
 
         // Act
-        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(TITLE, 0, 10,
-                "id", "asc", false);
+        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(TITLE, false, 0, 10,
+                "id", "asc");
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, Objects.requireNonNull(response.getBody()).getTotalElements());
         assertNotNull(response.getBody());
-        verify(questionService, times(1)).getQuestions(TITLE, pageable, false);
+        verify(questionService, times(1)).getQuestions(TITLE, false, pageable);
     }
 
     @Test
@@ -244,50 +244,50 @@ class QuestionControllerTest {
         Page<QuestionDto> questionPage = new PageImpl<>(List.of(dto));
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
 
-        when(questionService.getQuestions(null, pageable, true)).thenReturn(questionPage);
+        when(questionService.getQuestions(null, true, pageable)).thenReturn(questionPage);
 
         // Act
         ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(
-                null, 0, 10, "id", "asc", true);
+                null, true, 0, 10, "id", "asc");
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, Objects.requireNonNull(response.getBody()).getTotalElements());
         assertNotNull(response.getBody());
-        verify(questionService, times(1)).getQuestions(null, pageable, true);
+        verify(questionService, times(1)).getQuestions(null, true, pageable);
     }
 
     @Test
     void testGetUsersServiceException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        when(questionService.getQuestions(null, pageable, false))
+        when(questionService.getQuestions(null, false, pageable))
                 .thenThrow(new ServiceException("Unauthorized: Only admins can list users"));
 
         // Act
         ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(null,
-                                                                        0, 10, "id", "asc", false);
+                false, 0, 10, "id", "asc");
 
         // Assert
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertNull(response.getBody());
-        verify(questionService, times(1)).getQuestions(null, pageable, false);
+        verify(questionService, times(1)).getQuestions(null, false, pageable );
     }
 
     @Test
     void testGetUsersGenericException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        when(questionService.getQuestions(null, pageable, false))
+        when(questionService.getQuestions(null, false, pageable))
                 .thenThrow(new RuntimeException(UNEXPECTED_ERROR));
 
         // Act
-        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(null, 0, 10, "id", "asc", false);
+        ResponseEntity<Page<QuestionDto>> response = questionController.getQuestions(null, false, 0, 10, "id", "asc");
 
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNull(response.getBody());
-        verify(questionService, times(1)).getQuestions(null, pageable, false);
+        verify(questionService, times(1)).getQuestions(null, false, pageable);
     }
 
     @Test
@@ -313,7 +313,7 @@ class QuestionControllerTest {
         // Arrange
         QuestionDto dto = new QuestionDto();
         when(questionService.updateQuestion(anyLong(), any(QuestionDto.class)))
-                .thenThrow(new ServiceException(StatusMsg.UNAUTHORIZED));
+                .thenThrow(new ServiceException(MessageUtil.UNAUTHORIZED));
 
         // Act
         ResponseEntity<QuestionDto> response = questionController.updateQuestion(QUESTION_ID, dto);
@@ -367,7 +367,7 @@ class QuestionControllerTest {
     @Test
     void testDeleteQuestionForbidden() {
         // Arrange
-        doThrow(new ServiceException(StatusMsg.UNAUTHORIZED))
+        doThrow(new ServiceException(MessageUtil.UNAUTHORIZED))
                 .when(questionService).deleteQuestion(anyLong());
 
         // Act
@@ -413,7 +413,7 @@ class QuestionControllerTest {
         List<QuestionDto> questions = Collections.singletonList(new QuestionDto());
         Page<QuestionDto> page = new PageImpl<>(questions);
 
-        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDate.class), any(Pageable.class)))
+        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDateTime.class), any(Pageable.class)))
                                                                                                     .thenReturn(page);
 
         // Act
@@ -431,7 +431,7 @@ class QuestionControllerTest {
     @Test
     void testGetMyQuestionsInternalError() {
         // Arrange
-        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDate.class), any(Pageable.class)))
+        when(questionService.getMyQuestions(anyString(), anyString(), any(LocalDateTime.class), any(Pageable.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         // Act

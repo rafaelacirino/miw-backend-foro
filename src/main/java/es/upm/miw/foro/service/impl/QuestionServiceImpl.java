@@ -8,8 +8,10 @@ import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
+import es.upm.miw.foro.persistence.repository.specification.QuestionSpecification;
 import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.service.UserService;
+import es.upm.miw.foro.util.MessageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -19,12 +21,15 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,7 +83,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionDto> getQuestions(String title, Pageable pageable, boolean unanswered) {
+    public Page<QuestionDto> getQuestions(String title, boolean unanswered, Pageable pageable) {
         try {
             Page<Question> questionPage;
 
@@ -137,7 +142,7 @@ public class QuestionServiceImpl implements QuestionService {
             User authenticatedUser = userService.getAuthenticatedUser();
 
             Question existingQuestion = questionRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("Question not found with id: " + id));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND + id));
 
             if (!existingQuestion.getAuthor().getId().equals(authenticatedUser.getId())) {
                 throw new ServiceException("You are not authorized to update this question");
@@ -162,7 +167,7 @@ public class QuestionServiceImpl implements QuestionService {
             User authenticatedUser = userService.getAuthenticatedUser();
 
             Question question = questionRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("Question not found with id: " + id));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND + id));
 
             if (!question.getAuthor().getId().equals(authenticatedUser.getId()) && !Role.ADMIN.equals(authenticatedUser.getRole())) {
                 throw new ServiceException("You are not authorized to delete this question");
@@ -180,15 +185,16 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public boolean isQuestionAuthor(Long questionId, String email) {
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new ServiceException("Question not found with id: " + questionId));
+                .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND + questionId));
         return question.getAuthor().getEmail().equals(email);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionDto> getMyQuestions(String email, String title, LocalDate fromDate, Pageable pageable) {
+    public Page<QuestionDto> getMyQuestions(String email, String title, LocalDateTime fromDate, Pageable pageable) {
         try {
-            Page<Question> page = questionRepository.findMyQuestions(email, title, fromDate, pageable);
+            Specification<Question> spec = QuestionSpecification.buildQuestionSpecification(email, title, fromDate);
+            Page<Question> page = questionRepository.findAll(spec, pageable);
             return page.map(QuestionMapper::toQuestionDto);
         } catch (ServiceException e) {
             throw e;

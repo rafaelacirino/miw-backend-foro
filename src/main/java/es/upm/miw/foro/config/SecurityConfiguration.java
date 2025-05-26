@@ -80,6 +80,9 @@ public class SecurityConfiguration {
                                 ApiPath.QUESTION_MY,
                                 ApiPath.QUESTION_VIEWS,
 
+                                ApiPath.ANSWERS,
+                                ApiPath.ANSWERS_BY_QUESTION_ID,
+
                                 ApiPath.ACTUATOR,
                                 ApiPath.ACCOUNT_FORGOT_PASSWORD,
                                 ApiPath.ACCOUNT_RESET_PASSWORD
