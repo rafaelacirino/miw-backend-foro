@@ -16,11 +16,12 @@ public class ApiPath {
     public static final String QUESTIONS = "/questions";
     public static final String QUESTION_ID = QUESTIONS + "/{id}";
     public static final String QUESTION_SEARCH = QUESTIONS + "/search";
-    public static final String QUESTION_CREATE = QUESTIONS + "/create";
     public static final String QUESTION_MY = QUESTIONS + "/my";
     public static final String QUESTION_VIEWS = QUESTION_ID + "/views";
 
     public static final String ANSWERS = QUESTIONS + "/*/answers";
+
+    public static final String TAGS = "/tags";
 
     public static final String NOTIFICATIONS = "/notifications";
     public static final String TOPIC_NOTIFICATIONS = "/topic/notifications/";

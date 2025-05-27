@@ -80,13 +80,14 @@ public class SecurityConfiguration {
                                 ApiPath.QUESTION_MY,
                                 ApiPath.QUESTION_VIEWS,
 
+                                ApiPath.TAGS,
+
                                 ApiPath.ACTUATOR,
                                 ApiPath.ACCOUNT_FORGOT_PASSWORD,
                                 ApiPath.ACCOUNT_RESET_PASSWORD
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, ApiPath.ANSWERS).permitAll()
                         .requestMatchers("/ws-notifications/**").permitAll()
-                        .requestMatchers(ApiPath.QUESTION_CREATE).hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
