@@ -80,6 +80,9 @@ public class SecurityConfiguration {
                                 ApiPath.QUESTION_MY,
                                 ApiPath.QUESTION_VIEWS,
 
+                                ApiPath.ANSWERS,
+                                ApiPath.ANSWERS_BY_QUESTION_ID,
+
                                 ApiPath.TAGS,
 
                                 ApiPath.ACTUATOR,
@@ -88,6 +91,7 @@ public class SecurityConfiguration {
                                 ).permitAll()
                         .requestMatchers(HttpMethod.GET, ApiPath.ANSWERS).permitAll()
                         .requestMatchers("/ws-notifications/**").permitAll()
+                        .requestMatchers(ApiPath.QUESTION_CREATE).hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider()).addFilterBefore(

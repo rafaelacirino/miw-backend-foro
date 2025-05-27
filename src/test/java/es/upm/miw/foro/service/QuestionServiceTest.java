@@ -22,9 +22,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -221,7 +221,7 @@ class QuestionServiceTest {
         when(questionRepository.findByTitleContainingIgnoreCase(TITLE, pageable)).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(TITLE, pageable, false);
+        Page<QuestionDto> result = questionService.getQuestions(TITLE, false, pageable);
 
         // Assert
         assertNotNull(result);
@@ -242,7 +242,7 @@ class QuestionServiceTest {
         when(questionRepository.findAll(pageable)).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(null, pageable, false);
+        Page<QuestionDto> result = questionService.getQuestions(null, false, pageable);
 
         // Assert
         assertNotNull(result);
@@ -261,7 +261,7 @@ class QuestionServiceTest {
         when(questionRepository.findAll(pageable)).thenThrow(new DataAccessException("DB error") {});
 
         // Act & Assert
-        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, pageable, false));
+        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, false, pageable));
         assertEquals("Error while getting questions", exception.getMessage());
 
         // Verify
@@ -488,9 +488,9 @@ class QuestionServiceTest {
     void testGetMyQuestions_success() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-        LocalDate fromDate = LocalDate.now().minusDays(10);
+        LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.findMyQuestions(EMAIL, TITLE, fromDate, pageable)).thenReturn(questionPage);
+        when(questionRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(questionPage);
 
         // Act
         Page<QuestionDto> result = questionService.getMyQuestions(EMAIL, TITLE, fromDate, pageable);
@@ -501,22 +501,23 @@ class QuestionServiceTest {
         assertEquals(QUESTION_ID, result.getContent().get(0).getId());
 
         // Verify
-        verify(questionRepository, times(1)).findMyQuestions(EMAIL, TITLE, fromDate, pageable);
+        verify(questionRepository, times(1)).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test
     void testGetMyQuestions_unexpectedException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-        LocalDate fromDate = LocalDate.now().minusDays(10);
-        when(questionRepository.findMyQuestions(EMAIL, TITLE, fromDate, pageable)).thenThrow(new RuntimeException("Unexpected error"));
+        LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
+        when(questionRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenThrow(new RuntimeException("Unexpected error"));
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.getMyQuestions(EMAIL, TITLE, fromDate, pageable));
         assertEquals("Error retrieving user questions with filters", exception.getMessage());
 
         // Verify
-        verify(questionRepository, times(1)).findMyQuestions(EMAIL, TITLE, fromDate, pageable);
+        verify(questionRepository, times(1)).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test

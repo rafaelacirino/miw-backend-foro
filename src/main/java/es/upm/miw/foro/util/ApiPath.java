@@ -19,7 +19,8 @@ public class ApiPath {
     public static final String QUESTION_MY = QUESTIONS + "/my";
     public static final String QUESTION_VIEWS = QUESTION_ID + "/views";
 
-    public static final String ANSWERS = QUESTIONS + "/*/answers";
+    public static final String ANSWERS = "/answers";
+    public static final String ANSWERS_BY_QUESTION_ID = ANSWERS + "/{id}";
 
     public static final String TAGS = "/tags";
 

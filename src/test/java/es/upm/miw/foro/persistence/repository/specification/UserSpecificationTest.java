@@ -37,6 +37,8 @@ class UserSpecificationTest {
     private static final Long USER_ID = 1L;
     private static final String FIRST_NAME = "UserName";
     private static final String LAST_NAME = "UserLastName";
+    public static final String USERNAME = "userName";
+    public static final String PHONE = "phone";
     private static final String EMAIL = "email@email.com";
     private static final String PASSWORD = "password";
     private static final LocalDateTime REGISTERED_DATE = LocalDateTime.now();
@@ -54,6 +56,8 @@ class UserSpecificationTest {
         dto.setId(USER_ID);
         dto.setFirstName(FIRST_NAME);
         dto.setLastName(LAST_NAME);
+        dto.setUserName(USERNAME);
+        dto.setPhone(PHONE);
         dto.setEmail(EMAIL);
         dto.setPassword(PASSWORD);
         dto.setRole(Role.MEMBER);
@@ -77,6 +81,8 @@ class UserSpecificationTest {
         dto.setId(USER_ID);
         dto.setFirstName(FIRST_NAME);
         dto.setLastName(null);
+        dto.setUserName(USERNAME);
+        dto.setPhone(null);
         dto.setEmail(null);
         dto.setPassword(null);
         dto.setRole(null);
