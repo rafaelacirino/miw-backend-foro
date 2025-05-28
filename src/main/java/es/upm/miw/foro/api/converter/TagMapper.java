@@ -1,12 +1,10 @@
 package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.TagDto;
-import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.Tag;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -66,19 +64,10 @@ public class TagMapper {
         }
         dto.setId(tag.getId());
         dto.setName(tag.getName());
-
-        dto.setQuestions(QuestionMapper.toDtoList(tag.getQuestions()));
     }
 
     private static void populateEntity(Tag tag, TagDto tagDto) {
         tag.setId(tagDto.getId());
         tag.setName(tagDto.getName());
-
-        if (tagDto.getQuestions() != null) {
-            List<Question> questions = new ArrayList<>(
-                    QuestionMapper.toEntityList(tagDto.getQuestions(), null)
-            );
-            tag.setQuestions(questions);
-        }
     }
 }

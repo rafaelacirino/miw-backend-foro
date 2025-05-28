@@ -3,13 +3,13 @@ package es.upm.miw.foro.api.converter;
 import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.persistence.model.Answer;
 import es.upm.miw.foro.persistence.model.Question;
+import es.upm.miw.foro.persistence.model.Tag;
 import es.upm.miw.foro.persistence.model.User;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class QuestionMapper {
@@ -30,6 +30,9 @@ public class QuestionMapper {
             return questionDto;
         } catch (ConstraintViolationException e) {
             log.error("DTO validation failed for question {}: {}", question.getId(), e.getMessage());
+            return null;
+        } catch (Exception e) {
+            log.error("Unexpected error mapping question {}: {}", question.getId(), e.getMessage(), e);
             return null;
         }
     }
@@ -87,6 +90,14 @@ public class QuestionMapper {
                         ? AnswerMapper.toDtoList(question.getAnswers())
                         : null
         );
+
+        if (question.getTags() != null) {
+            dto.setTags(question.getTags().stream()
+                    .map(Tag::getName)
+                    .collect(Collectors.toSet()));
+        } else {
+            dto.setTags(Collections.emptySet());
+        }
     }
 
     private static void populateEntity(Question question, QuestionDto questionDto, User questionAuthor) {
@@ -101,5 +112,7 @@ public class QuestionMapper {
             List<Answer> answers = AnswerMapper.toEntityList(questionDto.getAnswers(), question, questionAuthor);
             answers.forEach(question::addAnswer);
         }
+
+        question.setTags(new HashSet<>());
     }
 }

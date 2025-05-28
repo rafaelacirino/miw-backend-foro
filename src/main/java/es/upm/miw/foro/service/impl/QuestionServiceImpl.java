@@ -6,8 +6,10 @@ import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.Role;
+import es.upm.miw.foro.persistence.model.Tag;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
+import es.upm.miw.foro.persistence.repository.TagRepository;
 import es.upm.miw.foro.persistence.repository.specification.QuestionSpecification;
 import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.service.UserService;
@@ -16,10 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -27,8 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,11 +37,14 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionRepository questionRepository;
     private final UserService userService;
+    private final TagRepository tagRepository;
     private final Validator validator;
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, UserService userService, Validator validator) {
+    public QuestionServiceImpl(QuestionRepository questionRepository, UserService userService, TagRepository tagRepository,
+                               Validator validator) {
         this.questionRepository = questionRepository;
         this.userService = userService;
+        this.tagRepository = tagRepository;
         this.validator = validator;
     }
 
@@ -50,9 +52,14 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto createQuestion(QuestionDto questionDto) {
         try {
             validateQuestionDto(questionDto);
+            validateTags(questionDto.getTags());
+
             User author = userService.getAuthenticatedUser();
             questionDto.setAnswers(null);
             Question question = QuestionMapper.toEntity(questionDto, author);
+            Set<Tag> tags = processTags(questionDto.getTags());
+            question.setTags(tags);
+
             Question savedQuestion = questionRepository.save(question);
             return QuestionMapper.toQuestionDto(savedQuestion);
         } catch (DataAccessException exception) {
@@ -65,12 +72,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public QuestionDto getQuestionById(Long id) {
         try {
             Question question = questionRepository.findById(id)
                     .orElseThrow(() -> new ServiceException("Question not found"));
-            Hibernate.initialize(question.getAuthor());
-            Hibernate.initialize(question.getAnswers());
             return QuestionMapper.toQuestionDto(question);
         } catch (DataAccessException e) {
             throw new RepositoryException("Error while retrieving question", e);
@@ -97,13 +103,6 @@ public class QuestionServiceImpl implements QuestionService {
                         : questionRepository.findAll(pageable);
             }
 
-            questionPage.forEach(question -> {
-                Hibernate.initialize(question.getAuthor());
-                if (question.getAnswers() != null) {
-                    Hibernate.initialize(question.getAnswers());
-                }
-            });
-
             return questionPage.map(QuestionMapper::toQuestionDto);
         } catch (DataAccessException exception) {
             log.error("Error while getting filtered questions", exception);
@@ -115,21 +114,14 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional(readOnly = true)
     public Page<QuestionDto> searchQuestions(String query, Pageable pageable) {
         try {
-            Page<Question> questions = questionRepository.searchByTitleOrDescriptionContainingIgnoreCase(
-                    query, pageable);
+            if (query == null || query.trim().isEmpty()) {
+                return Page.empty(pageable);
+            }
 
-            List<Question> combinedResults = new ArrayList<>(questions.getContent());
+            Page<Question> questions = questionRepository
+                    .searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(query.trim(), pageable);
 
-            List<Question> uniqueResults = combinedResults.stream()
-                    .distinct()
-                    .skip(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .toList();
-
-            return new PageImpl<>(
-                    uniqueResults.stream().map(QuestionMapper::toQuestionDto).toList(),
-                    pageable,
-                    questions.getTotalElements());
+            return questions.map(QuestionMapper::toQuestionDto);
         } catch (DataAccessException e) {
             throw new RepositoryException("Error searching questions", e);
         }
@@ -139,6 +131,8 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto updateQuestion(Long id, QuestionDto questionDto) {
         try {
             validateQuestionDto(questionDto);
+            validateTags(questionDto.getTags());
+
             User authenticatedUser = userService.getAuthenticatedUser();
 
             Question existingQuestion = questionRepository.findById(id)
@@ -149,6 +143,9 @@ public class QuestionServiceImpl implements QuestionService {
             }
             existingQuestion.setTitle(questionDto.getTitle());
             existingQuestion.setDescription(questionDto.getDescription());
+
+            Set<Tag> tags = processTags(questionDto.getTags());
+            existingQuestion.setTags(tags);
 
             Question updatedQuestion = questionRepository.save(existingQuestion);
             return QuestionMapper.toQuestionDto(updatedQuestion);
@@ -220,6 +217,33 @@ public class QuestionServiceImpl implements QuestionService {
         question.incrementViewsIfNew(sessionId, userId);
     }
 
+    @Override
+    public Set<Tag> processTags(Set<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return new HashSet<>();
+        }
+
+        Set<Tag> tags = new HashSet<>();
+        for (String name : tagNames) {
+            String normalizedName = name.trim().toLowerCase();
+            Tag tag = tagRepository.findByName(normalizedName)
+                    .orElseGet(() -> createTag(normalizedName));
+            tags.add(tag);
+        }
+        return tags;
+    }
+
+    private Tag createTag(String name) {
+        Tag newTag = new Tag();
+        newTag.setName(name);
+        return tagRepository.save(newTag);
+    }
+
+    private void validateTags(Set<String> tags) {
+        if (tags != null && tags.size() > 5) {
+            throw new ServiceException("Maximum 5 tags allowed per question");
+        }
+    }
 
     private void validateQuestionDto(QuestionDto dto) {
         Set<ConstraintViolation<QuestionDto>> violations = validator.validate(dto);

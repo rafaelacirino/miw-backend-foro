@@ -1,5 +1,6 @@
 package es.upm.miw.foro.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class Tag {
     private String name;
 
     @ManyToMany(mappedBy = "tags")
+    @JsonIgnoreProperties("tags")
     private List<Question> questions = new ArrayList<>();
 
 }

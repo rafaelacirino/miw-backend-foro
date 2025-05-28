@@ -273,7 +273,7 @@ class QuestionServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.searchByTitleOrDescriptionContainingIgnoreCase(TITLE, pageable)).thenReturn(questionPage);
+        when(questionRepository.searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(TITLE, pageable)).thenReturn(questionPage);
 
         // Act
         Page<QuestionDto> result = questionService.searchQuestions(TITLE, pageable);
@@ -284,14 +284,14 @@ class QuestionServiceTest {
         assertEquals(QUESTION_ID, result.getContent().get(0).getId());
 
         // Verify
-        verify(questionRepository, times(1)).searchByTitleOrDescriptionContainingIgnoreCase(TITLE, pageable);
+        verify(questionRepository, times(1)).searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(TITLE, pageable);
     }
 
     @Test
     void testSearchQuestions_dataAccessException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-        when(questionRepository.searchByTitleOrDescriptionContainingIgnoreCase(TITLE, pageable))
+        when(questionRepository.searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(TITLE, pageable))
                 .thenThrow(new DataAccessException("DB error") {});
 
         // Act & Assert
@@ -299,7 +299,7 @@ class QuestionServiceTest {
         assertEquals("Error searching questions", exception.getMessage());
 
         // Verify
-        verify(questionRepository, times(1)).searchByTitleOrDescriptionContainingIgnoreCase(TITLE, pageable);
+        verify(questionRepository, times(1)).searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(TITLE, pageable);
     }
 
     @Test

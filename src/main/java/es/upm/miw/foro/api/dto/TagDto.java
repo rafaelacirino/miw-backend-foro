@@ -9,9 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +24,4 @@ public class TagDto {
     @Schema(description = "Tag name of the question", example = "Bug")
     private String name;
 
-    @Schema(description = "List of questions to the tag")
-    private List<QuestionDto> questions = new ArrayList<>();
 }

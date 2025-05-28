@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -42,6 +44,10 @@ public class QuestionDto {
 
     @Schema(description = "List of answers to the question")
     private List<AnswerDto> answers= new ArrayList<>();
+
+    @Size(max = 5, message = "Maximum 5 tags allowed")
+    @Schema(description = "Set of tag names for the question")
+    private Set<String> tags = new HashSet<>();
 
     @Schema(description = "Views for the question", example = "0")
     private Integer views;

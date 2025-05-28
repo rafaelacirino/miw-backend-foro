@@ -8,25 +8,28 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
+    @EntityGraph(attributePaths = {"author", "tags"})
     Page<Question> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"author", "tags"})
     Page<Question> findByAnswersEmpty(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"author", "tags"})
     Page<Question> findByTitleContainingIgnoreCaseAndAnswersEmpty(String title, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"author", "answers.author", "tags"})
     @Query("""
-    SELECT q FROM Question q
-    WHERE LOWER(q.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(q.description) LIKE LOWER(CONCAT('%', :query, '%'))
+    SELECT DISTINCT q FROM Question q
+    LEFT JOIN q.answers a
+    WHERE LOWER(q.title) LIKE LOWER(CONCAT('%', :query, '%'))
+    OR LOWER(q.description) LIKE LOWER(CONCAT('%', :query, '%'))
+    OR LOWER(a.content) LIKE LOWER(CONCAT('%', :query, '%'))
     """)
-    Page<Question> searchByTitleOrDescriptionContainingIgnoreCase(
+    Page<Question> searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(
             @Param("query") String query, Pageable pageable);
-
-    @EntityGraph(attributePaths = {"author", "answers", "answers.author"})
-    Optional<Question> findById(Long id);
 
     @Transactional
     @Modifying

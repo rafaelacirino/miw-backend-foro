@@ -1,5 +1,6 @@
 package es.upm.miw.foro.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +47,7 @@ public class Question {
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
+    @JsonIgnoreProperties("questions")
     private Set<Tag> tags = new HashSet<>();
 
     @Column(name = "views", nullable = false)
