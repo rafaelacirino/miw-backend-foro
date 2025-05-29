@@ -14,6 +14,7 @@ import es.upm.miw.foro.service.impl.AnswerServiceImpl;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DataAccessException;
@@ -327,7 +328,7 @@ class AnswerServiceTest {
         List<Answer> answers = Collections.singletonList(answer);
         Page<Answer> answerPage = new PageImpl<>(answers);
 
-        when(answerRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(answerPage);
+        when(answerRepository.findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable))).thenReturn(answerPage);
 
         Page<AnswerDto> result = answerService.getMyAnswers(USER_EMAIL, null, null, null, pageable);
 
@@ -335,7 +336,7 @@ class AnswerServiceTest {
         assertEquals(1, result.getTotalElements());
         assertEquals(answerDto.getContent(), result.getContent().getFirst().getContent());
 
-        verify(answerRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(answerRepository, times(1)).findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable));
     }
 
     @Test
@@ -344,7 +345,7 @@ class AnswerServiceTest {
         List<Answer> answers = Collections.singletonList(answer);
         Page<Answer> answerPage = new PageImpl<>(answers);
 
-        when(answerRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(answerPage);
+        when(answerRepository.findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable))).thenReturn(answerPage);
 
         Page<AnswerDto> result = answerService.getMyAnswers(
                 USER_EMAIL, QUESTION_TITLE, CONTENT, CREATION_DATE, pageable);
@@ -352,7 +353,7 @@ class AnswerServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
 
-        verify(answerRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(answerRepository, times(1)).findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable));
     }
 
     @Test
@@ -360,20 +361,20 @@ class AnswerServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Answer> emptyPage = new PageImpl<>(Collections.emptyList());
 
-        when(answerRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(emptyPage);
+        when(answerRepository.findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable))).thenReturn(emptyPage);
 
         Page<AnswerDto> result = answerService.getMyAnswers(USER_EMAIL, null, null, null, pageable);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(answerRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(answerRepository, times(1)).findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable));
     }
 
     @Test
     void testGetMyAnswers_repositoryThrowsDataAccessException() {
         Pageable pageable = PageRequest.of(0, 10);
 
-        when(answerRepository.findAll(any(Specification.class), eq(pageable)))
+        when(answerRepository.findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable)))
                 .thenThrow(new RuntimeException("DB error"));
 
         ServiceException exception = assertThrows(ServiceException.class, () ->
@@ -381,7 +382,7 @@ class AnswerServiceTest {
 
         assertNotNull(exception.getMessage());
         assertTrue(exception.getMessage().contains("Error retrieving user answers with filters"));
-        verify(answerRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(answerRepository, times(1)).findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable));
     }
 
     @Test
@@ -391,7 +392,7 @@ class AnswerServiceTest {
         int totalSize = 6;
         Page<Answer> answerPage = new PageImpl<>(answers, pageable, totalSize);
 
-        when(answerRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(answerPage);
+        when(answerRepository.findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable))).thenReturn(answerPage);
 
         Page<AnswerDto> result = answerService.getMyAnswers(USER_EMAIL, null, null, null, pageable);
 
@@ -400,7 +401,7 @@ class AnswerServiceTest {
         assertEquals(1, result.getNumber());
         assertEquals(5, result.getSize());
 
-        verify(answerRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(answerRepository, times(1)).findAll(ArgumentMatchers.<Specification<Answer>>any(), eq(pageable));
     }
 
     @Test

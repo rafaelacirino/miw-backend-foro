@@ -36,10 +36,10 @@ public class AnswerController {
         this.answerService = answerService;
     }
 
-    @PostMapping("/{questionId}")
+    @PostMapping()
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")
-    public ResponseEntity<AnswerDto> createAnswer(@PathVariable Long questionId,
+    public ResponseEntity<AnswerDto> createAnswer(@RequestParam Long questionId,
                                                   @Valid @RequestBody AnswerDto answerDto) {
         try {
             return new ResponseEntity<>(answerService.createAnswer(questionId, answerDto), HttpStatus.CREATED);
@@ -53,8 +53,8 @@ public class AnswerController {
         }
     }
 
-    @GetMapping("/{questionId}")
-    public ResponseEntity<List<AnswerDto>> getAnswersByQuestion(@PathVariable Long questionId) {
+    @GetMapping()
+    public ResponseEntity<List<AnswerDto>> getAnswersByQuestion(@RequestParam Long questionId) {
         try {
             List<AnswerDto> answers = answerService.getAnswersByQuestionId(questionId);
             return ResponseEntity.ok(answers);
