@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 class AnswerSpecificationTest {
 
@@ -29,14 +30,11 @@ class AnswerSpecificationTest {
     private Path<Object> path;
 
     @Mock
-    private Path<Object> nestedPath;
-
-    @Mock
     private Predicate predicate;
 
-    private static final String EMAIL = "test@example.com";
-    private static final String QUESTION = "Question";
-    private static final String CONTENT = "Sample content";
+    private static final String EMAIL = "author@email.com";
+    private static final String QUESTION = "Question?";
+    private static final String CONTENT = "Answer content";
     private static final LocalDateTime CREATION_DATE = LocalDateTime.now();
 
     @BeforeEach
@@ -47,16 +45,12 @@ class AnswerSpecificationTest {
     @Test
     void buildAnswerSpecification_AllFieldsProvided() {
         // Given
-        when(root.get("author")).thenReturn(path);
-        when(path.get("email")).thenReturn(nestedPath);
-        when(root.get("question")).thenReturn(path);
-        when(root.get("content")).thenReturn(path);
-        when(root.get("creationDate")).thenReturn(path);
+        when(root.get(anyString())).thenReturn(path);
         when(criteriaBuilder.equal(any(), any())).thenReturn(predicate);
 
         // When
-        Specification<Answer> specification = AnswerSpecification.buildAnswerSpecification(
-                EMAIL, QUESTION, CONTENT, CREATION_DATE);
+        Specification<Answer> specification = AnswerSpecification.buildAnswerSpecification(EMAIL, QUESTION,
+                                                                                           CONTENT, CREATION_DATE);
         Predicate result = specification.toPredicate(root, query, criteriaBuilder);
 
         // Then
@@ -64,16 +58,14 @@ class AnswerSpecificationTest {
     }
 
     @Test
-    void buildAnswerSpecification_SomeFieldsNull() {
+    void buildQuestionSpecification_SomeFieldsNull() {
         // Given
-        when(root.get("author")).thenReturn(path);
-        when(path.get("email")).thenReturn(nestedPath);
-        when(root.get("content")).thenReturn(mock(Path.class));
+        when(root.get(anyString())).thenReturn(path);
         when(criteriaBuilder.equal(any(), any())).thenReturn(predicate);
 
         // When
-        Specification<Answer> specification = AnswerSpecification.buildAnswerSpecification(
-                EMAIL, null, CONTENT, null);
+        Specification<Answer> specification = AnswerSpecification.buildAnswerSpecification(null, null,
+                                                                                           CONTENT, CREATION_DATE);
         Predicate result = specification.toPredicate(root, query, criteriaBuilder);
 
         // Then
@@ -81,14 +73,13 @@ class AnswerSpecificationTest {
     }
 
     @Test
-    void buildAnswerSpecification_AllFieldsNull() {
+    void buildQuestionSpecification_AllFieldsNull() {
         // When
-        Specification<Answer> specification = AnswerSpecification.buildAnswerSpecification(
-                null, null, null, null);
+        Specification<Answer> specification = AnswerSpecification.buildAnswerSpecification(null, null,
+                                                                                        null, null);
         Predicate result = specification.toPredicate(root, query, criteriaBuilder);
 
         // Then
         assertNull(result);
     }
 }
-

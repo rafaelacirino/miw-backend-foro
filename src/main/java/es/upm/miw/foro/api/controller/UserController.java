@@ -6,6 +6,7 @@ import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
 import es.upm.miw.foro.util.ApiPath;
+import es.upm.miw.foro.util.MessageUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -56,10 +57,10 @@ public class UserController {
             return new ResponseEntity<>(userService.registerUser(userDto), HttpStatus.CREATED);
         } catch (ServiceException e) {
             return ResponseEntity.status(e.getStatus())
-                    .body(Map.of("message", e.getMessage()));
+                    .body(Map.of(MessageUtil.MESSAGE, e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred"));
+                    .body(Map.of(MessageUtil.MESSAGE, MessageUtil.UNEXPECTED_ERROR));
         }
     }
 
@@ -84,10 +85,10 @@ public class UserController {
             return ResponseEntity.ok(new TokenDto(token));
         } catch (ServiceException e) {
             return ResponseEntity.status(e.getStatus())
-                    .body(Map.of("message", e.getMessage()));
+                    .body(Map.of(MessageUtil.MESSAGE, e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred"));
+                    .body(Map.of(MessageUtil.MESSAGE, MessageUtil.UNEXPECTED_ERROR));
         }
     }
 
@@ -127,7 +128,7 @@ public class UserController {
             return ResponseEntity.status(status).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "An unexpected error occurred"));
+                    .body(Map.of(MessageUtil.MESSAGE, MessageUtil.UNEXPECTED_ERROR));
         }
     }
 

@@ -1,5 +1,6 @@
 package es.upm.miw.foro.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class Answer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false, referencedColumnName = "id")
+    @JsonBackReference
     private Question question;
 
     @ManyToOne(fetch = FetchType.LAZY)

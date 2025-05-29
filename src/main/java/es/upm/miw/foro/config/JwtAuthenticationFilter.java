@@ -2,15 +2,15 @@ package es.upm.miw.foro.config;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import es.upm.miw.foro.service.impl.JwtService;
+import es.upm.miw.foro.service.impl.JwtServiceImpl;
 import es.upm.miw.foro.util.ApiPath;
+import es.upm.miw.foro.util.MessageUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,10 +23,7 @@ import java.util.Optional;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String AUTHORIZATION = "Authorization";
-
-    @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
@@ -40,23 +37,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        String authHeader = request.getHeader(AUTHORIZATION);
+        String authHeader = request.getHeader(MessageUtil.AUTHORIZATION);
         log.info("JWT Header: {}", authHeader);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
-        String token = jwtService.extractToken(authHeader);
+        String token = jwtServiceImpl.extractToken(authHeader);
         log.info("Extracted Token: {}", token);
         try {
-            Optional<DecodedJWT> decodedJWT = jwtService.verify(token);
+            Optional<DecodedJWT> decodedJWT = jwtServiceImpl.verify(token);
             log.info("DecodedJWT: {}", decodedJWT.isPresent());
             if (decodedJWT.isEmpty()) {
                 chain.doFilter(request, response);
                 return;
             }
-            String userEmail = jwtService.user(token);
+            String userEmail = jwtServiceImpl.user(token);
             log.info("User: {}", userEmail);
             if (userEmail == null || userEmail.isEmpty()) {
                 log.error("Failed to extract user email from token");
@@ -80,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private UserDetails loadUserByUsername(String token, String userEmail) {
-        String role = jwtService.role(token);
+        String role = jwtServiceImpl.role(token);
         log.info("Role for user {}: {}", userEmail, role);
         return org.springframework.security.core.userdetails.User.builder()
                 .username(userEmail)
