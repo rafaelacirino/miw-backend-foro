@@ -6,9 +6,9 @@ import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.UserRepository;
-import es.upm.miw.foro.service.impl.EmailService;
-import es.upm.miw.foro.service.impl.JwtService;
-import es.upm.miw.foro.service.impl.PasswordResetService;
+import es.upm.miw.foro.service.email.EmailService;
+import es.upm.miw.foro.service.impl.JwtServiceImpl;
+import es.upm.miw.foro.service.email.PasswordResetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,7 +30,7 @@ class PasswordResetServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     @Mock
     private EmailService emailService;
@@ -68,14 +68,14 @@ class PasswordResetServiceTest {
     void sendPasswordResetEmail_UserExists_SendsEmail() {
         // Arrange
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(testUser));
-        when(jwtService.createPasswordResetToken(TEST_EMAIL)).thenReturn(TEST_TOKEN);
+        when(jwtServiceImpl.createPasswordResetToken(TEST_EMAIL)).thenReturn(TEST_TOKEN);
 
         // Act
         passwordResetService.sendPasswordResetEmail(userDto.getEmail());
 
         // Assert
         verify(userRepository, times(1)).findByEmail(TEST_EMAIL);
-        verify(jwtService, times(1)).createPasswordResetToken(TEST_EMAIL);
+        verify(jwtServiceImpl, times(1)).createPasswordResetToken(TEST_EMAIL);
         verify(emailService, times(1)).sendPasswordResetEmail(TEST_EMAIL, RESET_LINK_DEV);
     }
 
@@ -89,14 +89,14 @@ class PasswordResetServiceTest {
 
         // Assert
         verify(userRepository, times(1)).findByEmail(TEST_EMAIL);
-        verify(jwtService, never()).createPasswordResetToken(anyString());
+        verify(jwtServiceImpl, never()).createPasswordResetToken(anyString());
         verify(emailService, never()).sendPasswordResetEmail(anyString(), anyString());
     }
 
     @Test
     void resetPassword_ValidToken_UpdatesPassword() {
         // Arrange
-        when(jwtService.validatePasswordResetToken(TEST_TOKEN)).thenReturn(TEST_EMAIL);
+        when(jwtServiceImpl.validatePasswordResetToken(TEST_TOKEN)).thenReturn(TEST_EMAIL);
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.encode(NEW_PASSWORD)).thenReturn(ENCODED_PASSWORD);
 
@@ -104,7 +104,7 @@ class PasswordResetServiceTest {
         passwordResetService.resetPassword(TEST_TOKEN, NEW_PASSWORD);
 
         // Assert
-        verify(jwtService, times(1)).validatePasswordResetToken(TEST_TOKEN);
+        verify(jwtServiceImpl, times(1)).validatePasswordResetToken(TEST_TOKEN);
         verify(userRepository, times(1)).findByEmail(TEST_EMAIL);
         verify(passwordEncoder, times(1)).encode(NEW_PASSWORD);
         verify(userRepository, times(1)).save(testUser);
@@ -114,7 +114,7 @@ class PasswordResetServiceTest {
     @Test
     void resetPassword_InvalidToken_ThrowsServiceException() {
         // Arrange
-        when(jwtService.validatePasswordResetToken(TEST_TOKEN)).thenThrow(new JWTVerificationException("Invalid token"));
+        when(jwtServiceImpl.validatePasswordResetToken(TEST_TOKEN)).thenThrow(new JWTVerificationException("Invalid token"));
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> {
@@ -127,7 +127,7 @@ class PasswordResetServiceTest {
     @Test
     void resetPassword_UserNotFound_ThrowsServiceException() {
         // Arrange
-        when(jwtService.validatePasswordResetToken(TEST_TOKEN)).thenReturn(TEST_EMAIL);
+        when(jwtServiceImpl.validatePasswordResetToken(TEST_TOKEN)).thenReturn(TEST_EMAIL);
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
 
         // Act & Assert
@@ -141,11 +141,11 @@ class PasswordResetServiceTest {
     @Test
     void sendPasswordResetEmail_InProduction_UsesProductionUrl() {
         // Arrange
-        passwordResetService = new PasswordResetService(userRepository, jwtService, emailService, passwordEncoder);
+        passwordResetService = new PasswordResetService(userRepository, jwtServiceImpl, emailService, passwordEncoder);
         passwordResetService.environment = "prod";
 
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(testUser));
-        when(jwtService.createPasswordResetToken(TEST_EMAIL)).thenReturn(TEST_TOKEN);
+        when(jwtServiceImpl.createPasswordResetToken(TEST_EMAIL)).thenReturn(TEST_TOKEN);
 
         // Act
         passwordResetService.sendPasswordResetEmail(TEST_EMAIL);

@@ -16,6 +16,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSp
     Page<Question> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     Page<Question> findByAnswersEmpty(Pageable pageable);
+
     Page<Question> findByTitleContainingIgnoreCaseAndAnswersEmpty(String title, Pageable pageable);
 
     @Query("""

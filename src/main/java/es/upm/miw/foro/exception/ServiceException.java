@@ -27,5 +27,4 @@ public class ServiceException extends RuntimeException {
         super(message);
         this.status = status;
     }
-
 }

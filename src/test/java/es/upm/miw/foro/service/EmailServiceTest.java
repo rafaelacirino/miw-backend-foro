@@ -1,18 +1,16 @@
 package es.upm.miw.foro.service;
 
 import es.upm.miw.foro.TestConfig;
-import es.upm.miw.foro.service.impl.EmailService;
+import es.upm.miw.foro.service.email.EmailService;
+import es.upm.miw.foro.service.email.PasswordResetEmailTemplate;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
-
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +25,9 @@ class EmailServiceTest {
     @Mock
     private MimeMessage mimeMessage;
 
+    @Mock
+    private PasswordResetEmailTemplate emailTemplate;
+
     @InjectMocks
     private EmailService emailService;
 
@@ -37,8 +38,9 @@ class EmailServiceTest {
     @BeforeEach
     void setUp() {
         String fromEmail = "noreply@test.com";
-        emailService = new EmailService(mailSender, fromEmail, appName);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        when(emailTemplate.buildResetEmailHtml(anyString())).thenReturn("<html><body>Mocked HTML</body></html>");
+        emailService = new EmailService(emailTemplate, mailSender, fromEmail, appName);
     }
 
     @Test
@@ -79,30 +81,5 @@ class EmailServiceTest {
         assertThrows(RuntimeException.class, () -> {
             emailService.sendPasswordResetEmail(testEmail, resetLink);
         });
-    }
-
-    @Test
-    void buildResetEmailHtml_ContainsCorrectContent() {
-        // Act
-        String htmlContent = emailService.buildResetEmailHtml(resetLink);
-
-        // Assert
-        assertTrue(htmlContent.contains("Password Reset Request"));
-        assertTrue(htmlContent.contains(resetLink));
-        assertTrue(htmlContent.contains(appName));
-        assertTrue(htmlContent.contains(String.valueOf(LocalDate.now().getYear())));
-        assertTrue(htmlContent.contains("Reset Password"));
-        assertTrue(htmlContent.contains("If you didn't request this password reset"));
-        assertTrue(htmlContent.contains("For security reasons"));
-    }
-
-    @Test
-    void buildResetEmailHtml_FormatsCorrectly() {
-        // Act
-        String htmlContent = emailService.buildResetEmailHtml(resetLink);
-
-        // Assert
-        int linkCount = StringUtils.countMatches(htmlContent, resetLink);
-        assertEquals(3, linkCount);
     }
 }

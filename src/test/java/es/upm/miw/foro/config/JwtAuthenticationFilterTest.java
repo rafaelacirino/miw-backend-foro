@@ -4,7 +4,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.persistence.model.Role;
-import es.upm.miw.foro.service.impl.JwtService;
+import es.upm.miw.foro.service.impl.JwtServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ class JwtAuthenticationFilterTest {
     private static final String PASSWORD = "mockPassword";
 
     @Mock
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     @Mock
     private FilterChain filterChain;
@@ -64,7 +64,7 @@ class JwtAuthenticationFilterTest {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain, times(1)).doFilter(request, response);
-        verifyNoInteractions(jwtService);
+        verifyNoInteractions(jwtServiceImpl);
     }
 
     @Test
@@ -78,15 +78,15 @@ class JwtAuthenticationFilterTest {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain, times(1)).doFilter(request, response);
-        verifyNoInteractions(jwtService);
+        verifyNoInteractions(jwtServiceImpl);
     }
 
     @Test
     void testDoFilterInternal_WithInvalidBearerToken() throws ServletException, IOException {
         // Arrange
         request.addHeader(AUTHORIZATION, BEARER_TOKEN);
-        when(jwtService.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
-        when(jwtService.verify(TOKEN)).thenReturn(Optional.empty());
+        when(jwtServiceImpl.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
+        when(jwtServiceImpl.verify(TOKEN)).thenReturn(Optional.empty());
 
         // Act
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -94,19 +94,19 @@ class JwtAuthenticationFilterTest {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
-        verify(jwtService, times(1)).verify(TOKEN);
-        verifyNoMoreInteractions(jwtService);
+        verify(jwtServiceImpl, times(1)).extractToken(BEARER_TOKEN);
+        verify(jwtServiceImpl, times(1)).verify(TOKEN);
+        verifyNoMoreInteractions(jwtServiceImpl);
     }
 
     @Test
     void testDoFilterInternal_WithValidTokenAndNoExistingAuth() throws ServletException, IOException {
         // Arrange
         request.addHeader(AUTHORIZATION, BEARER_TOKEN);
-        when(jwtService.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
-        when(jwtService.verify(TOKEN)).thenReturn(Optional.of(mock(DecodedJWT.class)));
-        when(jwtService.user(TOKEN)).thenReturn(USERNAME);
-        when(jwtService.role(TOKEN)).thenReturn(ROLE);
+        when(jwtServiceImpl.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
+        when(jwtServiceImpl.verify(TOKEN)).thenReturn(Optional.of(mock(DecodedJWT.class)));
+        when(jwtServiceImpl.user(TOKEN)).thenReturn(USERNAME);
+        when(jwtServiceImpl.role(TOKEN)).thenReturn(ROLE);
 
         // Act
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -123,19 +123,19 @@ class JwtAuthenticationFilterTest {
         assertThat(authentication.getDetails()).isNotNull();
 
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
-        verify(jwtService, times(1)).verify(TOKEN);
-        verify(jwtService, times(1)).user(TOKEN);
-        verify(jwtService, times(1)).role(TOKEN);
+        verify(jwtServiceImpl, times(1)).extractToken(BEARER_TOKEN);
+        verify(jwtServiceImpl, times(1)).verify(TOKEN);
+        verify(jwtServiceImpl, times(1)).user(TOKEN);
+        verify(jwtServiceImpl, times(1)).role(TOKEN);
     }
 
     @Test
     void testDoFilterInternal_WithValidTokenAndExistingAuth() throws ServletException, IOException {
         // Arrange
         request.addHeader(AUTHORIZATION, BEARER_TOKEN);
-        when(jwtService.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
-        when(jwtService.verify(TOKEN)).thenReturn(Optional.of(mock(com.auth0.jwt.interfaces.DecodedJWT.class)));
-        when(jwtService.user(TOKEN)).thenReturn(USERNAME);
+        when(jwtServiceImpl.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
+        when(jwtServiceImpl.verify(TOKEN)).thenReturn(Optional.of(mock(com.auth0.jwt.interfaces.DecodedJWT.class)));
+        when(jwtServiceImpl.user(TOKEN)).thenReturn(USERNAME);
 
         UserDetails existingUser = User.withUsername(USERNAME).password(PASSWORD).roles(String.valueOf(Role.MEMBER)).build();
         UsernamePasswordAuthenticationToken existingAuth = new UsernamePasswordAuthenticationToken(
@@ -149,19 +149,19 @@ class JwtAuthenticationFilterTest {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         assertThat(authentication).isSameAs(existingAuth);
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
-        verify(jwtService, times(1)).verify(TOKEN);
-        verify(jwtService, times(1)).user(TOKEN);
-        verify(jwtService, never()).role(anyString());
+        verify(jwtServiceImpl, times(1)).extractToken(BEARER_TOKEN);
+        verify(jwtServiceImpl, times(1)).verify(TOKEN);
+        verify(jwtServiceImpl, times(1)).user(TOKEN);
+        verify(jwtServiceImpl, never()).role(anyString());
     }
 
     @Test
     void testDoFilterInternal_WithValidTokenButEmptyUserEmail() throws ServletException, IOException {
         // Arrange
         request.addHeader(AUTHORIZATION, BEARER_TOKEN);
-        when(jwtService.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
-        when(jwtService.verify(TOKEN)).thenReturn(Optional.of(mock(DecodedJWT.class)));
-        when(jwtService.user(TOKEN)).thenReturn("");
+        when(jwtServiceImpl.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
+        when(jwtServiceImpl.verify(TOKEN)).thenReturn(Optional.of(mock(DecodedJWT.class)));
+        when(jwtServiceImpl.user(TOKEN)).thenReturn("");
 
         // Act
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -169,19 +169,19 @@ class JwtAuthenticationFilterTest {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
-        verify(jwtService, times(1)).verify(TOKEN);
-        verify(jwtService, times(1)).user(TOKEN);
-        verify(jwtService, never()).role(anyString());
+        verify(jwtServiceImpl, times(1)).extractToken(BEARER_TOKEN);
+        verify(jwtServiceImpl, times(1)).verify(TOKEN);
+        verify(jwtServiceImpl, times(1)).user(TOKEN);
+        verify(jwtServiceImpl, never()).role(anyString());
     }
 
     @Test
     void testDoFilterInternal_WithValidTokenButNullUserEmail() throws ServletException, IOException {
         // Arrange
         request.addHeader(AUTHORIZATION, BEARER_TOKEN);
-        when(jwtService.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
-        when(jwtService.verify(TOKEN)).thenReturn(Optional.of(mock(DecodedJWT.class)));
-        when(jwtService.user(TOKEN)).thenReturn(null);
+        when(jwtServiceImpl.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
+        when(jwtServiceImpl.verify(TOKEN)).thenReturn(Optional.of(mock(DecodedJWT.class)));
+        when(jwtServiceImpl.user(TOKEN)).thenReturn(null);
 
         // Act
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -189,18 +189,18 @@ class JwtAuthenticationFilterTest {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
-        verify(jwtService, times(1)).verify(TOKEN);
-        verify(jwtService, times(1)).user(TOKEN);
-        verify(jwtService, never()).role(anyString());
+        verify(jwtServiceImpl, times(1)).extractToken(BEARER_TOKEN);
+        verify(jwtServiceImpl, times(1)).verify(TOKEN);
+        verify(jwtServiceImpl, times(1)).user(TOKEN);
+        verify(jwtServiceImpl, never()).role(anyString());
     }
 
     @Test
     void testDoFilterInternal_WithTokenDecodeException() throws ServletException, IOException {
         // Arrange
         request.addHeader(AUTHORIZATION, BEARER_TOKEN);
-        when(jwtService.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
-        when(jwtService.verify(TOKEN)).thenThrow(new JWTDecodeException("Invalid token format"));
+        when(jwtServiceImpl.extractToken(BEARER_TOKEN)).thenReturn(TOKEN);
+        when(jwtServiceImpl.verify(TOKEN)).thenThrow(new JWTDecodeException("Invalid token format"));
 
         // Act
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
@@ -208,10 +208,10 @@ class JwtAuthenticationFilterTest {
         // Assert
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, times(1)).extractToken(BEARER_TOKEN);
-        verify(jwtService, times(1)).verify(TOKEN);
-        verify(jwtService, never()).user(anyString());
-        verify(jwtService, never()).role(anyString());
+        verify(jwtServiceImpl, times(1)).extractToken(BEARER_TOKEN);
+        verify(jwtServiceImpl, times(1)).verify(TOKEN);
+        verify(jwtServiceImpl, never()).user(anyString());
+        verify(jwtServiceImpl, never()).role(anyString());
     }
 }
 

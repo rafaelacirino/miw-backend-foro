@@ -8,7 +8,7 @@ import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.UserRepository;
-import es.upm.miw.foro.service.impl.JwtService;
+import es.upm.miw.foro.service.impl.JwtServiceImpl;
 import es.upm.miw.foro.service.impl.UserServiceImpl;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +43,7 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -494,7 +494,7 @@ class UserServiceTest {
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(PASSWORD, user.getPassword())).thenReturn(true);
-        when(jwtService.createToken(
+        when(jwtServiceImpl.createToken(
                 USER_ID,
                 FIRST_NAME,
                 LAST_NAME,
@@ -509,7 +509,7 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findByEmail(EMAIL);
         verify(passwordEncoder, times(1)).matches(PASSWORD, ENCODED_PASSWORD);
-        verify(jwtService, times(1)).createToken(
+        verify(jwtServiceImpl, times(1)).createToken(
                 USER_ID,
                 FIRST_NAME,
                 LAST_NAME,
@@ -532,7 +532,7 @@ class UserServiceTest {
         when(passwordEncoder.matches(PASSWORD, PASSWORD)).thenReturn(false);
         when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(jwtService.createToken(USER_ID, FIRST_NAME, LAST_NAME, EMAIL, Role.MEMBER.name())).thenReturn("jwtToken");
+        when(jwtServiceImpl.createToken(USER_ID, FIRST_NAME, LAST_NAME, EMAIL, Role.MEMBER.name())).thenReturn("jwtToken");
 
         // Act
         String token = userService.login(EMAIL, PASSWORD);

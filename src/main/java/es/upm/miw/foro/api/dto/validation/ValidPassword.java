@@ -1,5 +1,6 @@
 package es.upm.miw.foro.api.dto.validation;
 
+import es.upm.miw.foro.util.MessageUtil;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,8 +12,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface ValidPassword {
 
-    String message() default "Password must be at least 8 characters, contain at least one uppercase letter, " +
-            "one lowercase letter, one digit, and one special character.";
+    String message() default MessageUtil.PASSWORD_MESSAGE;
 
     Class<?>[] groups() default {};
 

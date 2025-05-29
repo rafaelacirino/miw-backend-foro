@@ -1,48 +1,17 @@
-package es.upm.miw.foro.service.impl;
+package es.upm.miw.foro.service.email;
 
-import jakarta.mail.internet.MimeMessage;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Service
-@Slf4j
-public class EmailService {
-    private final JavaMailSender mailSender;
-    private final String fromEmail;
+@Component
+public class PasswordResetEmailTemplate {
+
     private final String appName;
 
-    public EmailService(JavaMailSender mailSender,
-                        @Value("${spring.mail.username}") String fromEmail,
-                        @Value("${app.name}") String appName) {
-        this.mailSender = mailSender;
-        this.fromEmail = fromEmail;
+    public PasswordResetEmailTemplate(@Value("${app.name}") String appName) {
         this.appName = appName;
-    }
-
-    public void sendPasswordResetEmail(String toEmail, String resetLink) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(fromEmail, appName + " Support");
-            helper.setTo(toEmail);
-            helper.setSubject("Password Reset Request for " + appName);
-
-            String htmlContent = buildResetEmailHtml(resetLink);
-            helper.setText(htmlContent, true);
-
-            mailSender.send(message);
-            log.info("Password reset email sent to {}", toEmail);
-
-        } catch (Exception e) {
-            log.error("Error sending email to {}", toEmail, e);
-            throw new RuntimeException("Failed to send password reset email");
-        }
     }
 
     public String buildResetEmailHtml(String resetLink) {

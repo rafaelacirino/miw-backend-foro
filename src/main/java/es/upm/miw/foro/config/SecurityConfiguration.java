@@ -1,6 +1,5 @@
 package es.upm.miw.foro.config;
 
-
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.UserRepository;

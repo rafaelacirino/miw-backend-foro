@@ -6,6 +6,7 @@ import es.upm.miw.foro.api.dto.TokenDto;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.UserService;
+import es.upm.miw.foro.util.MessageUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -147,7 +148,6 @@ class UserControllerTest {
     void testRegisterUserGenericException() {
         // Arrange
         UserDto dto = new UserDto();
-        String errorMessage = "An unexpected error occurred";
         when(userService.registerUser(any(UserDto.class))).thenThrow(new RuntimeException(UNEXPECTED_ERROR));
 
         // Act
@@ -156,7 +156,7 @@ class UserControllerTest {
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertInstanceOf(Map.class, response.getBody());
-        assertEquals(errorMessage, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
+        assertEquals(MessageUtil.UNEXPECTED_ERROR, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
         verify(userService, times(1)).registerUser(dto);
     }
 
@@ -394,7 +394,6 @@ class UserControllerTest {
     void testUpdateUserGenericException() {
         // Arrange
         UserDto dto = new UserDto();
-        String errorMessage = "An unexpected error occurred";
         when(userService.updateUser(eq(USER_ID), any(UserDto.class)))
                 .thenThrow(new RuntimeException(UNEXPECTED_ERROR));
 
@@ -405,7 +404,7 @@ class UserControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
         assertInstanceOf(Map.class, response.getBody());
-        assertEquals(errorMessage, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
+        assertEquals(MessageUtil.UNEXPECTED_ERROR, ((Map<?, ?>) Objects.requireNonNull(response.getBody())).get("message"));
         verify(userService, times(1)).updateUser(USER_ID, dto);
     }
 

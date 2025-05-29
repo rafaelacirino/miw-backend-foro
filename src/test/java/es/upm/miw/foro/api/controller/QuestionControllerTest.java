@@ -138,7 +138,7 @@ class QuestionControllerTest {
     @Test
     void testGetQuestionById_NotFound() {
         // Arrange
-        when(questionService.getQuestionById(anyLong())).thenThrow(new ServiceException("Question not found"));
+        when(questionService.getQuestionById(anyLong())).thenThrow(new ServiceException(MessageUtil.QUESTION_NOT_FOUND));
 
         // Act
         ResponseEntity<QuestionDto> response = questionController.getQuestionById(QUESTION_ID);
@@ -381,7 +381,7 @@ class QuestionControllerTest {
     @Test
     void testDeleteQuestionNotFound() {
         // Arrange
-        doThrow(new ServiceException("Question not found"))
+        doThrow(new ServiceException(MessageUtil.QUESTION_NOT_FOUND))
                 .when(questionService).deleteQuestion(anyLong());
 
         // Act
