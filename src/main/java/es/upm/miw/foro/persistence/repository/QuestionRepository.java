@@ -11,15 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
-    @EntityGraph(attributePaths = {"author", "tags"})
-    Page<Question> findByTitleContainingIgnoreCase(String title, Pageable pageable);
-
-    @EntityGraph(attributePaths = {"author", "tags"})
-    Page<Question> findByAnswersEmpty(Pageable pageable);
-
-    @EntityGraph(attributePaths = {"author", "tags"})
-    Page<Question> findByTitleContainingIgnoreCaseAndAnswersEmpty(String title, Pageable pageable);
-
     @EntityGraph(attributePaths = {"author", "answers.author", "tags"})
     @Query("""
     SELECT DISTINCT q FROM Question q
@@ -28,8 +19,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSp
     OR LOWER(q.description) LIKE LOWER(CONCAT('%', :query, '%'))
     OR LOWER(a.content) LIKE LOWER(CONCAT('%', :query, '%'))
     """)
-    Page<Question> searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(
-            @Param("query") String query, Pageable pageable);
+    Page<Question> searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(@Param("query") String query, Pageable pageable);
 
     @Transactional
     @Modifying

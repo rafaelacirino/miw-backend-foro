@@ -48,7 +48,7 @@ class QuestionSpecificationTest {
         when(criteriaBuilder.equal(any(), any())).thenReturn(predicate);
 
         // When
-        Specification<Question> specification = QuestionSpecification.buildQuestionSpecification(AUTHOR, TITLE, CREATION_DATE);
+        Specification<Question> specification = QuestionSpecification.buildQuestionSpecification(AUTHOR, TITLE, CREATION_DATE, null, null);
         Predicate result = specification.toPredicate(root, query, criteriaBuilder);
 
         // Then
@@ -62,7 +62,7 @@ class QuestionSpecificationTest {
         when(criteriaBuilder.equal(any(), any())).thenReturn(predicate);
 
         // When
-        Specification<Question> specification = QuestionSpecification.buildQuestionSpecification(AUTHOR, null, null);
+        Specification<Question> specification = QuestionSpecification.buildQuestionSpecification(AUTHOR, null, null, null, null);
         Predicate result = specification.toPredicate(root, query, criteriaBuilder);
 
         // Then
@@ -72,7 +72,7 @@ class QuestionSpecificationTest {
     @Test
     void buildQuestionSpecification_AllFieldsNull() {
         // When
-        Specification<Question> specification = QuestionSpecification.buildQuestionSpecification(null, null, null);
+        Specification<Question> specification = QuestionSpecification.buildQuestionSpecification(null, null, null, null, null);
         Predicate result = specification.toPredicate(root, query, criteriaBuilder);
 
         // Then

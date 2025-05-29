@@ -15,7 +15,7 @@ public interface QuestionService {
 
     QuestionDto getQuestionById(Long id);
 
-    Page<QuestionDto> getQuestions(String title, Boolean unanswered, Pageable pageable);
+    Page<QuestionDto> getQuestions(String title, Boolean unanswered, String tag, Pageable pageable);
 
     Page<QuestionDto> searchQuestions(String query, Pageable pageable);
 
@@ -30,5 +30,4 @@ public interface QuestionService {
     void registerView(Long questionId, HttpServletRequest request);
 
     Set<Tag> processTags(Set<String> tagNames);
-
 }

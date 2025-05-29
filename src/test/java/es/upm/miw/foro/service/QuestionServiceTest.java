@@ -15,6 +15,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DataAccessException;
@@ -228,10 +229,10 @@ class QuestionServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.findByTitleContainingIgnoreCase(TITLE, pageable)).thenReturn(questionPage);
+        when(questionRepository.findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable))).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(TITLE, false, pageable);
+        Page<QuestionDto> result = questionService.getQuestions(TITLE, false, null, pageable);
 
         // Assert
         assertNotNull(result);
@@ -240,7 +241,7 @@ class QuestionServiceTest {
         assertEquals(TITLE, result.getContent().getFirst().getTitle());
 
         // Verify
-        verify(questionRepository, times(1)).findByTitleContainingIgnoreCase(TITLE, pageable);
+        verify(questionRepository, times(1)).findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable));
         verify(questionRepository, never()).findAll(any(Pageable.class));
     }
 
@@ -249,10 +250,10 @@ class QuestionServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.findAll(pageable)).thenReturn(questionPage);
+        when(questionRepository.findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable))).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(null, false, pageable);
+        Page<QuestionDto> result = questionService.getQuestions(null, false, null, pageable);
 
         // Assert
         assertNotNull(result);
@@ -260,8 +261,7 @@ class QuestionServiceTest {
         assertEquals(QUESTION_ID, result.getContent().getFirst().getId());
 
         // Verify
-        verify(questionRepository, times(1)).findAll(pageable);
-        verify(questionRepository, never()).findByTitleContainingIgnoreCase(anyString(), any(Pageable.class));
+        verify(questionRepository, times(1)).findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable));
     }
 
     @Test
@@ -269,14 +269,14 @@ class QuestionServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.findByTitleContainingIgnoreCaseAndAnswersEmpty(TITLE, pageable)).thenReturn(questionPage);
+        when(questionRepository.findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable))).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(TITLE, true, pageable);
+        Page<QuestionDto> result = questionService.getQuestions(TITLE, true, null, pageable);
 
         // Assert
         assertEquals(1, result.getContent().size());
-        verify(questionRepository, times(1)).findByTitleContainingIgnoreCaseAndAnswersEmpty(TITLE, pageable);
+        verify(questionRepository, times(1)).findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable));
     }
 
     @Test
@@ -284,14 +284,14 @@ class QuestionServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.findByAnswersEmpty(pageable)).thenReturn(questionPage);
+        when(questionRepository.findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable))).thenReturn(questionPage);
 
         // Act
-        Page<QuestionDto> result = questionService.getQuestions(null, true, pageable);
+        Page<QuestionDto> result = questionService.getQuestions(null, true, null, pageable);
 
         // Assert
         assertEquals(1, result.getContent().size());
-        verify(questionRepository, times(1)).findByAnswersEmpty(pageable);
+        verify(questionRepository, times(1)).findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable));
     }
 
 
@@ -299,14 +299,14 @@ class QuestionServiceTest {
     void testGetQuestions_dataAccessException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
-        when(questionRepository.findAll(pageable)).thenThrow(new DataAccessException("DB error") {});
+        when(questionRepository.findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable))).thenThrow(new DataAccessException("DB error") {});
 
         // Act & Assert
-        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, false, pageable));
+        RepositoryException exception = assertThrows(RepositoryException.class, () -> questionService.getQuestions(null, false, null, pageable));
         assertEquals("Error while getting questions", exception.getMessage());
 
         // Verify
-        verify(questionRepository, times(1)).findAll(pageable);
+        verify(questionRepository, times(1)).findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable));
     }
 
     @Test
@@ -322,7 +322,7 @@ class QuestionServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals(QUESTION_ID, result.getContent().get(0).getId());
+        assertEquals(QUESTION_ID, result.getContent().getFirst().getId());
 
         // Verify
         verify(questionRepository, times(1)).searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(TITLE, pageable);
@@ -611,7 +611,7 @@ class QuestionServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
-        when(questionRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(questionPage);
+        when(questionRepository.findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable))).thenReturn(questionPage);
 
         // Act
         Page<QuestionDto> result = questionService.getMyQuestions(EMAIL, TITLE, fromDate, pageable);
@@ -619,10 +619,10 @@ class QuestionServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals(QUESTION_ID, result.getContent().get(0).getId());
+        assertEquals(QUESTION_ID, result.getContent().getFirst().getId());
 
         // Verify
-        verify(questionRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(questionRepository, times(1)).findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable));
     }
 
     @Test
@@ -630,7 +630,7 @@ class QuestionServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         LocalDateTime fromDate = LocalDateTime.now().minusDays(10);
-        when(questionRepository.findAll(any(Specification.class), eq(pageable)))
+        when(questionRepository.findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable)))
                 .thenThrow(new RuntimeException("Unexpected error"));
 
         // Act & Assert
@@ -638,7 +638,7 @@ class QuestionServiceTest {
         assertEquals("Error retrieving user questions with filters", exception.getMessage());
 
         // Verify
-        verify(questionRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        verify(questionRepository, times(1)).findAll(ArgumentMatchers.<Specification<Question>>any(), eq(pageable));
     }
 
     @Test

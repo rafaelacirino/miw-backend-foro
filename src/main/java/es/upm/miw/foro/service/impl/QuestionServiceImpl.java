@@ -89,19 +89,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionDto> getQuestions(String title, Boolean unanswered, Pageable pageable) {
+    public Page<QuestionDto> getQuestions(String title, Boolean unanswered, String tag, Pageable pageable) {
         try {
-            Page<Question> questionPage;
-
-            if (title != null && !title.isBlank()) {
-                questionPage = Boolean.TRUE.equals(unanswered)
-                        ? questionRepository.findByTitleContainingIgnoreCaseAndAnswersEmpty(title, pageable)
-                        : questionRepository.findByTitleContainingIgnoreCase(title, pageable);
-            } else {
-                questionPage = Boolean.TRUE.equals(unanswered)
-                        ? questionRepository.findByAnswersEmpty(pageable)
-                        : questionRepository.findAll(pageable);
-            }
+            Specification<Question> spec = QuestionSpecification.buildQuestionSpecification(null, title, null, unanswered, tag);
+            Page<Question> questionPage = questionRepository.findAll(spec, pageable);
 
             return questionPage.map(QuestionMapper::toQuestionDto);
         } catch (DataAccessException exception) {
@@ -190,7 +181,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional(readOnly = true)
     public Page<QuestionDto> getMyQuestions(String email, String title, LocalDateTime fromDate, Pageable pageable) {
         try {
-            Specification<Question> spec = QuestionSpecification.buildQuestionSpecification(email, title, fromDate);
+            Specification<Question> spec = QuestionSpecification.buildQuestionSpecification(email, title, fromDate, null, null);
             Page<Question> page = questionRepository.findAll(spec, pageable);
             return page.map(QuestionMapper::toQuestionDto);
         } catch (ServiceException e) {
