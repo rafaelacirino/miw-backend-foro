@@ -89,16 +89,16 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<QuestionDto> getQuestions(String title, boolean unanswered, Pageable pageable) {
+    public Page<QuestionDto> getQuestions(String title, Boolean unanswered, Pageable pageable) {
         try {
             Page<Question> questionPage;
 
             if (title != null && !title.isBlank()) {
-                questionPage = unanswered
+                questionPage = Boolean.TRUE.equals(unanswered)
                         ? questionRepository.findByTitleContainingIgnoreCaseAndAnswersEmpty(title, pageable)
                         : questionRepository.findByTitleContainingIgnoreCase(title, pageable);
             } else {
-                questionPage = unanswered
+                questionPage = Boolean.TRUE.equals(unanswered)
                         ? questionRepository.findByAnswersEmpty(pageable)
                         : questionRepository.findAll(pageable);
             }

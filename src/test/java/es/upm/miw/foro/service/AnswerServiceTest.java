@@ -242,7 +242,7 @@ class AnswerServiceTest {
     }
 
     @Test
-    void testUpdateAnswer_success() {
+    void testUpdateAnswer() {
         // Arrange
         when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
         when(validator.validate(any(AnswerDto.class))).thenReturn(Collections.emptySet());
@@ -404,7 +404,7 @@ class AnswerServiceTest {
     }
 
     @Test
-    void testDeleteAnswer_success() {
+    void testDeleteAnswer() {
         when(userService.getAuthenticatedUser()).thenReturn(author);
         when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
 

@@ -2,7 +2,6 @@ package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.TagDto;
 import es.upm.miw.foro.persistence.model.Tag;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -22,13 +21,7 @@ public class TagMapper {
 
         TagDto tagDto = new TagDto();
         populateDto(tag, tagDto);
-
-        try {
-            return tagDto;
-        } catch (ConstraintViolationException e) {
-            log.error("DTO validation failed for tag {}: {}", tag.getId(), e.getMessage());
-            return null;
-        }
+        return tagDto;
     }
 
     public static Tag toEntity(TagDto tagDto) {

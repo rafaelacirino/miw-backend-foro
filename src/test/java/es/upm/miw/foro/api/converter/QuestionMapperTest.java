@@ -1,5 +1,6 @@
 package es.upm.miw.foro.api.converter;
 
+import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.persistence.model.Answer;
 import es.upm.miw.foro.persistence.model.Question;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestConfig
 class QuestionMapperTest {
 
     private static final Long ID = 1L;
@@ -61,13 +63,13 @@ class QuestionMapperTest {
         assertEquals("Test", dto.getTitle());
     }
 
-   @Test
-    void testEntity_shouldMapDtoToEntity() {
+    @Test
+    void toEntity_shouldMapDtoToEntity() {
         // Arrange
         QuestionDto questionDto = createQuestionDto();
-       User author = createUser();
+        User author = createUser();
 
-       // Act
+        // Act
         Question question = QuestionMapper.toEntity(questionDto, author);
 
         // Assert
@@ -147,6 +149,23 @@ class QuestionMapperTest {
 
         // Assert
         assertNull(dto.getAnswers(), "Answers should be null in DTO if not present in entity");
+    }
+
+    @Test
+    void toQuestionDto_whenTagsAreNull_shouldSetEmptyTagSetInDto() {
+        // Arrange
+        Question question = new Question();
+        question.setId(1L);
+        question.setTitle("Title");
+        question.setTags(null);
+
+        // Act
+        QuestionDto dto = QuestionMapper.toQuestionDto(question);
+
+        // Assert
+        assertNotNull(dto);
+        assertNotNull(dto.getTags());
+        assertTrue(dto.getTags().isEmpty());
     }
 
     @Test

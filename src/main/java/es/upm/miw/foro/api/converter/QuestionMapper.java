@@ -5,7 +5,6 @@ import es.upm.miw.foro.persistence.model.Answer;
 import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.Tag;
 import es.upm.miw.foro.persistence.model.User;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -26,15 +25,7 @@ public class QuestionMapper {
         QuestionDto questionDto = new QuestionDto();
         populateDto(question, questionDto);
 
-        try {
-            return questionDto;
-        } catch (ConstraintViolationException e) {
-            log.error("DTO validation failed for question {}: {}", question.getId(), e.getMessage());
-            return null;
-        } catch (Exception e) {
-            log.error("Unexpected error mapping question {}: {}", question.getId(), e.getMessage(), e);
-            return null;
-        }
+        return questionDto;
     }
 
     public static Question toEntity(QuestionDto questionDto, User questionAuthor) {

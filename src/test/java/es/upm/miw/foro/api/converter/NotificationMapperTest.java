@@ -1,5 +1,6 @@
 package es.upm.miw.foro.api.converter;
 
+import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.NotificationDto;
 import es.upm.miw.foro.persistence.model.*;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestConfig
 class NotificationMapperTest {
 
     private static final Long NOTIFICATION_ID = 1L;

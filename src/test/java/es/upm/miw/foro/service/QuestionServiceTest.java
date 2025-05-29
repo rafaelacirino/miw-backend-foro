@@ -87,7 +87,7 @@ class QuestionServiceTest {
     }
 
     @Test
-    void testCreateQuestion_success() {
+    void testCreateQuestion() {
         // Arrange
         when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
@@ -113,7 +113,7 @@ class QuestionServiceTest {
     }
 
     @Test
-    void testCreateQuestion_validationFailurte() {
+    void testCreateQuestion_validationFailure() {
         // Arrange
         Set<ConstraintViolation<QuestionDto>> violations = new HashSet<>();
         ConstraintViolation<QuestionDto> violation = mock(ConstraintViolation.class);
@@ -214,6 +214,16 @@ class QuestionServiceTest {
     }
 
     @Test
+    void testGetQuestionById_unexpectedException() {
+        // Arrange
+        when(questionRepository.findById(QUESTION_ID)).thenThrow(new RuntimeException("Unexpected"));
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> questionService.getQuestionById(QUESTION_ID));
+        assertEquals("Unexpected error while getting question", exception.getMessage());
+    }
+
+    @Test
     void testGetQuestions_withTitle() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
@@ -255,6 +265,37 @@ class QuestionServiceTest {
     }
 
     @Test
+    void testGetQuestions_withTitleAndUnanswered() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
+        when(questionRepository.findByTitleContainingIgnoreCaseAndAnswersEmpty(TITLE, pageable)).thenReturn(questionPage);
+
+        // Act
+        Page<QuestionDto> result = questionService.getQuestions(TITLE, true, pageable);
+
+        // Assert
+        assertEquals(1, result.getContent().size());
+        verify(questionRepository, times(1)).findByTitleContainingIgnoreCaseAndAnswersEmpty(TITLE, pageable);
+    }
+
+    @Test
+    void testGetQuestions_unansweredWithoutTitle() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
+        when(questionRepository.findByAnswersEmpty(pageable)).thenReturn(questionPage);
+
+        // Act
+        Page<QuestionDto> result = questionService.getQuestions(null, true, pageable);
+
+        // Assert
+        assertEquals(1, result.getContent().size());
+        verify(questionRepository, times(1)).findByAnswersEmpty(pageable);
+    }
+
+
+    @Test
     void testGetQuestions_dataAccessException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
@@ -269,7 +310,7 @@ class QuestionServiceTest {
     }
 
     @Test
-    void testSearchQuestions_success() {
+    void testSearchQuestions() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         Page<Question> questionPage = new PageImpl<>(Collections.singletonList(question));
@@ -288,6 +329,19 @@ class QuestionServiceTest {
     }
 
     @Test
+    void testSearchQuestions_emptyQuery() {
+        // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // Act
+        Page<QuestionDto> result = questionService.searchQuestions("   ", pageable);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void testSearchQuestions_dataAccessException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
@@ -303,7 +357,7 @@ class QuestionServiceTest {
     }
 
     @Test
-    void testUpdateQuestion_success() {
+    void testUpdateQuestion() {
         // Arrange
         when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
@@ -368,7 +422,43 @@ class QuestionServiceTest {
     }
 
     @Test
-    void testDeleteQuestion_success() {
+    void testUpdateQuestion_dataAccessException() {
+        // Arrange
+        when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
+        when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
+        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.save(any(Question.class))).thenThrow(new DataAccessException("DB error") {});
+
+        // Act & Assert
+        RepositoryException exception = assertThrows(RepositoryException.class, () ->
+                questionService.updateQuestion(QUESTION_ID, questionDto));
+
+        assertEquals("Error while updating question", exception.getMessage());
+
+        // Verify
+        verify(validator, times(1)).validate(any(QuestionDto.class));
+        verify(userService, times(1)).getAuthenticatedUser();
+        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).save(any(Question.class));
+    }
+
+    @Test
+    void testUpdateQuestion_unexpectedException() {
+        // Arrange
+        when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
+        when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
+        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.save(any(Question.class))).thenThrow(new RuntimeException("Unexpected"));
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () ->
+                questionService.updateQuestion(QUESTION_ID, questionDto)
+        );
+        assertEquals("Unexpected error while updating question", exception.getMessage());
+    }
+
+    @Test
+    void testDeleteQuestion() {
         // Arrange
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
         when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
@@ -440,6 +530,37 @@ class QuestionServiceTest {
         verify(questionRepository, times(1)).findById(QUESTION_ID);
         verify(questionRepository, times(1)).delete(question);
     }
+
+    @Test
+    void testDeleteQuestion_dataAccessException() {
+        // Arrange
+        when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
+        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        doThrow(new DataAccessException("DB error") {}).when(questionRepository).delete(question);
+
+        // Act & Assert
+        RepositoryException exception = assertThrows(RepositoryException.class, () ->
+                questionService.deleteQuestion(QUESTION_ID));
+
+        assertEquals("Error while deleting question", exception.getMessage());
+
+        // Verify
+        verify(userService, times(1)).getAuthenticatedUser();
+        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).delete(question);
+    }
+
+
+    @Test
+    void testDeleteQuestion_unexpectedException() {
+        // Arrange
+        when(userService.getAuthenticatedUser()).thenThrow(new RuntimeException("Something went wrong"));
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> questionService.deleteQuestion(QUESTION_ID));
+        assertEquals("Unexpected error while deleting question", exception.getMessage());
+    }
+
 
     @Test
     void testIsQuestionAuthor_success() {

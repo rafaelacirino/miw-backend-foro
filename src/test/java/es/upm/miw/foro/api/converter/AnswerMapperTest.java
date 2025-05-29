@@ -1,5 +1,6 @@
 package es.upm.miw.foro.api.converter;
 
+import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.AnswerDto;
 import es.upm.miw.foro.persistence.model.Answer;
 import es.upm.miw.foro.persistence.model.Question;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestConfig
 class AnswerMapperTest {
 
     private static final Long ANSWER_ID = 1L;

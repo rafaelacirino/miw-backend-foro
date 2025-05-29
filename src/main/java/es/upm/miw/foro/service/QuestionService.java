@@ -15,7 +15,7 @@ public interface QuestionService {
 
     QuestionDto getQuestionById(Long id);
 
-    Page<QuestionDto> getQuestions(String title, boolean unanswered, Pageable pageable);
+    Page<QuestionDto> getQuestions(String title, Boolean unanswered, Pageable pageable);
 
     Page<QuestionDto> searchQuestions(String query, Pageable pageable);
 

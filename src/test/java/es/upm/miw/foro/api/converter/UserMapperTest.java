@@ -1,5 +1,6 @@
 package es.upm.miw.foro.api.converter;
 
+import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestConfig
 class UserMapperTest {
 
     private static final Long USER_ID = 1L;

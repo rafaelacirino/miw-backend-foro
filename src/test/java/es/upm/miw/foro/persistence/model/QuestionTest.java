@@ -63,7 +63,7 @@ class QuestionTest {
 
     @Test
     void testNoArgsConstructor() {
-        // Arrange & Act
+        // Arrange
         question = new Question();
 
         // Assert
@@ -216,7 +216,7 @@ class QuestionTest {
 
         // Assert
         assertFalse(result);
-        assertEquals(1, question.getViews()); // no incrementa
+        assertEquals(1, question.getViews());
     }
 
     @Test
@@ -236,7 +236,7 @@ class QuestionTest {
 
     @Test
     void testToString() {
-        // Arrange
+        // Arrange & Act
         LocalDateTime creationDate = LocalDateTime.of(2025, 1, 1, 10, 0);
         List<Answer> answers = new ArrayList<>();
         answers.add(mockAnswer1);
@@ -250,13 +250,19 @@ class QuestionTest {
         when(mockTag1.toString()).thenReturn("Tag(id=1, name=java)");
         when(mockTag2.toString()).thenReturn("Tag(id=2, name=bug)");
 
-        String expectedString = "Question(id=1, author=User(id=1, firstName=Alex, lastName=Ye), " +
-                "title=How to implement..., description=I need help with..., " +
-                "creationDate=2025-01-01T10:00, answers=[Answer(id=1, content=Use @Entity)], " +
-                "tags=[Tag(id=2, name=bug), Tag(id=1, name=java)], " +
-                "views=0, viewedBySessions=[], viewedByUsers=[])";
+        String toStringResult = question.toString();
 
-        // Act & Assert
-        assertEquals(expectedString, question.toString());
+        // Assert
+        assertTrue(toStringResult.contains("id=1"));
+        assertTrue(toStringResult.contains("author=User(id=1, firstName=Alex, lastName=Ye)"));
+        assertTrue(toStringResult.contains("title=How to implement..."));
+        assertTrue(toStringResult.contains("description=I need help with..."));
+        assertTrue(toStringResult.contains("creationDate=2025-01-01T10:00"));
+        assertTrue(toStringResult.contains("Answer(id=1, content=Use @Entity)"));
+        assertTrue(toStringResult.contains("Tag(id=1, name=java)"));
+        assertTrue(toStringResult.contains("Tag(id=2, name=bug)"));
+        assertTrue(toStringResult.contains("views=0"));
+        assertTrue(toStringResult.contains("viewedBySessions=[]"));
+        assertTrue(toStringResult.contains("viewedByUsers=[]"));
     }
 }

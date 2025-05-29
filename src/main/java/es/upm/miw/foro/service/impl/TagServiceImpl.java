@@ -7,22 +7,16 @@ import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.Tag;
 import es.upm.miw.foro.persistence.model.User;
-import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.persistence.repository.TagRepository;
 import es.upm.miw.foro.service.TagService;
 import es.upm.miw.foro.service.UserService;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,13 +24,10 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
     private final UserService userService;
-    private final Validator validator;
 
-    public TagServiceImpl(TagRepository tagRepository, UserService userService,
-                          Validator validator) {
+    public TagServiceImpl(TagRepository tagRepository, UserService userService) {
         this.tagRepository = tagRepository;
         this.userService = userService;
-        this.validator = validator;
     }
 
     @Transactional(readOnly = true)
