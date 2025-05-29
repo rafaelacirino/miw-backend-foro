@@ -9,6 +9,7 @@ import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.service.impl.QuestionServiceImpl;
+import es.upm.miw.foro.util.MessageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
@@ -194,7 +195,7 @@ class QuestionServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.getQuestionById(QUESTION_ID));
-        assertEquals("Question not found", exception.getMessage());
+        assertEquals(MessageUtil.QUESTION_NOT_FOUND, exception.getMessage());
 
         // Verify
         verify(questionRepository, times(1)).findById(QUESTION_ID);
@@ -335,7 +336,7 @@ class QuestionServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.updateQuestion(QUESTION_ID, questionDto));
-        assertEquals("Question not found with id: " + QUESTION_ID, exception.getMessage());
+        assertEquals(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + QUESTION_ID, exception.getMessage());
 
         // Verify
         verify(validator, times(1)).validate(any(QuestionDto.class));
@@ -391,7 +392,7 @@ class QuestionServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.deleteQuestion(QUESTION_ID));
-        assertEquals("Question not found with id: " + QUESTION_ID, exception.getMessage());
+        assertEquals(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + QUESTION_ID, exception.getMessage());
 
         // Verify
         verify(userService, times(1)).getAuthenticatedUser();
@@ -478,7 +479,7 @@ class QuestionServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.isQuestionAuthor(QUESTION_ID, EMAIL));
-        assertEquals("Question not found with id: " + QUESTION_ID, exception.getMessage());
+        assertEquals(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + QUESTION_ID, exception.getMessage());
 
         // Verify
         verify(questionRepository, times(1)).findById(QUESTION_ID);

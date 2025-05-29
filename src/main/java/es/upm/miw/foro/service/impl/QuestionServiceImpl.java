@@ -68,7 +68,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto getQuestionById(Long id) {
         try {
             Question question = questionRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("Question not found"));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND));
             Hibernate.initialize(question.getAuthor());
             Hibernate.initialize(question.getAnswers());
             return QuestionMapper.toQuestionDto(question);
@@ -142,7 +142,7 @@ public class QuestionServiceImpl implements QuestionService {
             User authenticatedUser = userService.getAuthenticatedUser();
 
             Question existingQuestion = questionRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND + id));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + id));
 
             if (!existingQuestion.getAuthor().getId().equals(authenticatedUser.getId())) {
                 throw new ServiceException("You are not authorized to update this question");
@@ -167,7 +167,7 @@ public class QuestionServiceImpl implements QuestionService {
             User authenticatedUser = userService.getAuthenticatedUser();
 
             Question question = questionRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND + id));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + id));
 
             if (!question.getAuthor().getId().equals(authenticatedUser.getId()) && !Role.ADMIN.equals(authenticatedUser.getRole())) {
                 throw new ServiceException("You are not authorized to delete this question");
@@ -185,7 +185,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public boolean isQuestionAuthor(Long questionId, String email) {
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND + questionId));
+                .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + questionId));
         return question.getAuthor().getEmail().equals(email);
     }
 
@@ -206,7 +206,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public void registerView(Long questionId, HttpServletRequest request) {
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RepositoryException("Question not found"));
+                .orElseThrow(() -> new RepositoryException(MessageUtil.QUESTION_NOT_FOUND));
 
         String sessionId = request.getSession().getId();
         User user;

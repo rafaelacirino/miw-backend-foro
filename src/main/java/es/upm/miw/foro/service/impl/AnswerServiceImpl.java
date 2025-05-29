@@ -59,7 +59,7 @@ public class AnswerServiceImpl implements AnswerService {
             User author = userService.getAuthenticatedUser();
             log.info("Validate user...");
             Question question = questionRepository.findById(questionId)
-                    .orElseThrow(() -> new ServiceException("Question not found"));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND));
 
             Answer answer = AnswerMapper.toEntity(answerDto, question, author);
             Answer savedAnswer = answerRepository.save(answer);
@@ -84,7 +84,7 @@ public class AnswerServiceImpl implements AnswerService {
     public List<AnswerDto> getAnswersByQuestionId(Long questionId) {
         try {
             Question question = questionRepository.findById(questionId)
-                    .orElseThrow(() -> new RepositoryException("Question not found"));
+                    .orElseThrow(() -> new RepositoryException(MessageUtil.QUESTION_NOT_FOUND));
 
             List<Answer> answers = answerRepository.findByQuestionOrderByCreationDateAsc(question);
             return AnswerMapper.toDtoList(answers);

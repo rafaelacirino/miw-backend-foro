@@ -64,7 +64,7 @@ public class QuestionController {
 
             return ResponseEntity.ok(questionDto);
         } catch (ServiceException e) {
-            log.warn("Question not found with id: {}", id);
+            log.warn(MessageUtil.QUESTION_NOT_FOUND_WITH_ID, id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
             log.error("Error retrieving question with id {}: {}", id, e.getMessage());

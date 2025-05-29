@@ -1,5 +1,6 @@
 package es.upm.miw.foro.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class Question {
     private LocalDateTime creationDate;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Answer> answers = new ArrayList<>();
 
     @Column(name = "views", nullable = false)
@@ -83,5 +85,4 @@ public class Question {
 
         return isNewView;
     }
-
 }

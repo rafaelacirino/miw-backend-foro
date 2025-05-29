@@ -4,7 +4,8 @@ import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.EmailDto;
 import es.upm.miw.foro.api.dto.ResetPasswordDto;
 import es.upm.miw.foro.exception.ServiceException;
-import es.upm.miw.foro.service.impl.PasswordResetService;
+import es.upm.miw.foro.service.email.PasswordResetService;
+import es.upm.miw.foro.util.MessageUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -59,7 +60,7 @@ class PasswordResetControllerTest {
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertInstanceOf(Map.class, response.getBody());
-        assertEquals("An unexpected error occurred", ((Map<?, ?>) response.getBody()).get("message"));
+        assertEquals(MessageUtil.UNEXPECTED_ERROR, ((Map<?, ?>) response.getBody()).get("message"));
         verify(passwordResetService, times(1)).sendPasswordResetEmail(EMAIL);
     }
 
@@ -108,7 +109,7 @@ class PasswordResetControllerTest {
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertInstanceOf(Map.class, response.getBody());
-        assertEquals("An unexpected error occurred", ((Map<?, ?>) response.getBody()).get("message"));
+        assertEquals(MessageUtil.UNEXPECTED_ERROR, ((Map<?, ?>) response.getBody()).get("message"));
         verify(passwordResetService, times(1)).resetPassword(TOKEN, NEW_PASSWORD);
     }
 }

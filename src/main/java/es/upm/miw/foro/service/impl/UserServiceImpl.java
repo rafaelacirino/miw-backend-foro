@@ -9,6 +9,7 @@ import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.UserRepository;
 import es.upm.miw.foro.service.UserService;
+import es.upm.miw.foro.util.MessageUtil;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -28,16 +29,16 @@ import java.util.Set;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    public static final String NOT_FOUND = " not found";
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtServiceImpl;
     private final Validator validator;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, Validator validator) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                           JwtServiceImpl jwtServiceImpl, Validator validator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
+        this.jwtServiceImpl = jwtServiceImpl;
         this.validator = validator;
     }
 
@@ -97,23 +98,16 @@ public class UserServiceImpl implements UserService {
             }
             return userRepository.findById(id)
                     .map(UserMapper::toUserDto)
-                    .orElseThrow(() -> new ServiceException("User with ID " + id + NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException("User with ID " + id + MessageUtil.NOT_FOUND));
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error getting User with ID: " + id, exception);
         }
     }
 
     @Override
-    public UserDto getUserByEmail(String email) throws ServiceException {
-        return  userRepository.findByEmail(email)
-                .map(UserMapper::toUserDto)
-                .orElseThrow(() -> new ServiceException("User with email " + email + " not found"));
-    }
-
-    @Override
     public String login(String email, String password) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ServiceException("User with email " + email + NOT_FOUND, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ServiceException("User with email " + email + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND));
         if (!passwordEncoder.matches(password, user.getPassword())) {
             if (user.getPassword().equals(password)) {
                 String encodedPassword = passwordEncoder.encode(password);
@@ -123,7 +117,7 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Incorrect password", HttpStatus.UNAUTHORIZED);
             }
         }
-        return jwtService.createToken(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole().name());
+        return jwtServiceImpl.createToken(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole().name());
     }
 
     @Override
@@ -161,7 +155,7 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Unauthorized: Only admins or the user themselves can update this user");
             }
             User existingUser = userRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("User with id " + id + NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException("User with id " + id + MessageUtil.NOT_FOUND));
 
             if (!existingUser.getEmail().equals(userDto.getEmail())) {
                 validateEmail(userDto.getEmail());
@@ -198,7 +192,7 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Unauthorized: Only admins or the user themselves can delete this user", HttpStatus.UNAUTHORIZED);
             }
             if (!userRepository.existsById(id)) {
-                throw new ServiceException("User with id " + id + NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new ServiceException("User with id " + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND);
             }
             userRepository.deleteById(id);
         } catch (DataAccessException exception) {
