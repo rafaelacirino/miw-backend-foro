@@ -178,6 +178,51 @@ class QuestionControllerTest {
     }
 
     @Test
+    void testSearchQuestions() throws ServiceException {
+        // Arrange
+        String query = "Java";
+        int page = 0, size = 10;
+        Page<QuestionDto> questionPage = new PageImpl<>(List.of(new QuestionDto()));
+        when(questionService.searchQuestions(eq(query), any(Pageable.class))).thenReturn(questionPage);
+
+        // Act
+        ResponseEntity<Page<QuestionDto>> response = questionController.searchQuestions(query, page, size);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getContent().size());
+
+        verify(questionService).searchQuestions(eq(query), any(Pageable.class));
+    }
+
+    @Test
+    void testSearchQuestions_notFound() throws ServiceException {
+        // Arrange
+        when(questionService.searchQuestions(eq("query"), any(Pageable.class)))
+                .thenThrow(new ServiceException("Service failure"));
+
+        // Act
+        ResponseEntity<Page<QuestionDto>> response = questionController.searchQuestions("query", 0, 10);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testSearchQuestions_unexpectedException_returnsServerError() throws ServiceException {
+        // Arrange
+        when(questionService.searchQuestions(eq("query"), any(Pageable.class)))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act
+        ResponseEntity<Page<QuestionDto>> response = questionController.searchQuestions("query", 0, 10);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
     void testGetQuestions() {
         // Arrange
         Page<QuestionDto> questionPage = new PageImpl<>(List.of(new QuestionDto()));

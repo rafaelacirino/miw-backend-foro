@@ -33,7 +33,7 @@ public class TagServiceImpl implements TagService {
     @Transactional(readOnly = true)
     public List<TagDto> getAllTags() {
         return tagRepository.findAll().stream()
-                .map(tag -> new TagDto(tag.getId(), tag.getName()))
+                .map(tag -> new TagDto(tag.getId(), tag.getName(), tag.getQuestions().size()))
                 .toList();
     }
 

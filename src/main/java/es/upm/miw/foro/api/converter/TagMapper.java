@@ -57,6 +57,7 @@ public class TagMapper {
         }
         dto.setId(tag.getId());
         dto.setName(tag.getName());
+        dto.setQuestionCount(tag.getQuestions() != null ? tag.getQuestions().size() : 0);
     }
 
     private static void populateEntity(Tag tag, TagDto tagDto) {

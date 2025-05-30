@@ -24,4 +24,8 @@ public class TagDto {
     @Schema(description = "Tag name of the question", example = "Bug")
     private String name;
 
+    @Schema(description = "Number of questions with this tag", example = "72")
+    private Integer questionCount;
+
+
 }

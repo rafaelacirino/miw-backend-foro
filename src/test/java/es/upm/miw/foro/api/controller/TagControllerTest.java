@@ -25,12 +25,12 @@ class TagControllerTest {
 
     private static final Long ID = 1L;
 
-    private final TagDto tagDto = new TagDto(ID, "java");
+    private final TagDto tagDto = new TagDto(ID, "java", 3);
 
     @Test
     void testGetTags() {
         // Arrange
-        List<TagDto> tags = List.of(tagDto);
+        List<TagDto> tags = List.of(tagDto, tagDto);
         when(tagService.getAllTags()).thenReturn(tags);
 
         // Act
