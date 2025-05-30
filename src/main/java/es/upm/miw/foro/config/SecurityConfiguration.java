@@ -3,6 +3,7 @@ package es.upm.miw.foro.config;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.UserRepository;
+import es.upm.miw.foro.service.impl.JwtServiceImpl;
 import es.upm.miw.foro.util.ApiPath;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtServiceImpl jwtServiceImpl) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -93,7 +94,7 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
-                        jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+                        jwtAuthorizationFilter(jwtServiceImpl), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();
@@ -126,8 +127,8 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthorizationFilter() {
-        return new JwtAuthenticationFilter();
+    public JwtAuthenticationFilter jwtAuthorizationFilter(JwtServiceImpl jwtServiceImpl) {
+        return new JwtAuthenticationFilter(jwtServiceImpl);
     }
 
     @Bean

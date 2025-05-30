@@ -19,11 +19,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private JwtServiceImpl jwtServiceImpl;
+    private final JwtServiceImpl jwtServiceImpl;
+
+    private static final Set<String> PUBLIC_GET_PATHS = Set.of(
+            ApiPath.QUESTIONS,
+            ApiPath.QUESTION_SEARCH,
+            ApiPath.TAGS,
+            ApiPath.TAGS_SEARCH,
+            ApiPath.ANSWERS
+    );
+
+    public JwtAuthenticationFilter(JwtServiceImpl jwtServiceImpl) {
+        this.jwtServiceImpl = jwtServiceImpl;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
@@ -31,12 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         String method = request.getMethod();
         log.info("Request path: {}", path);
-        if (("GET".equalsIgnoreCase(method)) && (path.equals(ApiPath.QUESTIONS) ||
-                path.matches(ApiPath.QUESTIONS + "/\\d+") ||
-                path.equals(ApiPath.QUESTION_SEARCH))) {
+
+        if ("GET".equalsIgnoreCase(method) && (PUBLIC_GET_PATHS.contains(path) || path.matches(ApiPath.QUESTIONS + "/\\d+"))) {
             chain.doFilter(request, response);
             return;
         }
+
         String authHeader = request.getHeader(MessageUtil.AUTHORIZATION);
         log.info("JWT Header: {}", authHeader);
 
