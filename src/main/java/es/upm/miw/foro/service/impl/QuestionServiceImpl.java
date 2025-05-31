@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -119,6 +120,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public QuestionDto updateQuestion(Long id, QuestionDto questionDto) {
         try {
             validateQuestionDto(questionDto);
@@ -126,7 +128,7 @@ public class QuestionServiceImpl implements QuestionService {
 
             User authenticatedUser = userService.getAuthenticatedUser();
 
-            Question existingQuestion = questionRepository.findById(id)
+            Question existingQuestion = questionRepository.findByIdWithAuthor(id)
                     .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + id));
 
             if (!existingQuestion.getAuthor().getId().equals(authenticatedUser.getId())) {
@@ -150,11 +152,12 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public void deleteQuestion(Long id) {
         try {
             User authenticatedUser = userService.getAuthenticatedUser();
 
-            Question question = questionRepository.findById(id)
+            Question question = questionRepository.findByIdWithAuthorAndTags(id)
                     .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + id));
 
             if (!question.getAuthor().getId().equals(authenticatedUser.getId()) && !Role.ADMIN.equals(authenticatedUser.getRole())) {
@@ -171,8 +174,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isQuestionAuthor(Long questionId, String email) {
-        Question question = questionRepository.findById(questionId)
+        Question question = questionRepository.findByIdWithAuthor(questionId)
                 .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + questionId));
         return question.getAuthor().getEmail().equals(email);
     }
@@ -183,6 +187,12 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             Specification<Question> spec = QuestionSpecification.buildQuestionSpecification(email, title, fromDate, null, null);
             Page<Question> page = questionRepository.findAll(spec, pageable);
+
+            page.getContent().forEach(question -> {
+                Hibernate.initialize(question.getAuthor());
+                Hibernate.initialize(question.getTags());
+            });
+
             return page.map(QuestionMapper::toQuestionDto);
         } catch (ServiceException e) {
             throw e;

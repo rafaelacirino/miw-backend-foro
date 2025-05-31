@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
@@ -20,6 +22,14 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSp
     OR LOWER(a.content) LIKE LOWER(CONCAT('%', :query, '%'))
     """)
     Page<Question> searchByTitleOrDescriptionOrAnswerContentContainingIgnoreCase(@Param("query") String query, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"author"})
+    @Query("SELECT q FROM Question q WHERE q.id = :id")
+    Optional<Question> findByIdWithAuthor(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = {"author", "tags"})
+    @Query("SELECT q FROM Question q WHERE q.id = :id")
+    Optional<Question> findByIdWithAuthorAndTags(@Param("id") Long id);
 
     @Transactional
     @Modifying
