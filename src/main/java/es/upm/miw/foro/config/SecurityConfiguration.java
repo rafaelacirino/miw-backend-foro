@@ -81,6 +81,7 @@ public class SecurityConfiguration {
                                 ApiPath.QUESTION_VIEWS,
 
                                 ApiPath.ANSWERS,
+                                ApiPath.ANSWER_ID,
 
                                 ApiPath.TAGS,
                                 ApiPath.TAGS_SEARCH,

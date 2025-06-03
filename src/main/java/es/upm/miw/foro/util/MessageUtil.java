@@ -3,7 +3,6 @@ package es.upm.miw.foro.util;
 public class MessageUtil {
 
     private MessageUtil() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     public static final String PASSWORD_MESSAGE = "Password must be at least 8 characters, contain at least one " +

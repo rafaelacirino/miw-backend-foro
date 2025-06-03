@@ -201,6 +201,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean verifyPassword(Long userId, String currentPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ServiceException("User not found"));
+        return passwordEncoder.matches(currentPassword, user.getPassword());
+    }
+
+    @Override
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {

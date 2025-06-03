@@ -21,5 +21,7 @@ public interface UserService {
 
     void deleteUser(Long id);
 
+    boolean verifyPassword(Long userId, String currentPassword);
+
     User getAuthenticatedUser();
 }

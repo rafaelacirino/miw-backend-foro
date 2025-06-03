@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +28,7 @@ public class AnswerDto {
     @Schema(description = "Content of the answer", example = "The answer is ...")
     private String content;
 
-    //@NotNull(message = "Unique identifier of the question")
+    @NotNull(message = "Unique identifier of the question")
     private Long questionId;
 
     @JsonProperty("author")

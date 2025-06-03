@@ -20,6 +20,7 @@ public class ApiPath {
     public static final String QUESTION_VIEWS = QUESTION_ID + "/views";
 
     public static final String ANSWERS = "/answers";
+    public static final String ANSWER_ID = ANSWERS + "/{id}";
 
     public static final String TAGS = "/tags";
     public static final String TAGS_SEARCH = TAGS + "/search";

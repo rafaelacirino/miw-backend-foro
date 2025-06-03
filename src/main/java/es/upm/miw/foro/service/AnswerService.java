@@ -13,6 +13,8 @@ public interface AnswerService {
 
     List<AnswerDto> getAnswersByQuestionId(Long questionId);
 
+    AnswerDto getAnswerById(Long answerId);
+
     AnswerDto updateAnswer(Long id, AnswerDto answerDto);
 
     Page<AnswerDto> getMyAnswers(String email, String question, String content, LocalDateTime creationDate, Pageable pageable);

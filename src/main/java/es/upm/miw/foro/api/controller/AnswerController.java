@@ -65,6 +65,24 @@ public class AnswerController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AnswerDto> getAnswerById(@Valid @PathVariable Long id) {
+        try {
+            AnswerDto answerDto = answerService.getAnswerById(id);
+
+            if (answerDto == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+            return ResponseEntity.ok(answerDto);
+        } catch (ServiceException e) {
+            log.warn(MessageUtil.ANSWER_NOT_FOUND, id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            log.error("Error retrieving answer with id {}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @GetMapping("/myAnswers")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasAnyRole('MEMBER', 'ADMIN')")

@@ -97,6 +97,22 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public AnswerDto getAnswerById(Long answerId) {
+        try {
+            Answer answer = answerRepository.findById(answerId)
+                    .orElseThrow(() -> new RepositoryException(MessageUtil.ANSWER_NOT_FOUND + answerId));
+            return AnswerMapper.toAnswerDto(answer);
+        } catch (DataAccessException e) {
+            throw new RepositoryException("Error while retrieving answer", e);
+        } catch (ServiceException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServiceException("Unexpected error while getting answer", e);
+        }
+    }
+
+    @Override
     public AnswerDto updateAnswer(Long id, AnswerDto answerDto) {
         try {
             validateAnswerDto(answerDto);

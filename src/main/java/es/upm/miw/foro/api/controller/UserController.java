@@ -146,4 +146,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PostMapping("/verifyPassword")
+    @Operation(summary = "verifyPassword", description = "Verify the password")
+    public ResponseEntity<Map<String, Boolean>> verifyPassword(@RequestBody Map<String, String> request) {
+        Long userId = Long.valueOf(request.get("userId"));
+        String currentPassword = request.get("currentPassword");
+        boolean isValid = userService.verifyPassword(userId, currentPassword);
+
+        return ResponseEntity.ok(Map.of("isValid", isValid));
+    }
 }
