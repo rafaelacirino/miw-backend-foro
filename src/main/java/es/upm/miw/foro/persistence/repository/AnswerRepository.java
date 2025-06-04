@@ -16,6 +16,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Long>, JpaSpecif
 
     List<Answer> findByQuestionOrderByCreationDateAsc(Question question);
 
-    @Query("select a from Answer a join fetch a.author where a.id = :id")
+    @Query("SELECT a FROM Answer a JOIN FETCH a.author WHERE a.id = :id")
     Optional<Answer> findByIdWithAuthor(@Param("id") Long id);
 }

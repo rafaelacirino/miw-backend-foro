@@ -43,9 +43,6 @@ class AnswerControllerTest {
     private static final String CONTENT = "Content";
     private static final LocalDateTime DATE_TIME = LocalDateTime.now();
 
-    @Autowired
-    private QuestionService questionService;
-
     @BeforeEach
     void setUp() {
         answerDto = new AnswerDto();
@@ -127,7 +124,7 @@ class AnswerControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        assertEquals(answerDto, response.getBody().get(0));
+        assertEquals(answerDto, response.getBody().getFirst());
         verify(answerService, times(1)).getAnswersByQuestionId(QUESTION_ID);
     }
 

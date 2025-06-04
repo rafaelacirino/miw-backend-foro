@@ -90,4 +90,10 @@ public class NotificationServiceImpl implements NotificationService {
             throw new ServiceException("Unexpected error while getting notifications", exception);
         }
     }
+
+    @Override
+    @Transactional
+    public void deleteByAnswerId(Long answerId) {
+        notificationRepository.deleteByAnswerId(answerId);
+    }
 }

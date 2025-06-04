@@ -28,7 +28,6 @@ public class AnswerDto {
     @Schema(description = "Content of the answer", example = "The answer is ...")
     private String content;
 
-    @NotNull(message = "Unique identifier of the question")
     private Long questionId;
 
     @JsonProperty("author")
