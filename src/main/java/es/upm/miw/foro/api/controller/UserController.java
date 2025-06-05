@@ -43,10 +43,11 @@ public class UserController {
         try {
             return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
         } catch (ServiceException e) {
-            HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.CONFLICT;
-            return ResponseEntity.status(status).body(e.getMessage());
+            return ResponseEntity.status(e.getStatus())
+                    .body(Map.of(MessageUtil.MESSAGE, e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(MessageUtil.MESSAGE, MessageUtil.UNEXPECTED_ERROR));
         }
     }
 
@@ -119,13 +120,13 @@ public class UserController {
     @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "updateUser", description = "Update User into DB")
-    public ResponseEntity<Object> updateUser( @Valid @PathVariable Long id,
-                                              @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> updateUser(@Valid @PathVariable Long id, @RequestBody UserDto userDto) {
         try {
             return ResponseEntity.ok(userService.updateUser(id, userDto));
         } catch (ServiceException e) {
             HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.CONFLICT;
-            return ResponseEntity.status(status).body(e.getMessage());
+            return ResponseEntity.status(status)
+                    .body(Map.of(MessageUtil.MESSAGE, e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(MessageUtil.MESSAGE, MessageUtil.UNEXPECTED_ERROR));

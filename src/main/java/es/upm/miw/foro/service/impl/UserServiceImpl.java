@@ -47,28 +47,16 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
         User currentUser = getAuthenticatedUserWithRole();
         log.info("Current user: {} with role: {}", currentUser.getFirstName(), currentUser.getRole());
-        try {
-            validateEmail(userDto.getEmail());
-            validateUserDto(userDto);
-            if (userDto.getRole() == null) {
-                userDto.setRole(Role.MEMBER);
-            }
-            User user = UserMapper.toEntity(userDto);
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            User savedUser = userRepository.save(user);
-            return UserMapper.toUserDto(savedUser);
-        } catch (DataAccessException exception) {
-            throw new RepositoryException("Error saving User", exception);
-        } catch (ServiceException exception) {
-            throw exception;
-        } catch (Exception e) {
-            throw new ServiceException("Unexpected error while creating User", e);
-        }
+        return saveUser(userDto);
     }
 
     @Override
     @Transactional
     public UserDto registerUser(UserDto userDto) {
+        return saveUser(userDto);
+    }
+
+    private UserDto saveUser(UserDto userDto) {
         try {
             validateEmail(userDto.getEmail());
             validateUserName(userDto.getUserName());
@@ -85,7 +73,7 @@ public class UserServiceImpl implements UserService {
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error saving User", exception);
         } catch (Exception e) {
-            throw new ServiceException("Unexpected error while creating User", e);
+            throw new ServiceException("Unexpected error saving user", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -152,15 +140,17 @@ public class UserServiceImpl implements UserService {
         try {
             User currentUser = getAuthenticatedUser();
             if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
-                throw new ServiceException("Unauthorized: Only admins or the user themselves can update this user");
+                throw new ServiceException("Unauthorized: Only admins or the user themselves can update this user", HttpStatus.FORBIDDEN);
             }
             User existingUser = userRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("User with id " + id + MessageUtil.NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException("User with id " + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND));
 
             if (!existingUser.getEmail().equals(userDto.getEmail())) {
                 validateEmail(userDto.getEmail());
             }
-
+            if (!existingUser.getUserName().equals(userDto.getUserName())) {
+                validateUserName(userDto.getUserName());
+            }
             validateUserDto(userDto);
 
             existingUser.setFirstName(userDto.getFirstName());
@@ -176,10 +166,12 @@ public class UserServiceImpl implements UserService {
             User updatedUser = this.userRepository.save(existingUser);
             return UserMapper.toUserDto(updatedUser);
 
+        } catch (ServiceException e) {
+            throw e;
         } catch (DataAccessException exception) {
-            throw new RepositoryException("Error updating User with id " + id, exception);
+            throw new RepositoryException("Error updating User", exception);
         } catch (Exception exception) {
-            throw new ServiceException("Unexpected error while updating User with id " + id, exception);
+            throw new ServiceException("Unexpected error while updating User", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -216,7 +208,7 @@ public class UserServiceImpl implements UserService {
         }
         String currentUserEmail = authentication.getName();
         return userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ServiceException("Authenticated user not found"));
+                .orElseThrow(() -> new ServiceException("Authenticated user not found", HttpStatus.NOT_FOUND));
     }
 
     private User getAuthenticatedUserWithRole() {
@@ -230,12 +222,14 @@ public class UserServiceImpl implements UserService {
 
     private void validateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
+            log.error("Email already exists: {}", email);
             throw new ServiceException("Email already exists", HttpStatus.CONFLICT);
         }
     }
 
     private void validateUserName(String userName) {
         if (userRepository.existsByUserName(userName)) {
+            log.error("Username already exists: {}", userName);
             throw new ServiceException("Username already exists", HttpStatus.CONFLICT);
         }
     }
