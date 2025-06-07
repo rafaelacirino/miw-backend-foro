@@ -2,10 +2,16 @@ package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.UserDto;
 import es.upm.miw.foro.persistence.model.User;
+import lombok.Generated;
 
 import java.util.List;
 
 public class UserMapper {
+
+    @Generated
+    private UserMapper() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static UserDto toUserDto(User user) {
         if (user == null) {

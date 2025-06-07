@@ -2,6 +2,7 @@ package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.TagDto;
 import es.upm.miw.foro.persistence.model.Tag;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -9,6 +10,11 @@ import java.util.List;
 
 @Slf4j
 public class TagMapper {
+
+    @Generated
+    private TagMapper() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static TagDto toTagDto(Tag tag) {
         if (tag == null) {
