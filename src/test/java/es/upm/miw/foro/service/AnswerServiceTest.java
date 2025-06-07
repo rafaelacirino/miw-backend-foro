@@ -229,6 +229,58 @@ class AnswerServiceTest {
     }
 
     @Test
+    void testGetAnswerById_success() {
+        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+
+        AnswerDto result = answerService.getAnswerById(ANSWER_ID);
+
+        assertNotNull(result);
+        assertEquals(ANSWER_ID, result.getId());
+        assertEquals(CONTENT, result.getContent());
+        assertEquals(AUTHOR_NAME, result.getAuthor());
+        verify(answerRepository).findById(ANSWER_ID);
+    }
+
+    @Test
+    void testGetAnswerById_dataAccessException_throwsRepositoryException() {
+        when(answerRepository.findById(ANSWER_ID)).thenThrow(new DataAccessException("DB error") {});
+
+        RepositoryException ex = assertThrows(RepositoryException.class, () -> {
+            answerService.getAnswerById(ANSWER_ID);
+        });
+
+        assertEquals("Error while retrieving answer", ex.getMessage());
+        assertInstanceOf(DataAccessException.class, ex.getCause());
+        verify(answerRepository).findById(ANSWER_ID);
+    }
+
+    @Test
+    void testGetAnswerById_serviceException_rethrows() {
+        when(answerRepository.findById(ANSWER_ID)).thenThrow(new ServiceException("Service error"));
+
+        ServiceException ex = assertThrows(ServiceException.class, () -> {
+            answerService.getAnswerById(ANSWER_ID);
+        });
+
+        assertEquals("Service error", ex.getMessage());
+        verify(answerRepository).findById(ANSWER_ID);
+    }
+
+    @Test
+    void testGetAnswerById_unexpectedException_throwsServiceException() {
+        when(answerRepository.findById(ANSWER_ID)).thenThrow(new RuntimeException("Unexpected"));
+
+        ServiceException ex = assertThrows(ServiceException.class, () -> {
+            answerService.getAnswerById(ANSWER_ID);
+        });
+
+        assertEquals("Unexpected error while getting answer", ex.getMessage());
+        assertInstanceOf(RuntimeException.class, ex.getCause());
+        verify(answerRepository).findById(ANSWER_ID);
+    }
+
+
+    @Test
     void testValidateAnswerDto() {
         // Arrange
         when(validator.validate(answerDto)).thenReturn(Collections.emptySet());
