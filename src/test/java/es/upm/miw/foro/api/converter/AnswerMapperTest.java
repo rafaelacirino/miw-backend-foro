@@ -22,11 +22,6 @@ class AnswerMapperTest {
     private static final LocalDateTime DATE_TIME = LocalDateTime.of(2020, 1, 1, 1, 1);
 
     @Test
-    void testToConstructorThrowsUnsupportedOperationException() {
-         assertThrows(UnsupportedOperationException.class, AnswerMapper::new);
-    }
-
-    @Test
     void toAnswerDto_thenMapsToDto() {
         // Arrange
         Answer answer = createAnswerEntity();

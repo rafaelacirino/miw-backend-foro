@@ -21,11 +21,6 @@ class NotificationMapperTest {
     private static final LocalDateTime CREATION_DATE = LocalDateTime.of(2025, 1, 1, 10, 0);
 
     @Test
-    void testConstructor_ShouldThrowUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, NotificationMapper::new);
-    }
-
-    @Test
     void toNotificationDto_thenMapsDto() {
         // Arrange
         Notification notification = createNotification(NotificationType.QUESTION_REPLIED);

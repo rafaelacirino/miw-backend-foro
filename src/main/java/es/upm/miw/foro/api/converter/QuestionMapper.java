@@ -16,10 +16,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class QuestionMapper {
 
-    public QuestionMapper() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
     public static QuestionDto toQuestionDto(Question question) {
         if (question == null) {
             return null;

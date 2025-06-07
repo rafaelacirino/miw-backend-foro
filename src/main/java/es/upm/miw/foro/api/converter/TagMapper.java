@@ -10,10 +10,6 @@ import java.util.List;
 @Slf4j
 public class TagMapper {
 
-    public TagMapper() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
     public static TagDto toTagDto(Tag tag) {
         if (tag == null) {
             return null;

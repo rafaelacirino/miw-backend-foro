@@ -10,10 +10,6 @@ import java.util.List;
 
 public class AnswerMapper {
 
-    public AnswerMapper() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
     public static AnswerDto toAnswerDto(Answer answer) {
         if (answer == null) {
             return null;
