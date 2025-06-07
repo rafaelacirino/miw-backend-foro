@@ -1,6 +1,6 @@
 package es.upm.miw.foro.persistence.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -28,11 +28,12 @@ public class Answer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false, referencedColumnName = "id")
-    @JsonBackReference
+    @JsonIgnoreProperties("answers")
     private Question question;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false, referencedColumnName = "id")
+    @JsonIgnoreProperties("answers")
     private User author;
 
     @Column(name = "creation_date", nullable = false)

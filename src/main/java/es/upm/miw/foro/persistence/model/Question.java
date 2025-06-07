@@ -1,7 +1,6 @@
 package es.upm.miw.foro.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +27,7 @@ public class Question {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false, referencedColumnName = "id")
+    @JsonIgnoreProperties("questions")
     private User author;
 
     @Column(name = "title", nullable = false)
@@ -40,7 +40,7 @@ public class Question {
     private LocalDateTime creationDate;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonIgnoreProperties("questions")
     private List<Answer> answers = new ArrayList<>();
 
     @ManyToMany
