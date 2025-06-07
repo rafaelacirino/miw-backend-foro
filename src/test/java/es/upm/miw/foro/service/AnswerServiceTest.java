@@ -71,6 +71,7 @@ class AnswerServiceTest {
         author = new User();
         author.setId(AUTHOR_ID);
         author.setUserName(AUTHOR_NAME);
+        author.setEmail(USER_EMAIL);
 
         questionAuthor = new User();
         questionAuthor.setId(QUESTION_AUTHOR_ID);
@@ -245,12 +246,10 @@ class AnswerServiceTest {
     @Test
     void testUpdateAnswer() {
         // Arrange
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
         when(validator.validate(any(AnswerDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
         when(answerRepository.save(any(Answer.class))).thenReturn(answer);
-        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
 
         // Acct
         AnswerDto result = answerService.updateAnswer(ANSWER_ID, answerDto);
@@ -263,21 +262,21 @@ class AnswerServiceTest {
         assertEquals(CREATION_DATE, result.getCreationDate());
 
         // Verify
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(2)).findByIdWithAuthor(ANSWER_ID);
         verify(validator, times(1)).validate(any(AnswerDto.class));
         verify(userService, times(1)).getAuthenticatedUser();
         verify(answerRepository, times(1)).save(any(Answer.class));
-        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
+        verify(answerRepository, times(2)).findByIdWithAuthor(ANSWER_ID);
     }
 
     @Test
     void testUpdateAnswer_answerNotFound_throwsException() {
         // Arrange
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.empty());
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(ServiceException.class, () -> answerService.updateAnswer(ANSWER_ID, answerDto));
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
     }
 
     @Test
@@ -287,12 +286,12 @@ class AnswerServiceTest {
         otherUser.setId(9L);
         otherUser.setUserName("user");
 
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
         when(userService.getAuthenticatedUser()).thenReturn(otherUser);
 
         // Act & Assert
         assertThrows(ServiceException.class, () -> answerService.updateAnswer(ANSWER_ID, answerDto));
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
         verify(userService, times(1)).getAuthenticatedUser();
     }
 
@@ -311,10 +310,10 @@ class AnswerServiceTest {
     @Test
     void testUpdateAnswer_repositorySaveThrowsException() {
         // Arrange
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
         when(validator.validate(any(AnswerDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithAuthor(QUESTION_ID)).thenReturn(Optional.of(question));
         when(answerRepository.save(any(Answer.class))).thenThrow(new DataAccessException("DB Error") {});
 
         // Act & Assert
@@ -407,24 +406,24 @@ class AnswerServiceTest {
     @Test
     void testDeleteAnswer() {
         when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
 
         answerService.deleteAnswer(ANSWER_ID);
 
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
         verify(answerRepository, times(1)).delete(answer);
     }
 
     @Test
     void testDeleteAnswer_answerNotFound_throwsException() {
         when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.empty());
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.empty());
 
         ServiceException exception = assertThrows(ServiceException.class, () ->
                 answerService.deleteAnswer(ANSWER_ID));
 
         assertTrue(exception.getMessage().contains("Answer not found"));
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
         verify(answerRepository, never()).delete(answer);
     }
 
@@ -436,27 +435,27 @@ class AnswerServiceTest {
         otherUser.setRole(Role.MEMBER);
 
         when(userService.getAuthenticatedUser()).thenReturn(otherUser);
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
 
         ServiceException exception = assertThrows(ServiceException.class, () ->
                 answerService.deleteAnswer(ANSWER_ID));
 
         assertEquals("You are not authorized to delete this answer", exception.getMessage());
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
         verify(answerRepository, never()).delete(answer);
     }
 
     @Test
     void testDeleteAnswer_repositoryDeleteThrowsDataAccessException() {
         when(userService.getAuthenticatedUser()).thenReturn(author);
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
         doThrow(new DataAccessException("DB Error") {}).when(answerRepository).delete(answer);
 
         RepositoryException exception = assertThrows(RepositoryException.class, () ->
                 answerService.deleteAnswer(ANSWER_ID));
 
         assertTrue(exception.getMessage().contains("Error while deleting answer"));
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
         verify(answerRepository, times(1)).delete(answer);
     }
 
@@ -474,43 +473,43 @@ class AnswerServiceTest {
 
     @Test
     void testIsAnswerAuthor_usernameMatches_returnTrue() {
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
 
-        boolean result = answerService.isAnswerAuthor(ANSWER_ID, AUTHOR_NAME);
+        boolean result = answerService.isAnswerAuthor(ANSWER_ID, USER_EMAIL);
 
         assertTrue(result);
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
     }
 
     @Test
     void testIsAnswerAuthor_usernameDoesNotMatch_returnFalse() {
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.of(answer));
 
         boolean result = answerService.isAnswerAuthor(ANSWER_ID, "Name");
 
         assertFalse(result);
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
     }
 
     @Test
     void testIsAnswerAuthor_answerNotFound_throwsException() {
-        when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.empty());
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenReturn(Optional.empty());
 
         ServiceException exception = assertThrows(ServiceException.class, () ->
-                answerService.isAnswerAuthor(ANSWER_ID, AUTHOR_NAME));
+                answerService.isAnswerAuthor(ANSWER_ID, USER_EMAIL));
 
         assertTrue(exception.getMessage().contains("Answer not found"));
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
     }
 
     @Test
     void testIsAnswerAuthor_repositoryThrowsDataAccessException() {
-        when(answerRepository.findById(ANSWER_ID)).thenThrow(new RuntimeException("DB error"));
+        when(answerRepository.findByIdWithAuthor(ANSWER_ID)).thenThrow(new RuntimeException("DB error"));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                answerService.isAnswerAuthor(ANSWER_ID, AUTHOR_NAME));
+                answerService.isAnswerAuthor(ANSWER_ID, USER_EMAIL));
 
         assertTrue(exception.getMessage().contains("DB error"));
-        verify(answerRepository, times(1)).findById(ANSWER_ID);
+        verify(answerRepository, times(1)).findByIdWithAuthor(ANSWER_ID);
     }
 }

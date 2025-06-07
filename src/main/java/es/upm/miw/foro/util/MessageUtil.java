@@ -13,6 +13,7 @@ public class MessageUtil {
     public static final String QUESTION_NOT_FOUND = "Question not found";
     public static final String ANSWER_NOT_FOUND = "Answer not found with id: ";
     public static final String UNEXPECTED_ERROR = "An unexpected error occurred";
+    public static final String USER_ID = "User with id ";
 
     public static final String FIRSTNAME_CLAIM = "firstName";
     public static final String LASTNAME_CLAIM = "lastName";

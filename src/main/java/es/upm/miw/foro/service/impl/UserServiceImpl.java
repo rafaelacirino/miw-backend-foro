@@ -7,6 +7,9 @@ import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
+import es.upm.miw.foro.persistence.repository.AnswerRepository;
+import es.upm.miw.foro.persistence.repository.NotificationRepository;
+import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.persistence.repository.UserRepository;
 import es.upm.miw.foro.service.UserService;
 import es.upm.miw.foro.util.MessageUtil;
@@ -31,13 +34,21 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
+    private final NotificationRepository notificationRepository;
     private final JwtServiceImpl jwtServiceImpl;
     private final Validator validator;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           JwtServiceImpl jwtServiceImpl, Validator validator) {
+                           QuestionRepository questionRepository, AnswerRepository answerRepository,
+                           NotificationRepository notificationRepository, JwtServiceImpl jwtServiceImpl,
+                           Validator validator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.questionRepository = questionRepository;
+        this.answerRepository = answerRepository;
+        this.notificationRepository = notificationRepository;
         this.jwtServiceImpl = jwtServiceImpl;
         this.validator = validator;
     }
@@ -47,28 +58,16 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
         User currentUser = getAuthenticatedUserWithRole();
         log.info("Current user: {} with role: {}", currentUser.getFirstName(), currentUser.getRole());
-        try {
-            validateEmail(userDto.getEmail());
-            validateUserDto(userDto);
-            if (userDto.getRole() == null) {
-                userDto.setRole(Role.MEMBER);
-            }
-            User user = UserMapper.toEntity(userDto);
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            User savedUser = userRepository.save(user);
-            return UserMapper.toUserDto(savedUser);
-        } catch (DataAccessException exception) {
-            throw new RepositoryException("Error saving User", exception);
-        } catch (ServiceException exception) {
-            throw exception;
-        } catch (Exception e) {
-            throw new ServiceException("Unexpected error while creating User", e);
-        }
+        return saveUser(userDto);
     }
 
     @Override
     @Transactional
     public UserDto registerUser(UserDto userDto) {
+        return saveUser(userDto);
+    }
+
+    private UserDto saveUser(UserDto userDto) {
         try {
             validateEmail(userDto.getEmail());
             validateUserName(userDto.getUserName());
@@ -85,7 +84,7 @@ public class UserServiceImpl implements UserService {
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error saving User", exception);
         } catch (Exception e) {
-            throw new ServiceException("Unexpected error while creating User", e);
+            throw new ServiceException("Unexpected error saving user", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -98,7 +97,7 @@ public class UserServiceImpl implements UserService {
             }
             return userRepository.findById(id)
                     .map(UserMapper::toUserDto)
-                    .orElseThrow(() -> new ServiceException("User with ID " + id + MessageUtil.NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND));
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error getting User with ID: " + id, exception);
         }
@@ -152,15 +151,17 @@ public class UserServiceImpl implements UserService {
         try {
             User currentUser = getAuthenticatedUser();
             if (!currentUser.getId().equals(id) && !Role.ADMIN.equals(currentUser.getRole())) {
-                throw new ServiceException("Unauthorized: Only admins or the user themselves can update this user");
+                throw new ServiceException("Unauthorized: Only admins or the user themselves can update this user", HttpStatus.FORBIDDEN);
             }
             User existingUser = userRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("User with id " + id + MessageUtil.NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND));
 
             if (!existingUser.getEmail().equals(userDto.getEmail())) {
                 validateEmail(userDto.getEmail());
             }
-
+            if (!existingUser.getUserName().equals(userDto.getUserName())) {
+                validateUserName(userDto.getUserName());
+            }
             validateUserDto(userDto);
 
             existingUser.setFirstName(userDto.getFirstName());
@@ -176,10 +177,12 @@ public class UserServiceImpl implements UserService {
             User updatedUser = this.userRepository.save(existingUser);
             return UserMapper.toUserDto(updatedUser);
 
+        } catch (ServiceException e) {
+            throw e;
         } catch (DataAccessException exception) {
-            throw new RepositoryException("Error updating User with id " + id, exception);
+            throw new RepositoryException("Error updating User", exception);
         } catch (Exception exception) {
-            throw new ServiceException("Unexpected error while updating User with id " + id, exception);
+            throw new ServiceException("Unexpected error while updating User", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -192,9 +195,27 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Unauthorized: Only admins or the user themselves can delete this user", HttpStatus.UNAUTHORIZED);
             }
             if (!userRepository.existsById(id)) {
-                throw new ServiceException("User with id " + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND);
             }
+
+            User deletedUser = userRepository.findById(id)
+                    .orElseThrow(() -> new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND));
+
+            if ("unknown_user".equals(deletedUser.getUserName())) {
+                throw new ServiceException("Cannot delete the unknown_user_account", HttpStatus.BAD_REQUEST);
+            }
+
+            Long unknownUserId = 0L;
+
+            if (questionRepository.existsByAuthorId(id)) {
+                questionRepository.updateAuthorId(id, unknownUserId);
+            }
+            if (answerRepository.existsByAuthorId(id)) {
+                answerRepository.updateAuthorId(id, unknownUserId);
+            }
+            notificationRepository.deleteByUserId(id);
             userRepository.deleteById(id);
+            log.info(MessageUtil.USER_ID + id + " deleted successfully. Questions and answers reassigned to unknown_user.");
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting user with id " + id, exception);
         }
@@ -216,7 +237,7 @@ public class UserServiceImpl implements UserService {
         }
         String currentUserEmail = authentication.getName();
         return userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ServiceException("Authenticated user not found"));
+                .orElseThrow(() -> new ServiceException("Authenticated user not found", HttpStatus.NOT_FOUND));
     }
 
     private User getAuthenticatedUserWithRole() {
@@ -230,12 +251,14 @@ public class UserServiceImpl implements UserService {
 
     private void validateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
+            log.error("Email already exists: {}", email);
             throw new ServiceException("Email already exists", HttpStatus.CONFLICT);
         }
     }
 
     private void validateUserName(String userName) {
         if (userRepository.existsByUserName(userName)) {
+            log.error("Username already exists: {}", userName);
             throw new ServiceException("Username already exists", HttpStatus.CONFLICT);
         }
     }

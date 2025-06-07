@@ -4,13 +4,11 @@ import es.upm.miw.foro.TestConfig;
 import es.upm.miw.foro.api.dto.AnswerDto;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.service.AnswerService;
-import es.upm.miw.foro.service.QuestionService;
 import es.upm.miw.foro.util.MessageUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,9 +40,6 @@ class AnswerControllerTest {
     private static final String QUESTION_TITLE = "Question Title";
     private static final String CONTENT = "Content";
     private static final LocalDateTime DATE_TIME = LocalDateTime.now();
-
-    @Autowired
-    private QuestionService questionService;
 
     @BeforeEach
     void setUp() {
@@ -127,7 +122,7 @@ class AnswerControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        assertEquals(answerDto, response.getBody().get(0));
+        assertEquals(answerDto, response.getBody().getFirst());
         verify(answerService, times(1)).getAnswersByQuestionId(QUESTION_ID);
     }
 
@@ -172,6 +167,64 @@ class AnswerControllerTest {
         assertNotNull(response.getBody());
         assertTrue(response.getBody().isEmpty());
     }
+
+    @Test
+    void testGetAnswerById_Success() {
+        // Arrange
+        when(answerService.getAnswerById(ANSWER_ID)).thenReturn(answerDto);
+
+        // Act
+        ResponseEntity<AnswerDto> response = answerController.getAnswerById(ANSWER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(answerDto, response.getBody());
+        verify(answerService, times(1)).getAnswerById(ANSWER_ID);
+    }
+
+    @Test
+    void testGetAnswerById_ReturnsInternalServerErrorWhenAnswerDtoIsNull() {
+        // Arrange
+        when(answerService.getAnswerById(ANSWER_ID)).thenReturn(null);
+
+        // Act
+        ResponseEntity<AnswerDto> response = answerController.getAnswerById(ANSWER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(answerService, times(1)).getAnswerById(ANSWER_ID);
+    }
+
+    @Test
+    void testGetAnswerById_ServiceException() {
+        // Arrange
+        when(answerService.getAnswerById(ANSWER_ID)).thenThrow(new ServiceException("Answer not found"));
+
+        // Act
+        ResponseEntity<AnswerDto> response = answerController.getAnswerById(ANSWER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(answerService, times(1)).getAnswerById(ANSWER_ID);
+    }
+
+    @Test
+    void testGetAnswerById_GenericException() {
+        // Arrange
+        when(answerService.getAnswerById(ANSWER_ID)).thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act
+        ResponseEntity<AnswerDto> response = answerController.getAnswerById(ANSWER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(answerService, times(1)).getAnswerById(ANSWER_ID);
+    }
+
 
     @Test
     void testGetMyAnswers() {

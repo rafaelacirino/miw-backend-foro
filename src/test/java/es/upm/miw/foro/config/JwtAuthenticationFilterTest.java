@@ -54,6 +54,7 @@ class JwtAuthenticationFilterTest {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         SecurityContextHolder.setContext(new SecurityContextImpl());
+        jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtServiceImpl);
     }
 
     @Test
@@ -214,4 +215,3 @@ class JwtAuthenticationFilterTest {
         verify(jwtServiceImpl, never()).role(anyString());
     }
 }
-

@@ -7,7 +7,10 @@ import es.upm.miw.foro.persistence.model.Tag;
 import es.upm.miw.foro.persistence.model.User;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -69,11 +72,11 @@ public class QuestionMapper {
         try {
             String authorName = Optional.ofNullable(question.getAuthor())
                     .map(User::getUserName)
-                    .orElse("Unknown");
+                    .orElse("unknown_user");
             dto.setAuthor(authorName);
         } catch (Exception e) {
             log.error("Error mapping author for question {}: {}", question.getId(), e.getMessage());
-            dto.setAuthor("Unknown");
+            dto.setAuthor("unknown_user");
         }
 
         dto.setAnswers(

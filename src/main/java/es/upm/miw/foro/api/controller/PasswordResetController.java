@@ -21,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/account")
 public class PasswordResetController {
+
     private final PasswordResetService passwordResetService;
 
     @Autowired

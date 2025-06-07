@@ -113,12 +113,13 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
+    @Transactional
     public AnswerDto updateAnswer(Long id, AnswerDto answerDto) {
         try {
             validateAnswerDto(answerDto);
             User authenticateUser = userService.getAuthenticatedUser();
 
-            Answer existingAnswer = answerRepository.findById(id)
+            Answer existingAnswer = answerRepository.findByIdWithAuthor(id)
                     .orElseThrow(() -> new ServiceException(MessageUtil.ANSWER_NOT_FOUND + id));
 
             if (!existingAnswer.getAuthor().getId().equals(authenticateUser.getId())) {
@@ -153,16 +154,19 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
+    @Transactional
     public void deleteAnswer(Long id) {
         try {
             User authenticateUser = userService.getAuthenticatedUser();
 
-            Answer answer = answerRepository.findById(id)
+            Answer answer = answerRepository.findByIdWithAuthor(id)
                     .orElseThrow(() -> new ServiceException(MessageUtil.ANSWER_NOT_FOUND + id));
 
             if (!answer.getAuthor().getId().equals(authenticateUser.getId()) && !Role.ADMIN.equals(authenticateUser.getRole())) {
                 throw new ServiceException("You are not authorized to delete this answer");
             }
+
+            notificationService.deleteByAnswerId(answer.getId());
             answerRepository.delete(answer);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error while deleting answer", exception);
@@ -174,10 +178,11 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public boolean isAnswerAuthor(Long answerId, String username) {
-        Answer answer = answerRepository.findById(answerId)
+    @Transactional
+    public boolean isAnswerAuthor(Long answerId, String email) {
+        Answer answer = answerRepository.findByIdWithAuthor(answerId)
                 .orElseThrow(() -> new ServiceException(MessageUtil.ANSWER_NOT_FOUND + answerId));
-        return answer.getAuthor().getUserName().equals(username);
+        return answer.getAuthor().getEmail().equals(email);
     }
 
     private void validateAnswerDto(AnswerDto dto) {
