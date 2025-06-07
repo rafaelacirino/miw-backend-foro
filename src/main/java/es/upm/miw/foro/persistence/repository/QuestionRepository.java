@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
+    boolean existsByAuthorId(Long userId);
+
     @EntityGraph(attributePaths = {"author", "answers.author", "tags"})
     @Query("""
     SELECT DISTINCT q FROM Question q
@@ -35,4 +37,11 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSp
     @Modifying
     @Query("UPDATE Question q SET q.views = q.views + 1 WHERE q.id = :id")
     void incrementViews(@Param("id") Long id);
+
+    @Query("SELECT q FROM Question q LEFT JOIN FETCH q.tags LEFT JOIN FETCH q.answers WHERE q.id = :id")
+    Optional<Question> findByIdWithDetails(@Param("id") Long id);
+
+    @Modifying
+    @Query("UPDATE Question q SET q.author.id = :newAuthorId WHERE q.author.id = :oldAuthorId")
+    void updateAuthorId(@Param("oldAuthorId") Long oldAuthorId, @Param("newAuthorId") Long newAuthorId);
 }

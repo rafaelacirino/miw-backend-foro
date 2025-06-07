@@ -50,7 +50,7 @@ public class AnswerMapper {
     public static void populateDto(Answer answer, AnswerDto answerDto) {
         answerDto.setId(answer.getId());
         answerDto.setContent(answer.getContent());
-        answerDto.setAuthor(answer.getAuthor() != null ? answer.getAuthor().getUserName() : null);
+        answerDto.setAuthor(answer.getAuthor() != null ? answer.getAuthor().getUserName() : "unknown_user");
         answerDto.setCreationDate(answer.getCreationDate());
     }
 

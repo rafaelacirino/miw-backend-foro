@@ -4,10 +4,8 @@ import es.upm.miw.foro.api.converter.QuestionMapper;
 import es.upm.miw.foro.api.dto.QuestionDto;
 import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
-import es.upm.miw.foro.persistence.model.Question;
-import es.upm.miw.foro.persistence.model.Role;
-import es.upm.miw.foro.persistence.model.Tag;
-import es.upm.miw.foro.persistence.model.User;
+import es.upm.miw.foro.persistence.model.*;
+import es.upm.miw.foro.persistence.repository.NotificationRepository;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.persistence.repository.TagRepository;
 import es.upm.miw.foro.persistence.repository.specification.QuestionSpecification;
@@ -29,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,13 +38,15 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final UserService userService;
     private final TagRepository tagRepository;
+    private final NotificationRepository notificationRepository;
     private final Validator validator;
 
     public QuestionServiceImpl(QuestionRepository questionRepository, UserService userService, TagRepository tagRepository,
-                               Validator validator) {
+                               NotificationRepository notificationRepository, Validator validator) {
         this.questionRepository = questionRepository;
         this.userService = userService;
         this.tagRepository = tagRepository;
+        this.notificationRepository = notificationRepository;
         this.validator = validator;
     }
 
@@ -128,7 +129,7 @@ public class QuestionServiceImpl implements QuestionService {
 
             User authenticatedUser = userService.getAuthenticatedUser();
 
-            Question existingQuestion = questionRepository.findByIdWithAuthor(id)
+            Question existingQuestion = questionRepository.findByIdWithDetails(id)
                     .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + id));
 
             if (!existingQuestion.getAuthor().getId().equals(authenticatedUser.getId())) {
@@ -157,11 +158,16 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             User authenticatedUser = userService.getAuthenticatedUser();
 
-            Question question = questionRepository.findByIdWithAuthorAndTags(id)
+            Question question = questionRepository.findByIdWithDetails(id)
                     .orElseThrow(() -> new ServiceException(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + id));
 
             if (!question.getAuthor().getId().equals(authenticatedUser.getId()) && !Role.ADMIN.equals(authenticatedUser.getRole())) {
                 throw new ServiceException("You are not authorized to delete this question");
+            }
+            List<Answer> answers = question.getAnswers();
+            if (answers != null && !answers.isEmpty()) {
+                List<Long> answerIds = answers.stream().map(Answer::getId).toList();
+                notificationRepository.deleteByAnswerIds(answerIds);
             }
             questionRepository.delete(question);
         } catch (DataAccessException exception) {

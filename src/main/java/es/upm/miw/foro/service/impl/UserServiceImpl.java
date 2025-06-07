@@ -7,9 +7,13 @@ import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
+import es.upm.miw.foro.persistence.repository.AnswerRepository;
+import es.upm.miw.foro.persistence.repository.NotificationRepository;
+import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.persistence.repository.UserRepository;
 import es.upm.miw.foro.service.UserService;
 import es.upm.miw.foro.util.MessageUtil;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +25,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -31,13 +37,21 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
+    private final NotificationRepository notificationRepository;
     private final JwtServiceImpl jwtServiceImpl;
     private final Validator validator;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           JwtServiceImpl jwtServiceImpl, Validator validator) {
+                           QuestionRepository questionRepository, AnswerRepository answerRepository,
+                           NotificationRepository notificationRepository, JwtServiceImpl jwtServiceImpl,
+                           Validator validator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.questionRepository = questionRepository;
+        this.answerRepository = answerRepository;
+        this.notificationRepository = notificationRepository;
         this.jwtServiceImpl = jwtServiceImpl;
         this.validator = validator;
     }
@@ -194,7 +208,25 @@ public class UserServiceImpl implements UserService {
             if (!userRepository.existsById(id)) {
                 throw new ServiceException("User with id " + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND);
             }
+
+            User deletedUser = userRepository.findById(id)
+                    .orElseThrow(() -> new ServiceException("User with id " + id + MessageUtil.NOT_FOUND));
+
+            if ("unknown_user".equals(deletedUser.getUserName())) {
+                throw new ServiceException("Cannot delete the unknown_user_account", HttpStatus.BAD_REQUEST);
+            }
+
+            Long unknownUserId = 0L;
+
+            if (questionRepository.existsByAuthorId(id)) {
+                questionRepository.updateAuthorId(id, unknownUserId);
+            }
+            if (answerRepository.existsByAuthorId(id)) {
+                answerRepository.updateAuthorId(id, unknownUserId);
+            }
+            notificationRepository.deleteByUserId(id);
             userRepository.deleteById(id);
+            log.info("User with id " + id + " deleted successfully. Questions and answers reassigned to unknown_user.");
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting user with id " + id, exception);
         }
