@@ -25,11 +25,6 @@ class UserMapperTest {
     private static final LocalDateTime REGISTERED_DATE = LocalDateTime.now();
 
     @Test
-    void testConstructorThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, UserMapper::new);
-    }
-
-    @Test
     void toUserDto_shouldMapEntityToDto() {
         // Arrange
         User user = createUserEntity();

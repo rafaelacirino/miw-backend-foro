@@ -17,11 +17,6 @@ class TagMapperTest {
     private static final String TAG_NAME = "java";
 
     @Test
-    void testToConstructorThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, TagMapper::new);
-    }
-
-    @Test
     void toTagDto_shouldMapEntityToDto() {
         // Arrange
         Tag tag = createTag();

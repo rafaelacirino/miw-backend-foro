@@ -7,10 +7,6 @@ import java.util.List;
 
 public class UserMapper {
 
-    public UserMapper() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
     public static UserDto toUserDto(User user) {
         if (user == null) {
             return null;

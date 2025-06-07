@@ -7,10 +7,6 @@ import java.util.List;
 
 public class NotificationMapper {
 
-    public NotificationMapper() {
-        throw new UnsupportedOperationException("Utility class");
-    }
-
     public static NotificationDto toNotificationDto(Notification notification) {
         if (notification == null) {
             return null;

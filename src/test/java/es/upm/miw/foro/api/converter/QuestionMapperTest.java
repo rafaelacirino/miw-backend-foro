@@ -26,11 +26,6 @@ class QuestionMapperTest {
     private static final Integer VIEWS = 1;
 
     @Test
-    void testToConstructorThrowsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, QuestionMapper::new);
-    }
-
-    @Test
     void toQuestionDto_shouldMapEntityToDto() {
         // Arrange
         Question question = createQuestionEntityWithAnswers();
