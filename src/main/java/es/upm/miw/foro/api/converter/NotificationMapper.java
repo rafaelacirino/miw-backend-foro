@@ -2,10 +2,16 @@ package es.upm.miw.foro.api.converter;
 
 import es.upm.miw.foro.api.dto.NotificationDto;
 import es.upm.miw.foro.persistence.model.Notification;
+import lombok.Generated;
 
 import java.util.List;
 
 public class NotificationMapper {
+
+    @Generated
+    private NotificationMapper() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static NotificationDto toNotificationDto(Notification notification) {
         if (notification == null) {

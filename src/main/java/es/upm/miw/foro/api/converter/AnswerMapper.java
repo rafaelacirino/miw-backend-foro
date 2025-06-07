@@ -4,11 +4,17 @@ import es.upm.miw.foro.api.dto.AnswerDto;
 import es.upm.miw.foro.persistence.model.Answer;
 import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.User;
+import lombok.Generated;
 
 import java.util.Collections;
 import java.util.List;
 
 public class AnswerMapper {
+
+    @Generated
+    private AnswerMapper() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static AnswerDto toAnswerDto(Answer answer) {
         if (answer == null) {

@@ -1,9 +1,9 @@
 package es.upm.miw.foro.util;
 
-public class MessageUtil {
+import lombok.experimental.UtilityClass;
 
-    private MessageUtil() {
-    }
+@UtilityClass
+public class MessageUtil {
 
     public static final String PASSWORD_MESSAGE = "Password must be at least 8 characters, contain at least one " +
                                                   "uppercase letter, one lowercase letter, one digit, and one " +

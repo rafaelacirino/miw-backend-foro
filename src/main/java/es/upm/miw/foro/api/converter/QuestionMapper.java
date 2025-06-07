@@ -5,6 +5,7 @@ import es.upm.miw.foro.persistence.model.Answer;
 import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.Tag;
 import es.upm.miw.foro.persistence.model.User;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -15,6 +16,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class QuestionMapper {
+
+    @Generated
+    private QuestionMapper() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static QuestionDto toQuestionDto(Question question) {
         if (question == null) {
