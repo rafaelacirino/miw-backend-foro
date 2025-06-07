@@ -7,6 +7,9 @@ import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
+import es.upm.miw.foro.persistence.repository.AnswerRepository;
+import es.upm.miw.foro.persistence.repository.NotificationRepository;
+import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.persistence.repository.UserRepository;
 import es.upm.miw.foro.service.impl.JwtServiceImpl;
 import es.upm.miw.foro.service.impl.UserServiceImpl;
@@ -38,6 +41,15 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private QuestionRepository questionRepository;
+
+    @Mock
+    private AnswerRepository answerRepository;
+
+    @Mock
+    private NotificationRepository notificationRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -87,6 +99,11 @@ class UserServiceTest {
         user.setPassword(PASSWORD);
         user.setRole(Role.ADMIN);
         user.setRegisteredDate(REGISTERED_DATE);
+
+        when(validator.validate(any(UserDto.class), any(Class.class))).thenReturn(Collections.emptySet());
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedNewPassword");
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(userRepository.existsByUserName(anyString())).thenReturn(false);
     }
 
     @Test
@@ -291,7 +308,7 @@ class UserServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> userService.createUser(userDtoInput));
-        assertEquals("Unexpected error while creating User", exception.getMessage());
+        assertEquals("Unexpected error saving user", exception.getMessage());
 
         // Verify
         verify(userRepository, never()).save(any(User.class));
@@ -390,7 +407,7 @@ class UserServiceTest {
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> userService.registerUser(userDtoInput));
-        assertEquals("Unexpected error while creating User", exception.getMessage());
+        assertEquals("Unexpected error saving user", exception.getMessage());
 
         // Verify
         verify(passwordEncoder, times(1)).encode(PASSWORD);
@@ -441,7 +458,7 @@ class UserServiceTest {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
 
         ServiceException exception = assertThrows(ServiceException.class, () -> userService.getUserById(USER_ID));
-        assertEquals("User with ID " + USER_ID + " not found", exception.getMessage());
+        assertEquals("User with id " + USER_ID + " not found", exception.getMessage());
     }
 
     @Test
@@ -820,8 +837,14 @@ class UserServiceTest {
 
         User existingUser = new User();
         existingUser.setId(USER_ID);
+        existingUser.setFirstName(FIRST_NAME);
+        existingUser.setLastName(LAST_NAME);
+        existingUser.setUserName(USERNAME);
+        existingUser.setPhone(PHONE_NUMBER);
         existingUser.setEmail(EMAIL);
+        existingUser.setPassword(ENCODED_PASSWORD);
         existingUser.setRole(Role.MEMBER);
+        existingUser.setRegisteredDate(REGISTERED_DATE);
 
         UserDto userDtoInput = new UserDto();
         userDtoInput.setId(USER_ID);
@@ -837,11 +860,22 @@ class UserServiceTest {
         updatedUser.setId(USER_ID);
         updatedUser.setFirstName("UpdatedFirstName");
         updatedUser.setLastName("UpdatedLastName");
+        updatedUser.setUserName("UpdatedUserName");
+        updatedUser.setPhone("UpdatedPhone");
         updatedUser.setEmail("updated@email.com");
-        updatedUser.setPassword("newPassword");
-        updatedUser.setRole(Role.ADMIN);
+        updatedUser.setPassword("encodedNewPassword");
+        updatedUser.setRole(Role.MEMBER);
+        updatedUser.setRegisteredDate(REGISTERED_DATE);
 
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(existingUser));
+
+        when(userRepository.existsByEmail("updated@email.com")).thenReturn(false);
+        when(userRepository.existsByUserName("UpdatedUserName")).thenReturn(false);
+
+        when(validator.validate(any(UserDto.class), eq(UserValidation.class))).thenReturn(Collections.emptySet());
+
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
 
         // Act
@@ -853,9 +887,15 @@ class UserServiceTest {
         assertEquals("UpdatedFirstName", updatedUserDto.getFirstName());
         assertEquals("UpdatedLastName", updatedUserDto.getLastName());
         assertEquals("updated@email.com", updatedUserDto.getEmail());
+        assertEquals("UpdatedUserName", updatedUserDto.getUserName());
+        assertEquals("UpdatedPhone", updatedUserDto.getPhone());
 
         // Verify
         verify(userRepository, times(1)).findById(USER_ID);
+        verify(userRepository, times(1)).existsByEmail("updated@email.com");
+        verify(userRepository, times(1)).existsByUserName("UpdatedUserName");
+        verify(passwordEncoder, times(1)).encode("newPassword");
+        verify(validator, times(1)).validate(any(UserDto.class), eq(UserValidation.class));
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -866,6 +906,11 @@ class UserServiceTest {
         authenticatedUser.setEmail(EMAIL);
         authenticatedUser.setRole(Role.ADMIN);
 
+        User userToDelete = new User();
+        userToDelete.setId(USER_ID);
+        userToDelete.setUserName(USERNAME);
+        userToDelete.setEmail(EMAIL);
+
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
 
@@ -874,12 +919,64 @@ class UserServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
-
         when(userRepository.existsById(USER_ID)).thenReturn(true);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(userToDelete));
+
+        when(questionRepository.existsByAuthorId(USER_ID)).thenReturn(false);
+        when(answerRepository.existsByAuthorId(USER_ID)).thenReturn(false);
+
+        doNothing().when(notificationRepository).deleteByUserId(USER_ID);
         doNothing().when(userRepository).deleteById(USER_ID);
 
         assertDoesNotThrow(() -> userService.deleteUser(USER_ID));
 
+        // Verify
+        verify(userRepository, times(1)).existsById(USER_ID);
+        verify(userRepository, times(1)).findById(USER_ID);
+        verify(questionRepository, times(1)).existsByAuthorId(USER_ID);
+        verify(answerRepository, times(1)).existsByAuthorId(USER_ID);
+        verify(notificationRepository, times(1)).deleteByUserId(USER_ID);
+        verify(userRepository, times(1)).deleteById(USER_ID);
+    }
+
+    @Test
+    void testDeleteUser_withQuestionsAndAnswers() {
+        // Arrange
+        User authenticatedUser = new User();
+        authenticatedUser.setId(USER_ID);
+        authenticatedUser.setEmail(EMAIL);
+        authenticatedUser.setRole(Role.ADMIN);
+
+        User userToDelete = new User();
+        userToDelete.setId(USER_ID);
+        userToDelete.setUserName(USERNAME);
+        userToDelete.setEmail(EMAIL);
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(EMAIL);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(authenticatedUser));
+        when(userRepository.existsById(USER_ID)).thenReturn(true);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(userToDelete));
+
+        when(questionRepository.existsByAuthorId(USER_ID)).thenReturn(true);
+        when(answerRepository.existsByAuthorId(USER_ID)).thenReturn(true);
+
+        doNothing().when(questionRepository).updateAuthorId(USER_ID, 0L);
+        doNothing().when(answerRepository).updateAuthorId(USER_ID, 0L);
+        doNothing().when(notificationRepository).deleteByUserId(USER_ID);
+        doNothing().when(userRepository).deleteById(USER_ID);
+
+        // Act & Assert
+        assertDoesNotThrow(() -> userService.deleteUser(USER_ID));
+
+        // Verify
+        verify(questionRepository, times(1)).updateAuthorId(USER_ID, 0L);
+        verify(answerRepository, times(1)).updateAuthorId(USER_ID, 0L);
         verify(userRepository, times(1)).deleteById(USER_ID);
     }
 
@@ -891,6 +988,95 @@ class UserServiceTest {
 
         ServiceException exception = assertThrows(ServiceException.class, () -> userService.deleteUser(USER_ID));
         assertEquals("User with id " + USER_ID + " not found", exception.getMessage());
+    }
+
+    @Test
+    void verifyPassword_shouldReturnTrue_whenPasswordMatches() {
+        // Arrange
+        user.setPassword(ENCODED_PASSWORD);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(PASSWORD, ENCODED_PASSWORD)).thenReturn(true);
+
+        // Act
+        boolean result = userService.verifyPassword(USER_ID, PASSWORD);
+
+        // Assert
+        assertTrue(result);
+        verify(userRepository).findById(USER_ID);
+        verify(passwordEncoder).matches(PASSWORD, ENCODED_PASSWORD);
+    }
+
+    @Test
+    void verifyPassword_shouldReturnFalse_whenPasswordDoesNotMatch() {
+        // Arrange
+        user.setPassword(ENCODED_PASSWORD);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(PASSWORD, ENCODED_PASSWORD)).thenReturn(false);
+
+        // Act
+        boolean result = userService.verifyPassword(USER_ID, PASSWORD);
+
+        // Assert
+        assertFalse(result);
+        verify(userRepository).findById(USER_ID);
+        verify(passwordEncoder).matches(PASSWORD, ENCODED_PASSWORD);
+    }
+
+    @Test
+    void verifyPassword_shouldThrowServiceException_whenUserNotFound() {
+        // Arrange
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            userService.verifyPassword(USER_ID, PASSWORD);
+        });
+        assertEquals("User not found", exception.getMessage());
+        verify(userRepository).findById(USER_ID);
+        verifyNoInteractions(passwordEncoder);
+    }
+
+    @Test
+    void getAuthenticatedUser_shouldReturnUser_whenAuthenticationPresent() {
+        // Arrange
+        setupAuthentication();
+
+        // Act
+        User newUser = userService.getAuthenticatedUser();
+
+        // Assert
+        assertNotNull(newUser);
+        assertEquals(EMAIL, newUser.getEmail());
+        verify(userRepository).findByEmail(EMAIL);
+    }
+
+    @Test
+    void getAuthenticatedUser_shouldThrowException_whenAuthenticationIsNull() {
+        // Arrange
+        SecurityContextHolder.setContext(mock(SecurityContext.class)); // sem Authentication
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            userService.getAuthenticatedUser();
+        });
+        assertEquals("Unauthorized: No user is logged in", exception.getMessage());
+    }
+
+    @Test
+    void getAuthenticatedUser_shouldThrowException_whenUserNotFound() {
+        // Arrange
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(EMAIL);
+        SecurityContextHolder.setContext(securityContext);
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            userService.getAuthenticatedUser();
+        });
+        assertEquals("Authenticated user not found", exception.getMessage());
     }
 
     private void setupAuthentication() {

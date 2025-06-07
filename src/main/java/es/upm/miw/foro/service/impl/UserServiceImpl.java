@@ -13,7 +13,6 @@ import es.upm.miw.foro.persistence.repository.QuestionRepository;
 import es.upm.miw.foro.persistence.repository.UserRepository;
 import es.upm.miw.foro.service.UserService;
 import es.upm.miw.foro.util.MessageUtil;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +24,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -100,7 +97,7 @@ public class UserServiceImpl implements UserService {
             }
             return userRepository.findById(id)
                     .map(UserMapper::toUserDto)
-                    .orElseThrow(() -> new ServiceException("User with ID " + id + MessageUtil.NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND));
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error getting User with ID: " + id, exception);
         }
@@ -157,7 +154,7 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Unauthorized: Only admins or the user themselves can update this user", HttpStatus.FORBIDDEN);
             }
             User existingUser = userRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("User with id " + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND));
 
             if (!existingUser.getEmail().equals(userDto.getEmail())) {
                 validateEmail(userDto.getEmail());
@@ -198,11 +195,11 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException("Unauthorized: Only admins or the user themselves can delete this user", HttpStatus.UNAUTHORIZED);
             }
             if (!userRepository.existsById(id)) {
-                throw new ServiceException("User with id " + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND);
+                throw new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
             User deletedUser = userRepository.findById(id)
-                    .orElseThrow(() -> new ServiceException("User with id " + id + MessageUtil.NOT_FOUND));
+                    .orElseThrow(() -> new ServiceException(MessageUtil.USER_ID + id + MessageUtil.NOT_FOUND));
 
             if ("unknown_user".equals(deletedUser.getUserName())) {
                 throw new ServiceException("Cannot delete the unknown_user_account", HttpStatus.BAD_REQUEST);
@@ -218,7 +215,7 @@ public class UserServiceImpl implements UserService {
             }
             notificationRepository.deleteByUserId(id);
             userRepository.deleteById(id);
-            log.info("User with id " + id + " deleted successfully. Questions and answers reassigned to unknown_user.");
+            log.info(MessageUtil.USER_ID + id + " deleted successfully. Questions and answers reassigned to unknown_user.");
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error deleting user with id " + id, exception);
         }

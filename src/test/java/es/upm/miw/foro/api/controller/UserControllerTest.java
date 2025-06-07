@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -53,14 +54,17 @@ class UserControllerTest {
         // Arrange
         UserDto dto = new UserDto();
         String errorMessage = "User creation failed";
-        when(userService.createUser(any(UserDto.class))).thenThrow(new ServiceException("User creation failed"));
+        ServiceException serviceException = new ServiceException(errorMessage, HttpStatus.CONFLICT);
+        when(userService.createUser(any(UserDto.class))).thenThrow(serviceException);
 
         // Act
         ResponseEntity<Object> response = this.userController.createUser(dto);
 
         // Assert
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof Map);
+        Map<String, String> responseBody = (Map<String, String>) response.getBody();
+        assertEquals(errorMessage, responseBody.get("message"));
         verify(userService, times(1)).createUser(dto);
     }
 
@@ -78,7 +82,8 @@ class UserControllerTest {
 
         // Assert
         assertEquals(customStatus, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(customStatus);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
         verify(userService, times(1)).createUser(dto);
     }
 
@@ -86,14 +91,15 @@ class UserControllerTest {
     void testCreateUserGenericException() {
         // Arrange
         UserDto dto = new UserDto();
-        when(userService.createUser(any(UserDto.class))).thenThrow(new RuntimeException(UNEXPECTED_ERROR));
+        when(userService.createUser(any(UserDto.class))).thenThrow(new RuntimeException("Unexpected error"));
 
         // Act
         ResponseEntity<Object> response = this.userController.createUser(dto);
 
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals(UNEXPECTED_ERROR, response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
         verify(userService, times(1)).createUser(dto);
     }
 
@@ -237,7 +243,27 @@ class UserControllerTest {
         verify(userService, times(1)).login(EMAIL, PASSWORD);
     }
 
-   @Test
+    @Test
+    void testLogin_GenericException() {
+        // Arrange
+        LoginDto loginDto = new LoginDto();
+        loginDto.setEmail("user@example.com");
+        loginDto.setPassword("password123");
+
+        when(userService.login(anyString(), anyString()))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act
+        ResponseEntity<Object> response = userController.login(loginDto);
+
+        // Assert
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertThat(response.getBody()).isInstanceOf(Map.class);
+
+        verify(userService, times(1)).login(loginDto.getEmail(), loginDto.getPassword());
+    }
+
+    @Test
     void testGetUsers() {
         // Arrange
         UserDto userDto = new UserDto();
@@ -368,7 +394,7 @@ class UserControllerTest {
 
         // Assert
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertThat(response.getBody()).isInstanceOf(Map.class);
         verify(userService, times(1)).updateUser(USER_ID, dto);
     }
 
@@ -386,7 +412,7 @@ class UserControllerTest {
 
         // Assert
         assertEquals(customStatus, response.getStatusCode());
-        assertEquals(errorMessage, response.getBody());
+        assertThat(response.getBody()).isInstanceOf(Map.class);
         verify(userService, times(1)).updateUser(USER_ID, dto);
     }
 
@@ -445,4 +471,78 @@ class UserControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         verify(userService, times(1)).deleteUser(USER_ID);
     }
+
+    @Test
+    void testVerifyPassword_Success_ValidPassword() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", USER_ID.toString());
+        request.put("currentPassword", PASSWORD);
+
+        when(userService.verifyPassword(USER_ID, PASSWORD)).thenReturn(true);
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> response = userController.verifyPassword(request);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().containsKey("isValid"));
+        assertTrue(response.getBody().get("isValid"));
+        verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);
+    }
+
+    @Test
+    void testVerifyPassword_Success_InvalidPassword() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", USER_ID.toString());
+        request.put("currentPassword", PASSWORD);
+
+        when(userService.verifyPassword(USER_ID, PASSWORD)).thenReturn(false);
+
+        // Act
+        ResponseEntity<Map<String, Boolean>> response = userController.verifyPassword(request);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().containsKey("isValid"));
+        assertFalse(response.getBody().get("isValid"));
+        verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);
+    }
+
+    @Test
+    void testVerifyPassword_InvalidUserIdFormat() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", "invalidNumber");
+        request.put("currentPassword", PASSWORD);
+
+        // Act & Assert
+        assertThrows(NumberFormatException.class, () -> {
+            userController.verifyPassword(request);
+        });
+
+        verify(userService, never()).verifyPassword(anyLong(), anyString());
+    }
+
+    @Test
+    void testVerifyPassword_ServiceException() {
+        // Arrange
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", USER_ID.toString());
+        request.put("currentPassword", PASSWORD);
+
+        when(userService.verifyPassword(USER_ID, PASSWORD)).thenThrow(new RuntimeException("Unexpected error"));
+
+        // Act & Assert
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
+            userController.verifyPassword(request);
+        });
+
+        assertEquals("Unexpected error", thrown.getMessage());
+        verify(userService, times(1)).verifyPassword(USER_ID, PASSWORD);
+    }
+
 }

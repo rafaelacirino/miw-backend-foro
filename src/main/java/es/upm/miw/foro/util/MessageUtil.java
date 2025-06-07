@@ -13,6 +13,7 @@ public class MessageUtil {
     public static final String QUESTION_NOT_FOUND = "Question not found";
     public static final String ANSWER_NOT_FOUND = "Answer not found with id: ";
     public static final String UNEXPECTED_ERROR = "An unexpected error occurred";
+    public static final String USER_ID = "User with id ";
 
     public static final String FIRSTNAME_CLAIM = "firstName";
     public static final String LASTNAME_CLAIM = "lastName";
@@ -22,11 +23,4 @@ public class MessageUtil {
     public static final String NOT_FOUND = " not found";
     public static final String MESSAGE = "message";
     public static final String AUTHORIZATION = "Authorization";
-    public static final String UNKNOWN_FIRST_NAME = "Unknown";
-    public static final String UNKNOWN_LAST_NAME = "User";
-    public static final String UNKNOWN_EMAIL = "unknown@system.com";
-    public static final String UNKNOWN_USER_NAME = "unknown_user";
-    public static final String UNKNOWN_PASSWORD = "unknown_password";
-
-    public static final Long UNKNOWN_USER_ID = -1L;
 }

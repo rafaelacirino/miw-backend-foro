@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @TestConfig
 class QuestionMapperTest {
@@ -61,6 +63,27 @@ class QuestionMapperTest {
         // Assert
         assertNotNull(dto);
         assertEquals("Test", dto.getTitle());
+    }
+
+    @Test
+    void toQuestionDto_whenGetUserNameThrowsException_shouldSetAuthorToUnknownUser() {
+        // Arrange
+        User mockUser = mock(User.class);
+        when(mockUser.getUserName()).thenThrow(new RuntimeException("mock exception"));
+
+        Question question = new Question();
+        question.setId(ID);
+        question.setAuthor(mockUser);
+        question.setTitle(TITLE);
+        question.setDescription(DESCRIPTION);
+        question.setCreationDate(DATE);
+
+        // Act
+        QuestionDto dto = QuestionMapper.toQuestionDto(question);
+
+        // Assert
+        assertNotNull(dto);
+        assertEquals("unknown_user", dto.getAuthor());
     }
 
     @Test

@@ -65,6 +65,54 @@ class PasswordResetControllerTest {
     }
 
     @Test
+    void testForgotPasswordEmailNull() {
+        // Arrange
+        EmailDto emailDto = new EmailDto(null);
+
+        // Act
+        ResponseEntity<Object> response = passwordResetController.forgotPassword(emailDto);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals("Email is required", ((Map<?, ?>) response.getBody()).get(MessageUtil.MESSAGE));
+        verify(passwordResetService, never()).sendPasswordResetEmail(anyString());
+    }
+
+    @Test
+    void testForgotPasswordEmailBlank() {
+        // Arrange
+        EmailDto emailDto = new EmailDto("  ");
+
+        // Act
+        ResponseEntity<Object> response = passwordResetController.forgotPassword(emailDto);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals("Email is required", ((Map<?, ?>) response.getBody()).get(MessageUtil.MESSAGE));
+        verify(passwordResetService, never()).sendPasswordResetEmail(anyString());
+    }
+
+    @Test
+    void testForgotPasswordEmailNotSent() {
+        // Arrange
+        when(passwordResetService.sendPasswordResetEmail(EMAIL)).thenReturn(false);
+        EmailDto emailDto = new EmailDto(EMAIL);
+
+        // Act
+        ResponseEntity<Object> response = passwordResetController.forgotPassword(emailDto);
+
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertInstanceOf(Map.class, response.getBody());
+        assertEquals("If the email exists, a reset link has been sent",
+                ((Map<?, ?>) response.getBody()).get(MessageUtil.MESSAGE));
+        verify(passwordResetService, times(1)).sendPasswordResetEmail(EMAIL);
+    }
+
+
+    @Test
     void testResetPasswordSuccess() {
         // Arrange
         ResetPasswordDto resetPasswordDto = new ResetPasswordDto(TOKEN, NEW_PASSWORD);

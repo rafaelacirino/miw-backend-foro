@@ -237,4 +237,16 @@ class NotificationServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void deleteByAnswerId_shouldCallRepositoryDeleteByAnswerId() {
+        // Arrange
+        Long answerId = ANSWER_ID;
+
+        // Act
+        notificationService.deleteByAnswerId(answerId);
+
+        // Assert
+        verify(notificationRepository, times(1)).deleteByAnswerId(answerId);
+    }
 }

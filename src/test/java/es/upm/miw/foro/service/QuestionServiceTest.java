@@ -6,8 +6,10 @@ import es.upm.miw.foro.exception.RepositoryException;
 import es.upm.miw.foro.exception.ServiceException;
 import es.upm.miw.foro.persistence.model.Question;
 import es.upm.miw.foro.persistence.model.Role;
+import es.upm.miw.foro.persistence.model.Tag;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.QuestionRepository;
+import es.upm.miw.foro.persistence.repository.TagRepository;
 import es.upm.miw.foro.service.impl.QuestionServiceImpl;
 import es.upm.miw.foro.util.MessageUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +44,9 @@ class QuestionServiceTest {
 
     @Mock
     private QuestionRepository questionRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @Mock
     private UserService userService;
@@ -362,7 +367,7 @@ class QuestionServiceTest {
         // Arrange
         when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
         when(questionRepository.save(any(Question.class))).thenReturn(question);
 
         // Act
@@ -377,7 +382,7 @@ class QuestionServiceTest {
         // Verify
         verify(validator, times(1)).validate(any(QuestionDto.class));
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, times(1)).save(any(Question.class));
     }
 
@@ -386,7 +391,7 @@ class QuestionServiceTest {
         // Arrange
         when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.empty());
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.updateQuestion(QUESTION_ID, questionDto));
@@ -395,7 +400,7 @@ class QuestionServiceTest {
         // Verify
         verify(validator, times(1)).validate(any(QuestionDto.class));
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, never()).save(any(Question.class));
     }
 
@@ -409,7 +414,7 @@ class QuestionServiceTest {
 
         when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(differentUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.updateQuestion(QUESTION_ID, questionDto));
@@ -418,7 +423,7 @@ class QuestionServiceTest {
         // Verify
         verify(validator, times(1)).validate(any(QuestionDto.class));
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, never()).save(any(Question.class));
     }
 
@@ -427,7 +432,7 @@ class QuestionServiceTest {
         // Arrange
         when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
         when(questionRepository.save(any(Question.class))).thenThrow(new DataAccessException("DB error") {});
 
         // Act & Assert
@@ -439,7 +444,7 @@ class QuestionServiceTest {
         // Verify
         verify(validator, times(1)).validate(any(QuestionDto.class));
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, times(1)).save(any(Question.class));
     }
 
@@ -448,7 +453,7 @@ class QuestionServiceTest {
         // Arrange
         when(validator.validate(any(QuestionDto.class))).thenReturn(Collections.emptySet());
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
         when(questionRepository.save(any(Question.class))).thenThrow(new RuntimeException("Unexpected"));
 
         // Act & Assert
@@ -462,7 +467,7 @@ class QuestionServiceTest {
     void testDeleteQuestion() {
         // Arrange
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
         doNothing().when(questionRepository).delete(question);
 
         // Act
@@ -470,7 +475,7 @@ class QuestionServiceTest {
 
         // Verify
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, times(1)).delete(question);
     }
 
@@ -478,7 +483,7 @@ class QuestionServiceTest {
     void testDeleteQuestion_notFound() {
         // Arrange
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.empty());
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.deleteQuestion(QUESTION_ID));
@@ -486,7 +491,7 @@ class QuestionServiceTest {
 
         // Verify
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, never()).delete(any(Question.class));
     }
 
@@ -499,7 +504,7 @@ class QuestionServiceTest {
         differentUser.setRole(Role.MEMBER);
 
         when(userService.getAuthenticatedUser()).thenReturn(differentUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.deleteQuestion(QUESTION_ID));
@@ -507,7 +512,7 @@ class QuestionServiceTest {
 
         // Verify
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, never()).delete(any(Question.class));
     }
 
@@ -520,7 +525,7 @@ class QuestionServiceTest {
         adminUser.setRole(Role.ADMIN);
 
         when(userService.getAuthenticatedUser()).thenReturn(adminUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
         doNothing().when(questionRepository).delete(question);
 
         // Act
@@ -528,7 +533,7 @@ class QuestionServiceTest {
 
         // Verify
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, times(1)).delete(question);
     }
 
@@ -536,7 +541,7 @@ class QuestionServiceTest {
     void testDeleteQuestion_dataAccessException() {
         // Arrange
         when(userService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithDetails(QUESTION_ID)).thenReturn(Optional.of(question));
         doThrow(new DataAccessException("DB error") {}).when(questionRepository).delete(question);
 
         // Act & Assert
@@ -547,7 +552,7 @@ class QuestionServiceTest {
 
         // Verify
         verify(userService, times(1)).getAuthenticatedUser();
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithDetails(QUESTION_ID);
         verify(questionRepository, times(1)).delete(question);
     }
 
@@ -566,7 +571,7 @@ class QuestionServiceTest {
     @Test
     void testIsQuestionAuthor_success() {
         // Arrange
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithAuthor(QUESTION_ID)).thenReturn(Optional.of(question));
 
         // Act
         boolean result = questionService.isQuestionAuthor(QUESTION_ID, EMAIL);
@@ -575,13 +580,13 @@ class QuestionServiceTest {
         assertTrue(result);
 
         // Verify
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithAuthor(QUESTION_ID);
     }
 
     @Test
     void testIsQuestionAuthor_notAuthor() {
         // Arrange
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
+        when(questionRepository.findByIdWithAuthor(QUESTION_ID)).thenReturn(Optional.of(question));
 
         // Act
         boolean result = questionService.isQuestionAuthor(QUESTION_ID, "other@example.com");
@@ -590,20 +595,20 @@ class QuestionServiceTest {
         assertFalse(result);
 
         // Verify
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithAuthor(QUESTION_ID);
     }
 
     @Test
     void testIsQuestionAuthor_notFound() {
         // Arrange
-        when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.empty());
+        when(questionRepository.findByIdWithAuthor(QUESTION_ID)).thenReturn(Optional.empty());
 
         // Act & Assert
         ServiceException exception = assertThrows(ServiceException.class, () -> questionService.isQuestionAuthor(QUESTION_ID, EMAIL));
         assertEquals(MessageUtil.QUESTION_NOT_FOUND_WITH_ID + QUESTION_ID, exception.getMessage());
 
         // Verify
-        verify(questionRepository, times(1)).findById(QUESTION_ID);
+        verify(questionRepository, times(1)).findByIdWithAuthor(QUESTION_ID);
     }
 
     @Test
@@ -659,4 +664,96 @@ class QuestionServiceTest {
         assertEquals(1, question.getViews());
         assertTrue(question.getViewedBySessions().contains("session-abc"));
     }
+
+    @Test
+    void processTags_shouldReturnEmptySet_whenInputIsNull() {
+        Set<Tag> result = questionService.processTags(null);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void processTags_shouldReturnEmptySet_whenInputIsEmpty() {
+        Set<Tag> result = questionService.processTags(Collections.emptySet());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void processTags_shouldReturnExistingTags_whenTagsExist() {
+        // Arrange
+        String tagName = "java";
+        Tag existingTag = new Tag();
+        existingTag.setName(tagName);
+
+        when(tagRepository.findByName(tagName)).thenReturn(Optional.of(existingTag));
+
+        Set<String> inputTags = Set.of("Java"); // mixed case and trimmed test
+
+        // Act
+        Set<Tag> result = questionService.processTags(inputTags);
+
+        // Assert
+        assertEquals(1, result.size());
+        assertTrue(result.contains(existingTag));
+        verify(tagRepository, times(1)).findByName(tagName);
+        verify(tagRepository, never()).save(any());
+    }
+
+    @Test
+    void processTags_shouldCreateAndReturnTags_whenTagsDoNotExist() {
+        // Arrange
+        String tagName = "spring";
+        Tag newTag = new Tag();
+        newTag.setName(tagName);
+
+        when(tagRepository.findByName(tagName)).thenReturn(Optional.empty());
+        when(tagRepository.save(any(Tag.class))).thenAnswer(invocation -> {
+            Tag t = invocation.getArgument(0);
+            t.setId(1L); // simulate DB generated ID
+            return t;
+        });
+
+        Set<String> inputTags = Set.of(" Spring ");
+
+        // Act
+        Set<Tag> result = questionService.processTags(inputTags);
+
+        // Assert
+        assertEquals(1, result.size());
+        Tag tag = result.iterator().next();
+        assertEquals(tagName, tag.getName());
+        verify(tagRepository, times(1)).findByName(tagName);
+        verify(tagRepository, times(1)).save(any(Tag.class));
+    }
+
+    @Test
+    void processTags_shouldHandleMixedExistingAndNewTags() {
+        // Arrange
+        Tag existingTag = new Tag();
+        existingTag.setName("java");
+
+        Tag newTag = new Tag();
+        newTag.setName("spring");
+
+        when(tagRepository.findByName("java")).thenReturn(Optional.of(existingTag));
+        when(tagRepository.findByName("spring")).thenReturn(Optional.empty());
+        when(tagRepository.save(any(Tag.class))).thenAnswer(invocation -> {
+            Tag t = invocation.getArgument(0);
+            t.setId(2L);
+            return t;
+        });
+
+        Set<String> inputTags = Set.of("Java", " Spring ");
+
+        // Act
+        Set<Tag> result = questionService.processTags(inputTags);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertTrue(result.contains(existingTag));
+        assertTrue(result.stream().anyMatch(tag -> tag.getName().equals("spring")));
+        verify(tagRepository, times(1)).save(any(Tag.class));
+    }
+
 }
