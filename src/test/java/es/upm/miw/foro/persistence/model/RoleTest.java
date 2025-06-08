@@ -2,19 +2,27 @@ package es.upm.miw.foro.persistence.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RoleTest {
 
     @Test
-    void testRoleOf() {
-        assertEquals(Role.ADMIN, Role.of("ROLE_ADMIN"));
-        assertEquals(Role.MEMBER, Role.of("ROLE_MEMBER"));
+    void testRoleValuesContainsAllRoles() {
+        Role[] roles = Role.values();
+        assertThat(roles).containsExactly(Role.ADMIN, Role.MEMBER, Role.UNKNOWN);
     }
 
     @Test
-    void testRoleOfWithInvalidRole() {
-        assertThrows(IllegalArgumentException.class, () -> Role.of("ROLE_INVALID"));
+    void testValueOfReturnsCorrectEnum() {
+        assertThat(Role.valueOf("ADMIN")).isEqualTo(Role.ADMIN);
+        assertThat(Role.valueOf("MEMBER")).isEqualTo(Role.MEMBER);
+        assertThat(Role.valueOf("UNKNOWN")).isEqualTo(Role.UNKNOWN);
     }
+
+    @Test
+    void testValueOfThrowsExceptionForInvalidValue() {
+        assertThrows(IllegalArgumentException.class, () -> Role.valueOf("INVALID"));
+    }
+
 }

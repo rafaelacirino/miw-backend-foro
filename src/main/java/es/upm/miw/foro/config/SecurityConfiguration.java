@@ -1,6 +1,5 @@
 package es.upm.miw.foro.config;
 
-import es.upm.miw.foro.persistence.model.Role;
 import es.upm.miw.foro.persistence.model.User;
 import es.upm.miw.foro.persistence.repository.UserRepository;
 import es.upm.miw.foro.service.impl.JwtServiceImpl;
@@ -54,7 +53,7 @@ public class SecurityConfiguration {
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
                     .password(user.getPassword())
-                    .roles(Role.PREFIX + user.getRole().name())
+                    .roles(user.getRole().name())
                     .build();
         };
     }
