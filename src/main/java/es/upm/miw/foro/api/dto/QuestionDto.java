@@ -31,11 +31,11 @@ public class QuestionDto {
     private String author;
 
     @NotNull(message = "Title cannot be null")
-    @Size(max = 60, message = "Title must be at most 60 characters")
+    @Size(max = 200, message = "Title must be at most 60 characters")
     @Schema(description = "Title of the question", example = "How to implement ...?")
     private String title;
 
-    @Size(max = 150, message = "Description must be at most 150 characters")
+    @Size(max = 1000, message = "Description must be at most 150 characters")
     @Schema(description = "Brief description of the question", example = "I need help with ...")
     private String description;
 

@@ -23,7 +23,7 @@ public class AnswerDto {
     private Long id;
 
     @NotBlank(message = "Content cannot be null")
-    @Size(max = 1000, message = "Content must be at most 1000 characters")
+    @Size(max = 1500, message = "Content must be at most 1000 characters")
     @Schema(description = "Content of the answer", example = "The answer is ...")
     private String content;
 
