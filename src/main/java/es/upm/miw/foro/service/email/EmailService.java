@@ -36,7 +36,7 @@ public class EmailService {
             helper.setTo(toEmail);
             helper.setSubject("Password Reset Request for " + appName);
 
-            String htmlContent = passwordResetEmailTemplate.buildResetEmailHtml(resetLink); // usa o template aqui
+            String htmlContent = passwordResetEmailTemplate.buildResetEmailHtml(resetLink);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);

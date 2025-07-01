@@ -1,6 +1,5 @@
 package es.upm.miw.foro.service.impl;
 
-import com.google.api.gax.rpc.NotFoundException;
 import es.upm.miw.foro.api.converter.AnswerMapper;
 import es.upm.miw.foro.api.dto.AnswerDto;
 import es.upm.miw.foro.exception.RepositoryException;
@@ -72,8 +71,6 @@ public class AnswerServiceImpl implements AnswerService {
             return AnswerMapper.toAnswerDto(savedAnswer);
         } catch (DataAccessException exception) {
             throw new RepositoryException("Error while saving answer", exception);
-        } catch (NotFoundException exception) {
-            throw exception;
         } catch (Exception exception) {
             throw new ServiceException("Unexpected error while creating answer", exception);
         }
